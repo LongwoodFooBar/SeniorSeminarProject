@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
+		<title>C+++ Login</title>
+	</head>
+	<body>
+		<div class="loginPrompt">
+			<form method="POST">
+				<p>Username: <input type="text" name="username"></p>
+				<p>Password: <input type="password" name="password"></p>
+				<div name='errordiv' class='errormsg'>{{loginerror}}</div>
+				<p><input type="submit" value="Login"></p>
+			</form>
+		</div>
+	</body>
+</html>
