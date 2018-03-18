@@ -23,4 +23,5 @@ def logout():
 def courses():
     return "Courses Page"
 
-
+if __name__ == "__main__":
+    app.run()
