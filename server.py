@@ -23,3 +23,4 @@ def logout():
 def courses():
     return "Courses Page"
 
+

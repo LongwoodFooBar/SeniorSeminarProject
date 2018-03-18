@@ -1,17 +1,52 @@
-<!doctype html>
+<!--Benjamin Byrnes, 461, login.html-->
+
 <html>
-	<head>
-		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
-		<title>C+++ Login</title>
-	</head>
-	<body>
-		<div class="loginPrompt">
-			<form method="POST">
-				<p>Username: <input type="text" name="username"></p>
-				<p>Password: <input type="password" name="password"></p>
-				<div name='errordiv' class='errormsg'>{{loginerror}}</div>
-				<p><input type="submit" value="Login"></p>
-			</form>
-		</div>
-	</body>
+<head>
+<title>C++ Login</title>
+<script type="text/javascript">
+function validate(){
+	var error=0;
+	if(document.getElementById("UserName").value==""){
+	    document.getElementById("UserNameName").innerHTML = " User name required";
+		error=1;
+	} 
+	if(document.getElementById("password").value==""){
+       document.getElementById("Password").innerHTML = "Password required";
+	   error=1;
+	}
+	if(error ==0){
+	alert("Everything looks okay");
+	}
+}
+</script>
+<style>
+input{
+    text-transform: capitalize;
+}
+
+</style>
+</head>
+
+<body>
+<form>
+	<table>
+		<tr>
+			<td>User Name:<br>
+				<input type="text" name="UserName" id="UserName"></input>
+			</td>
+			<td> <div id="UserName"></div></td>
+		</tr>
+		<tr>
+			<td>Password:<br>
+				<input type="password"  id="password" name="password"></input>
+			</td>
+			<td><div id="Password"></div></td>
+		</tr>
+		<tr>
+			<td><button type="button" onclick="validate();">Validate</button></td>
+			<td><div id="Butt"></div></td>
+		</tr>
+	</table>
+</form>
+</body>
 </html>
