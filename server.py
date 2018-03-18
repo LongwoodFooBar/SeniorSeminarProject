@@ -24,7 +24,11 @@ def get_db():
 def root():
     if 'username' in session:
         return redirect(url_for("courses"))
-    return redirect(url_for("login"))
+    return home()#redirect(url_for('home'))
+
+#PLACEHOLDER
+def home():
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
