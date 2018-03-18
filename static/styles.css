@@ -1,3 +1,7 @@
 .loginPrompt {
 	text-align: center;	
 }
+
+.errormsg{
+	color: red;
+}

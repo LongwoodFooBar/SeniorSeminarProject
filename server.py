@@ -25,7 +25,7 @@ def login():
         validlogin = False
         session['username'] = request.form['username']
         session['password'] = request.form['password']
-        if session['username'] == "admin" and session['password'] == "FooBar":
+        if session['username'] == "admin" and session['password'] == "foobar":
             validlogin = True
 
         if validlogin:
