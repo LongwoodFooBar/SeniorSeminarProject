@@ -3,7 +3,10 @@ import sqlite3
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.config.update(dict(
-    SECRET_KEY="foobardongle"
+    SECRET_KEY="foobardongle",
+    DATABASE="dongle.db",
+    USERNAME="admin",
+    PASSWORD="default"
 ))
 
 def check_logged():
