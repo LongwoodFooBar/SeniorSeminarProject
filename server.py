@@ -6,6 +6,11 @@ app.config.update(dict(
     SECRET_KEY="foobardongle"
 ))
 
+def check_logged():
+    if 'username' in session:
+        return True
+    return False
+
 def connect_db():
     pass
 
@@ -27,7 +32,6 @@ def login():
         session['password'] = request.form['password']
         if session['username'] == "admin" and session['password'] == "foobar":
             validlogin = True
-
         if validlogin:
             return redirect(url_for('courses'))
         else:
@@ -43,12 +47,15 @@ def signup():
 @app.route('/logout')
 def logout():
     session.pop('username', None)
-    return redirect(url_for('login'))
+    return redirect(url_for('root'))
     #return "Logout Page"
 
 @app.route('/courses')
 def courses():
-    return "Courses Page"
+    if check_logged():
+        return render_template('courses.html', user=session['username'])
+    else:
+        return redirect(url_for('root'))
 
 if __name__ == "__main__":
     app.run()
