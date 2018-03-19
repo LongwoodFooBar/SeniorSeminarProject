@@ -50,7 +50,7 @@ def createSchema():
 		type TEXT,
 		PRIMARY KEY (userID, assignmentID),
 		FOREIGN KEY (userID) REFERENCES login(userID),
-		FOREIGN KEY	(assignmentID) REFERENCES assignment(assignmentID)
+		FOREIGN KEY (assignmentID) REFERENCES assignment(assignmentID)
 	) ''')
 
 	# Creates the test cases table
