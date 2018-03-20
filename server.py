@@ -47,10 +47,9 @@ def login():
     return render_template('login.html')
     #return "Login Page"
 
-@app.route('/signup')
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
     return render_template('signup.html')
-    #return "Signup Page"
 
 @app.route('/logout')
 def logout():

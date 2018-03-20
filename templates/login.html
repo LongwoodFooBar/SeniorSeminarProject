@@ -3,36 +3,29 @@
 
 <!DOCTYPE html>
 <html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
-<style>
-</style>
-</head>
-<body>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
+	</head>
+	<body>
   
-  <form method="POST">
-    <div class="imgcontainer">
-      <img src="{{url_for('static', filename='logo.png')}}" alt="Avatar" class="avatar">
-    </div>
+		<form method="POST">
+			<div class="imgcontainer">
+				<img src="{{url_for('static', filename='logo.png')}}" alt="Avatar" class="avatar">
+			</div>
 
-    <div class="container">
-      <label for="username"><b>Username</b></label>
-      <input type="text" placeholder="Enter Username" name="username" required>
-
-      <label for="password"><b>Password</b></label>
-      <input type="password" placeholder="Enter Password" name="password" required>
-        
-      <button type="Submit" onclick="validate();">Login</button>
-      <button><a href="{{url_for('signup')}}">Sign Up</a></button>
-      <label>
-<!--        <input type="checkbox" checked="checked" name="remember"> Remember me -->
-      <div name='errordiv' class='errmsg'>{{loginerror}}</div>
-      </label>
-    </div>
-      <span class="psw">Forgot <a href="#">password?</a></span>
-  </form>
-
-
-</body>
+			<div class="container">
+				<label for="username"><b>Username</b></label>
+				<input type="text" placeholder="Enter Username" name="username" required>
+				<label for="password"><b>Password</b></label>
+				<input type="password" placeholder="Enter Password" name="password" required>
+				<button type="submit" onclick="validate();">Login</button>
+				<a href="{{url_for('signup')}}"><button type="button">Sign Up</button></a>
+				<label>
+					<div name='errordiv' class='errmsg'>{{loginerror}}</div>
+				</label>
+				<span class="psw">Forgot <a href="#">password?</a></span>
+			</div>
+			</form>
+			</body>
 </html>
