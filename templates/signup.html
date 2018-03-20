@@ -1,38 +1,141 @@
-<!--Benjamin Byrnes, CMSC461,signup.html-->
+<!-- Heather Switzer, Ben Byrnes, Jacob Carney -->
+<!-- HTML and CSS adapted from: https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_login_form_modal -->
+
+<!DOCTYPE html>
 <html>
 <head>
-	<title>C++ Sign up</title>
-	<script type="text/javascript">
-	
-	</script>
-	
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
 
+/* Full-width input fields */
+input[type=text], input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+/* Set a style for all buttons */
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+/* Extra styles for the cancel button */
+.cancelbtn {
+    width: auto;
+    padding: 10px 18px;
+    background-color: #f44336;
+}
+
+/* Center the image and position the close button */
+.imgcontainer {
+    text-align: center;
+    margin: 24px 0 12px 0;
+    position: relative;
+}
+
+img.avatar {
+    width: 20%;
+    border-radius: 50%;
+}
+
+.container {
+    padding: 16px;
+}
+
+span.psw {
+    float: right;
+    padding-top: 16px;
+}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    padding-top: 60px;
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+    width: 80%; /* Could be more or less, depending on screen size */
+}
+
+.close:hover,
+.close:focus {
+    color: red;
+    cursor: pointer;
+}
+
+/* Change styles for span and cancel button on extra small screens */
+@media screen and (max-width: 300px) {
+    span.psw {
+       display: block;
+       float: none;
+    }
+    .cancelbtn {
+       width: 100%;
+    }
+}
+</style>
 </head>
-
 <body>
-	<table>
-        <tr>
-            <td>User Name:<br>
-            <input type="text" name="UserName" id="UserName"></input>
-            </td>
-            <td> <div id="UserName"></div></td>
-        </tr>
-        <tr>
-            <td>Password:<br>
-                <input type="password"  id="password" name="password"></input>
-                 </td>
-            <td><div id="Password"></div></td>
-        </tr>
-		<tr>
-			<td> Retype Password:<br>
-                <input type="password"  id="Repassword" name="password"></input>
-                 </td>
-            <td><div id="RePassword"></div></td>
-		</tr>
-         <tr>
-            <td><button type="button" onclick="validate();">Validate</button></td>
-            <td><div id="Butt"></div></td>
-        </tr>
-    </table>
+  
+  <form method="POST">
+    <div class="imgcontainer">
+      <img src="Untitled.png" alt="Avatar" class="avatar">
+    </div>
+
+    <div class="container">
+      <label for="firstName"><b>First Name</b></label>
+      <input type="text" placeholder="Enter First Name" name="firstName" required>
+
+      <label for="lastName"><b>Last Name</b></label>
+      <input type="text" placeholder="Enter Last Name" name="lastName" required>
+
+      <label for="uname"><b>Username</b></label>
+      <input type="text" placeholder="Enter Username" name="uname" required>
+
+      <label for="psw"><b>Password</b></label>
+      <input type="password" placeholder="Enter Password" name="psw" required>
+ 
+      <label for="psw2"><b>Confirm Password</b></label>
+      <input type="password" placeholder="Confirm Password" name="psw2" required>
+ 
+      <label for="email"><b>Email</b></label>
+      <input type="text" placeholder="Enter Email" name="email" required>      
+ 
+      <button type="Submit" onclick="validate();">Sign Up</button>
+      <label>
+<!--        <input type="checkbox" checked="checked" name="remember"> Remember me -->
+      <div name='errordiv' class='errmsg'>{{loginerror}}</div>
+      </label>
+    </div>
+      <span class="psw">Forgot <a href="#">password?</a></span>
+  </form>
+
+
 </body>
 </html>

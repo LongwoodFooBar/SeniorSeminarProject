@@ -49,7 +49,8 @@ def login():
 
 @app.route('/signup')
 def signup():
-    return "Signup Page"
+    return render_template('signup.html')
+    #return "Signup Page"
 
 @app.route('/logout')
 def logout():
