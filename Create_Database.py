@@ -43,9 +43,10 @@ def createSchema():
 	c.execute('''CREATE TABLE IF NOT EXISTS uploads (
 		userID INTEGER,
 		assignmentID INTEGER,
+		classID INTEGER,
 		fileLocation TEXT,
 		type TEXT,
-		PRIMARY KEY (userID, assignmentID),
+		PRIMARY KEY (userID, assignmentID, classID),
 		FOREIGN KEY (userID) REFERENCES login(userID),
 		FOREIGN KEY (assignmentID) REFERENCES assignment(assignmentID)
 	) ''')
