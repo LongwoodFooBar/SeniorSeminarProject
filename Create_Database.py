@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
 import sqlite3
+from hashlib import md5
 
 # Create the schema
 def createSchema():
-	conn = sqlite3.connect('masterDatabase.db')
+	conn = sqlite3.connect('foobar.db')
 	c = conn.cursor()
 
 	# Creates the login table
@@ -22,9 +23,10 @@ def createSchema():
 	# Creates the class table
 	# instructor is who is the main teacher (handles student teacher cases)
 	c.execute('''CREATE TABLE IF NOT EXISTS class (
-		classID INTEGER PRIMARY KEY,
+		classID INTEGER,
 		userID INTEGER,
 		instructor TEXT,
+                PRIMARY KEY (classID, userID),
 		FOREIGN KEY (userID) REFERENCES login(userID)
 	) ''')
 
@@ -34,7 +36,6 @@ def createSchema():
 		assignmentID INTEGER,
 		classID INTEGER,
 		PRIMARY KEY (assignmentID, classID),
-		FOREIGN KEY (assignmentID) REFERENCES assignment(assignmentID),
 		FOREIGN KEY (classID) REFERENCES class(classID)
 	) ''')
 
@@ -67,6 +68,10 @@ def createSchema():
 		FOREIGN KEY (userID) REFERENCES login(userID)
 	) ''')
 
+	password = md5("foobar".encode('utf-8')).hexdigest()
+	
+	print(password)
+	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("ADMIN", "ADMIN", ?, "admin", "ADMIN")',  (password,))
 	conn.commit()
 	conn.close()
 
