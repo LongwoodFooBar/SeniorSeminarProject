@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import sqlite3
-import sys
 
 # Create the schema
 def createSchema():
@@ -12,22 +11,20 @@ def createSchema():
 	# Position used to denote teacher or student
 	# password possibly stored as a hash?
 	c.execute('''CREATE TABLE IF NOT EXISTS login (
-		userID INTEGER,
+		userID INTEGER PRIMARY KEY AUTOINCREMENT,
 		firstName TEXT,
 		lastName TEXT,
 		password TEXT,
 		email TEXT,
-		position TEXT,
-		PRIMARY KEY (userID)
+		position TEXT
 	)''')
 
 	# Creates the class table
 	# instructor is who is the main teacher (handles student teacher cases)
 	c.execute('''CREATE TABLE IF NOT EXISTS class (
-		classID INTEGER,
+		classID INTEGER PRIMARY KEY,
 		userID INTEGER,
 		instructor TEXT,
-		PRIMARY KEY (classID),
 		FOREIGN KEY (userID) REFERENCES login(userID)
 	) ''')
 
@@ -55,16 +52,15 @@ def createSchema():
 
 	# Creates the test cases table
 	# Type is to denote if test case is teacher, student, or secret
-	# teacher can be used by class, student by individual or class, and secret for grading
+	# teacher can be used by class, student by individual or class, and grading for grading
 	c.execute('''CREATE TABLE IF NOT EXISTS testCases (
+		testID INTEGER PRIMARY KEY,
 		classID INTEGER,
-		testID INTEGER,
 		assignmentID INTEGER,
 		inputValue TEXT,
 		outputValue TEXT,
 		userID INTEGER,
 		type TEXT,
-		PRIMARY KEY (testID),
 		FOREIGN KEY (classID) REFERENCES class(classID),
 		FOREIGN KEY (assignmentID) REFERENCES assignment(assignmentID),
 		FOREIGN KEY (userID) REFERENCES login(userID)
