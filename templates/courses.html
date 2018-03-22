@@ -1,5 +1,6 @@
 
 <!DOCTYPE html>
+<!-- Benjamin Byrnes and Brandon lewis, help from https://www.w3schools.com/howto/howto_js_collapsible.asp -->
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,20 +27,59 @@
     overflow: hidden;
     background-color: #f1f1f1;
 }
+
+/* Create three equal columns that floats next to each other */
+.columnR{
+    float: right;
+    width: 25%;
+    padding: 10px;
+    height: 50px; /* Should be removed. Only for demonstration */
+}
+
+/* Create three equal columns that floats next to each other */
+.columnL{
+    float: left;
+    width: 75%;
+    padding: 10px;
+    height: 50px; /* Should be removed. Only for demonstration */
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
 </style>
 </head>
 <body>
 
+<!-- header -->
+<div class="row"> 
+	<!-- left div with logo in it -->
+	<div class="columnL"> 
+		logo
+	</div>
+	<!-- middle div with username and drop menu-->
+	<div class="columnR">
+		drop menu
+	</div>
+
+</div>
+
 <p>Collapsible Set:</p>
-<button class="collapsible">Assignments</button>
+<button class="collapsible">Assignments:</button>
 <div class="content">
 
-	<button class="collapsible">sub assignment</button>
+	<button class="collapsible">Lab:</button>
 	<div class="content">
-		<div>blah<div>
+		<div> blah.cpp<div>
 	</div>
 </div>
 
+
+
+<!-- javascript -->
 <script>
 var coll = document.getElementsByClassName("collapsible");
 var i;
