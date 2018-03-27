@@ -33,9 +33,8 @@ def createSchema():
 	# Creates the assignment table
 	# Mostly connects the tables together with the test cases along with searching
 	c.execute('''CREATE TABLE IF NOT EXISTS assignment (
-		assignmentID INTEGER,
+		assignmentID INTEGER PRIMARY KEY AUTOINCREMENT,
 		classID INTEGER,
-		PRIMARY KEY (assignmentID, classID),
 		FOREIGN KEY (classID) REFERENCES class(classID)
 	) ''')
 
@@ -43,30 +42,25 @@ def createSchema():
 	# upload type refers to a test file or a handout/assignment
 	c.execute('''CREATE TABLE IF NOT EXISTS uploads (
 		userID INTEGER,
+                uploadID INTEGER PRIMARY KEY AUTOINCREMENT,
 		assignmentID INTEGER,
-		classID INTEGER,
 		fileLocation TEXT,
 		type TEXT,
-		PRIMARY KEY (userID, assignmentID, classID),
 		FOREIGN KEY (userID) REFERENCES login(userID),
 		FOREIGN KEY (assignmentID) REFERENCES assignment(assignmentID)
-	) ''')
+        ) ''')
 
 	# Creates the test cases table
 	# Type is to denote if test case is teacher, student, or secret
 	# teacher can be used by class, student by individual or class, and grading for grading
 	c.execute('''CREATE TABLE IF NOT EXISTS testCases (
 		testID INTEGER PRIMARY KEY,
-		classID INTEGER,
-		assignmentID INTEGER,
+		uploadID INTEGER,
 		inputValue TEXT,
 		outputValue TEXT,
-		userID INTEGER,
 		type TEXT,
-		FOREIGN KEY (classID) REFERENCES class(classID),
-		FOREIGN KEY (assignmentID) REFERENCES assignment(assignmentID),
-		FOREIGN KEY (userID) REFERENCES login(userID)
-	) ''')
+	        FOREIGN KEY (uploadID) REFERENCES uploads(uploadID)
+        ) ''')
 
 	password = md5("foobar".encode('utf-8')).hexdigest()
 	
