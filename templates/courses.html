@@ -1,100 +1,44 @@
 <!DOCTYPE html>
 <!-- Benjamin Byrnes and Brandon lewis, help from https://www.w3schools.com/howto/howto_js_collapsible.asp -->
 <html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-.collapsible {
-    background-color: #777;
-    color: white;
-    cursor: pointer;
-    padding: 18px;
-    width: 100%;
-    border: none;
-    text-align: left;
-    outline: none;
-    font-size: 15px;
-}
-
-.active, .collapsible:hover {
-    background-color: #555;
-}
-
-.content {
-    padding: 0 18px;
-    display: none;
-    overflow: hidden;
-    background-color: #f1f1f1;
-}
-
-/* Create three equal columns that floats next to each other */
-.columnR{
-    float: right;
-    width: 25%;
-    padding: 10px;
-    height: 50px; /* Should be removed. Only for demonstration */
-}
-
-/* Create three equal columns that floats next to each other */
-.columnL{
-    float: left;
-    width: 75%;
-    padding: 10px;
-    height: 50px; /* Should be removed. Only for demonstration */
-}
-
-/* Clear floats after the columns */
-.row:after {
-    content: "";
-    display: table;
-    clear: both;
-}
-</style>
-</head>
-<body>
-
-<!-- header -->
-<div class="row"> 
-	<!-- left div with logo in it -->
-	<div class="columnL"> 
-		logo
-	</div>
-	<!-- middle div with username and drop menu-->
-	<div class="columnR">
-		drop menu
-	</div>
-
-</div>
-
-<p>Collapsible Set:</p>
-<button class="collapsible">Assignments:</button>
-<div class="content">
-
-	<button class="collapsible">Lab:</button>
-	<div class="content">
-		<div> blah.cpp<div>
-	</div>
-</div>
+	<head>
+	<title>C++ Courses</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="../static/style.css">
+	
 
 
 
-<!-- javascript -->
-<script>
-var coll = document.getElementsByClassName("collapsible");
-var i;
+	</head>
+	<body>
+	<!--	<header style='position:fixed;'>
+			<div style='position:fixed; left:1%;'>Logged in as: {{user}}</div>
+			<div style='position:fixed; left:46%; font-size:32px;'>Courses</div>
+			<a href="{{url_for('logout')}}" class='logout' style='position:fixed; left:92%;'><button>Logout</button></a>
+		</header>
+	-->
+		<ul>
+			<li id="nav-logo"> <img id="logo" src="../static/logo.png"></img></li>
+			<li id="nav-title"><a id="title">Courses</a></li>
+			<li id="nav-settings"> <a> Settings </a></li>
+			<li id="nav-logout"><a> Logout </a> </li>
+		</ul>
+		<div>
+		
+			<p>Collapsible Set:</p>
+			<button class="collapsible">Class 162</button>
+			<div class="content">
+				<button class="collapsible">Labs</button>
+				<div class="content">
+					<div>Lab1.cpp</div>
+				</div>
+				<button class="collapsible">Homework</button>
+				<div class="content">
+					<div>hw.docx</div>
+				</div>
+			</div>				
 
-for (i = 0; i < coll.length; i++) {
-    coll[i].addEventListener("click", function() {
-        this.classList.toggle("active");
-        var content = this.nextElementSibling;
-        if (content.style.display === "block") {
-            content.style.display = "none";
-        } else {
-            content.style.display = "block";
-        }
-    });
-}
-</script>
-
-</body>
+		</div>
+		<script src="../static/collapsable_list.js"></script>
+	</body>
 </html>
