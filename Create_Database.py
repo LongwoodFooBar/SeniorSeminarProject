@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import sqlite3
-from hashlib import md5
 
 # Create the schema
 def createSchema():
@@ -68,22 +67,6 @@ def createSchema():
 	    FOREIGN KEY (classID) REFERENCES class(classID),
 	    PRIMARY KEY (userID, classID)
 	)''')
-
-
-	password = md5("foobar".encode('utf-8')).hexdigest()
-	
-	#print(password)
-	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("ADMIN", "ADMIN", ?, "admin", "ADMIN")',  (password,))
-
-	password = md5("password".encode('utf-8')).hexdigest()
-	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("Jacob", "Carney", ?, "jacobsc897@gmail.com", "INSTRUCTOR")',  (password,))
-
-	password = md5("pass".encode('utf-8')).hexdigest()
-	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("Tyler", "Zamora-Carden", ?, "tylerzc@gmail.com", "STUDENT")',  (password,))
-	
-	c.execute('INSERT INTO class(instructorID, title) VALUES(2, "Graph Theory")')
-
-	c.execute('INSERT INTO takes(userID, classID) VALUES(3, 1)')
 
 	conn.commit()
 	conn.close()
