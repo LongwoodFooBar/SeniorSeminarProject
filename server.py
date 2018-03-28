@@ -76,6 +76,7 @@ def signup():
 		db.commit()
 		session['username'] = request.form['email']
 		session['password'] = request.form['password']
+		session['type'] = request.form['type']
 		return render_template('courses.html', user=session['username'])
 	return render_template('signup.html')
 
@@ -87,8 +88,21 @@ def logout():
 @app.route('/courses')
 def courses():
 	if check_logged():
-		return render_template('courses.html', user=session['username'])
+		db = getDB()
+		utype = db.execute("SELECT position FROM login WHERE email=?", (session['username'],)).fetchall()
+		if utype[0][0] == 'INSTRUCTOR':
+			return render_template('courses.html', user=session['username'])
+			
+		elif utype[0][0] == 'STUDENT':
+			cs = db.execute("SELECT title FROM class NATURAL JOIN takes NATURAL JOIN login WHERE login.email=?", (session['username'],)).fetchall()
+			for c in cs:
+				print(c[0])
+			return render_template('courses.html', user=session['username'], courses=cs)
 	return redirect(url_for('root'))
+
+@app.route('/sandbox')
+def sandbox():
+	return redirect(url_for('courses'))
 
 @app.teardown_appcontext
 def closeDB(error):

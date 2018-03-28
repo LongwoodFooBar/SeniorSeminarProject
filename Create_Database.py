@@ -23,11 +23,10 @@ def createSchema():
 	# Creates the class table
 	# instructor is who is the main teacher (handles student teacher cases)
 	c.execute('''CREATE TABLE IF NOT EXISTS class (
-		classID INTEGER,
-		userID INTEGER,
-		instructor TEXT,
-                PRIMARY KEY (classID, userID),
-		FOREIGN KEY (userID) REFERENCES login(userID)
+		classID INTEGER PRIMARY KEY AUTOINCREMENT,
+		instructorID INTEGER,
+		title TEXT,
+		FOREIGN KEY (instructorID) REFERENCES login(userID)
 	) ''')
 
 	# Creates the assignment table
@@ -73,8 +72,19 @@ def createSchema():
 
 	password = md5("foobar".encode('utf-8')).hexdigest()
 	
-	print(password)
+	#print(password)
 	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("ADMIN", "ADMIN", ?, "admin", "ADMIN")',  (password,))
+
+	password = md5("password".encode('utf-8')).hexdigest()
+	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("Jacob", "Carney", ?, "jacobsc897@gmail.com", "INSTRUCTOR")',  (password,))
+
+	password = md5("pass".encode('utf-8')).hexdigest()
+	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("Tyler", "Zamora-Carden", ?, "tylerzc@gmail.com", "STUDENT")',  (password,))
+	
+	c.execute('INSERT INTO class(instructorID, title) VALUES(2, "Graph Theory")')
+
+	c.execute('INSERT INTO takes(userID, classID) VALUES(3, 1)')
+
 	conn.commit()
 	conn.close()
 

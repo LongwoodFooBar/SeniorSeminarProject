@@ -22,7 +22,8 @@
 		<div>
 		
 			<p>Collapsible Set:</p>
-			<button class="collapsible">Class 162</button>
+			{% for c in courses %}
+			<button class="collapsible">{{c[0]|safe}}</button>
 			<div class="content">
 				<button class="collapsible">Labs</button>
 				<div class="content">
@@ -33,7 +34,7 @@
 					<div>hw.docx</div>
 				</div>
 			</div>				
-
+			{% endfor %}
 		</div>
 		<script src="../static/collapsable_list.js"></script>
 	</body>
