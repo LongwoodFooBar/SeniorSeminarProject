@@ -91,7 +91,8 @@ def courses():
 		db = getDB()
 		utype = db.execute("SELECT position FROM login WHERE email=?", (session['username'],)).fetchall()
 		if utype[0][0] == 'INSTRUCTOR':
-			return render_template('courses.html', user=session['username'])
+			cs = db.execute("SELECT title FROM class JOIN login on class.instructorID=login.userID WHERE login.email=?", (session['username'],)).fetchall()
+			return render_template('courses.html', user=session['username'], courses=cs)
 			
 		elif utype[0][0] == 'STUDENT':
 			cs = db.execute("SELECT title FROM class NATURAL JOIN takes NATURAL JOIN login WHERE login.email=?", (session['username'],)).fetchall()
