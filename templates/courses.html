@@ -4,11 +4,7 @@
 	<head>
 	<title>C++ Courses</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="../static/style.css">
-	
-
-
-
+	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 	</head>
 	<body>
 	<!--	<header style='position:fixed;'>
@@ -19,9 +15,9 @@
 	-->
 		<ul>
 			<li id="nav-logo"> <img id="logo" src="../static/logo.png"></img></li>
-			<li id="nav-title"><a id="title">Courses</a></li>
+			<li id="nav-title"><a id="title" href="{{url_for('courses')}}">Courses</a></li>
 			<li id="nav-settings"> <a> Settings </a></li>
-			<li id="nav-logout"><a> Logout </a> </li>
+			<li id="nav-logout"><a href="{{url_for('logout')}}"> Logout </a> </li>
 		</ul>
 		<div>
 		

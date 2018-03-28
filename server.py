@@ -51,7 +51,11 @@ def login():
 			session['password'] = request.form['password']
 			return redirect(url_for('courses'))
 		else:
-			error = "Incorrect username or password"
+			emailexists = db.execute('SELECT * FROM login where email = ?', (request.form['username'],)).fetchall()
+			if emailexists:
+			    error = "Password does not match"
+			else:
+			    error = "Username is not registered"
 			return render_template('login.html', loginerror=error)
 	return render_template('login.html')
 
@@ -61,11 +65,14 @@ def signup():
 		db = getDB()
 		error = None
 
+		emailexists = db.execute('SELECT * FROM login WHERE email=?', (request.form['email'],)).fetchall()
+		if emailexists:
+		    return render_template('signup.html', loginerror="That email is already registered")
+
 		password = md5(request.form['password'].encode('utf-8')).hexdigest()
 
-		#TODO Edit later to add type
-		db.execute('INSERT INTO login (firstName, lastName, email, password, position) VALUES (?, ?, ?, ?, "STUDENT")', (request.form['firstName'], request.form['lastName'], request.form['email'], password))
-		print("%s %s %s %s" % (request.form['firstName'], request.form['lastName'], request.form['email'], password))
+		db.execute('INSERT INTO login (firstName, lastName, email, password, position) VALUES (?, ?, ?, ?, ?)', (request.form['firstName'], request.form['lastName'], request.form['email'], password, request.form['type']))
+		print("%s %s %s %s %s" % (request.form['firstName'], request.form['lastName'], request.form['email'], password, request.form['type']))
 		db.commit()
 		session['username'] = request.form['email']
 		session['password'] = request.form['password']

@@ -62,6 +62,15 @@ def createSchema():
 	        FOREIGN KEY (uploadID) REFERENCES uploads(uploadID)
         ) ''')
 
+	c.execute('''CREATE TABLE IF NOT EXISTS takes (
+	    userID INTEGER,
+	    classID INTEGER,
+	    FOREIGN KEY (userID) REFERENCES login(userID),
+	    FOREIGN KEY (classID) REFERENCES class(classID),
+	    PRIMARY KEY (userID, classID)
+	)''')
+
+
 	password = md5("foobar".encode('utf-8')).hexdigest()
 	
 	print(password)
