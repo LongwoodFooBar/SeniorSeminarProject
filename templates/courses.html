@@ -2,9 +2,10 @@
 <!-- Benjamin Byrnes and Brandon lewis, help from https://www.w3schools.com/howto/howto_js_collapsible.asp -->
 <html>
 	<head>
-	<title>C++ Courses</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
+		<title>C++ Courses</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
+		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
 	</head>
 	<body>
 	<!--	<header style='position:fixed;'>
@@ -14,7 +15,7 @@
 		</header>
 	-->
 		<ul>
-			<li id="nav-logo"> <img id="logo" src="../static/logo.png"></img></li>
+			<li id="nav-logo"> <img id="logo" src="../static/logo.svg"></img></li>
 			<li id="nav-title"><a id="title" href="{{url_for('courses')}}">Courses</a></li>
 			<li id="nav-sandox"><a id="sandbox" href="{{url_for('sandbox')}}">Sandbox</a></li>
 			<li id="nav-settings"> <a> Settings </a></l>

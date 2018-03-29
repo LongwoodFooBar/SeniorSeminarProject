@@ -5,11 +5,12 @@
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
+		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
 	</head>
 	<body>
 		<form method="POST">
 			<div class="imgcontainer">
-				<img src="{{url_for('static', filename='logo.png')}}" alt="Avatar" class="avatar">
+				<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
 			</div>
 			<div class="container">
 				<label for="email"><b>Email</b></label>
