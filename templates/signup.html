@@ -27,6 +27,7 @@
 				<input type="radio" name="type" value="STUDENT" required>Student<br />
 				<input type="radio" name="type" value="INSTRUCTOR" required>Instructor<br />
 				<button type="Submit" onclick="validate();">Sign Up</button>
+				<a href="{{url_for('login')}}"><button type="button">Login</button></a>
 				<label>
 					<div name='errordiv' class='errmsg'>{{loginerror}}</div>
 				</label>
