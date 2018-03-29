@@ -105,6 +105,10 @@ def courses():
 def sandbox():
 	return redirect(url_for('courses'))
 
+@app.route('/faq')
+def faq():
+	return redirect(url_for('courses'))
+
 @app.route('/forgot')
 def forgot():
 	return redirect(url_for('root'))
