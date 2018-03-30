@@ -92,12 +92,20 @@ def courses():
 		utype = db.execute("SELECT position FROM login WHERE email=?", (session['username'],)).fetchall()
 		if utype[0][0] == 'INSTRUCTOR':
 			cs = db.execute("SELECT title FROM class JOIN login on class.instructorID=login.userID WHERE login.email=?", (session['username'],)).fetchall()
+			for i in range(len(cs)):
+				cs[i] = list(cs[i])
+				cs[i].append(db.execute("SELECT assignment.title FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (cs[i][0],)).fetchall())
+
+			for c in cs:
+				print(c)
 			return render_template('courses.html', user=session['username'], courses=cs)
 			
 		elif utype[0][0] == 'STUDENT':
 			cs = db.execute("SELECT title FROM class NATURAL JOIN takes NATURAL JOIN login WHERE login.email=?", (session['username'],)).fetchall()
 			for c in cs:
-				print(c[0])
+				c = list(c)
+				c.append(db.execute("SELECT assignment.title FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (c[0],)).fetchall())
+				print(c)
 			return render_template('courses.html', user=session['username'], courses=cs)
 	return redirect(url_for('root'))
 

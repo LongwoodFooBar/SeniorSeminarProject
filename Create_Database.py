@@ -32,6 +32,8 @@ def createSchema():
 	# Mostly connects the tables together with the test cases along with searching
 	c.execute('''CREATE TABLE IF NOT EXISTS assignment (
 		assignmentID INTEGER PRIMARY KEY AUTOINCREMENT,
+		title TEXT,
+		body TEXT,
 		classID INTEGER,
 		FOREIGN KEY (classID) REFERENCES class(classID)
 	) ''')
@@ -40,7 +42,7 @@ def createSchema():
 	# upload type refers to a test file or a handout/assignment
 	c.execute('''CREATE TABLE IF NOT EXISTS uploads (
 		userID INTEGER,
-                uploadID INTEGER PRIMARY KEY AUTOINCREMENT,
+		uploadID INTEGER PRIMARY KEY AUTOINCREMENT,
 		assignmentID INTEGER,
 		fileLocation TEXT,
 		type TEXT,

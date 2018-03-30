@@ -23,14 +23,11 @@
 			<li id="nav-logout"><a href="{{url_for('logout')}}"> Logout </a> </li>
 		</ul>
 		<div>
-		
-			<p>Collapsible Set:</p>
 			{% for c in courses %}
 			<button class="collapsible">{{c[0]|safe}}</button>
 			<div class="content">
-				
-				{% for a in c[1].assigns %}
-				<button class="collapsible ">{{a[0]|safe}}</button>
+				{% for a in c[1] %}
+				<button class="collapsible">{{a[0]|safe}}</button>
 				<div class="content">
 					<div>Hooplah.cpp</div>
 				</div>
