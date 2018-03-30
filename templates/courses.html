@@ -28,14 +28,13 @@
 			{% for c in courses %}
 			<button class="collapsible">{{c[0]|safe}}</button>
 			<div class="content">
-				<button class="collapsible">Labs</button>
+				
+				{% for l in assigns %}
+				<button class="collapsible ">{{l[0]|safe}}</button>
 				<div class="content">
-					<div>Lab1.cpp</div>
+					<div>Hooplah.cpp</div>
 				</div>
-				<button class="collapsible">Homework</button>
-				<div class="content">
-					<div>hw.docx</div>
-				</div>
+				{% endfor %}
 			</div>				
 			{% endfor %}
 		</div>
