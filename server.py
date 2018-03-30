@@ -107,11 +107,11 @@ def courses():
 
 @app.route('/sandbox')
 def sandbox():
-	return redirect(url_for('courses'))
+	return render_template('sandbox.html', user=session['username'])
 
 @app.route('/faq')
 def faq():
-	return redirect(url_for('courses'))
+	return render_template('faq.html', user=session['username'])
 
 @app.route('/forgot')
 def forgot():
