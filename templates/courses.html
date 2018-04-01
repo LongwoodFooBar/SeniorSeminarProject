@@ -21,7 +21,7 @@
 			<button class="collapsible">{{c[0]|safe}}</button>
 			<div class="content">
 				{% for a in c[1] %}
-				<button class="collapsible">{{a[0]|safe}}</button>
+				<a href="{{url_for('assignmentsID', assignmentID=a[1])}}"><button class="collapsible">{{a[0]|safe}}</button></a>
 				<div class="content">
 					<div>Hooplah.cpp</div>
 				</div>

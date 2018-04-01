@@ -94,14 +94,14 @@ def courses():
 			cs = db.execute("SELECT title FROM class JOIN login on class.instructorID=login.userID WHERE login.email=?", (session['username'],)).fetchall()
 			for i in range(len(cs)):
 				cs[i] = list(cs[i])
-				cs[i].append(db.execute("SELECT assignment.title FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (cs[i][0],)).fetchall())
+				cs[i].append(db.execute("SELECT assignment.title, assignment.assignmentID FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (cs[i][0],)).fetchall())
 			return render_template('courses.html', user=session['username'], courses=cs)
 			
 		elif utype[0][0] == 'STUDENT':
 			cs = db.execute("SELECT title FROM class NATURAL JOIN takes NATURAL JOIN login WHERE login.email=?", (session['username'],)).fetchall()
 			for i in range(len(cs)):
 				cs[i] = list(cs[i])
-				cs[i].append(db.execute("SELECT assignment.title FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (cs[i][0],)).fetchall())
+				cs[i].append(db.execute("SELECT assignment.title, assignment.assignmentID FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (cs[i][0],)).fetchall())
 			return render_template('courses.html', user=session['username'], courses=cs)
 	return redirect(url_for('root'))
 
@@ -116,6 +116,14 @@ def faq():
 @app.route('/forgot')
 def forgot():
 	return redirect(url_for('root'))
+
+@app.route('/assignments')
+def assignments():
+	return "Assignments"
+
+@app.route('/assignments/<int:assignmentID>')
+def assignmentsID(assignmentID):
+	return "%d" % assignmentID
 
 @app.teardown_appcontext
 def closeDB(error):
