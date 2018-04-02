@@ -95,7 +95,7 @@ def courses():
 			for i in range(len(cs)):
 				cs[i] = list(cs[i])
 				cs[i].append(db.execute("SELECT assignment.title, assignment.assignmentID FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (cs[i][0],)).fetchall())
-			return render_template('courses.html', user=session['username'], courses=cs)
+			return render_template('professor.html', user=session['username'], courses=cs)
 			
 		elif utype[0][0] == 'STUDENT':
 			cs = db.execute("SELECT title FROM class NATURAL JOIN takes NATURAL JOIN login WHERE login.email=?", (session['username'],)).fetchall()
@@ -123,7 +123,10 @@ def assignments():
 
 @app.route('/assignments/<int:assignmentID>')
 def assignmentsID(assignmentID):
-	return "%d" % assignmentID
+	db = getDB()
+	a = list(db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall())
+	print("%s \n%s\n" % (a[0][1], a[0][2]))
+	return "<h1>%s</h1><p>%s</p>" % (a[0][1], a[0][2])
 
 @app.teardown_appcontext
 def closeDB(error):

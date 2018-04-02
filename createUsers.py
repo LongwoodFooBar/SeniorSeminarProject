@@ -8,9 +8,6 @@ def createUsers():
 	conn = sqlite3.connect('foobar.db')
 	c = conn.cursor()
 
-	password = md5("foobar".encode('utf-8')).hexdigest()
-	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("ADMIN", "ADMIN", ?, "admin", "ADMIN")',  (password,))
-
 	password = md5("password".encode('utf-8')).hexdigest()
 	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("Jacob", "Carney", ?, "jacobsc@gmail.com", "INSTRUCTOR")',  (password,))
 
@@ -22,17 +19,17 @@ def createUsers():
 
 	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("Brandon", "Lewis", ?, "brandontl@gmail.com", "STUDENT")',  (password,))
 	
-	c.execute('INSERT INTO class(instructorID, title) VALUES(2, "Graph Theory")')
-	c.execute('INSERT INTO class(instructorID, title) VALUES(2, "Systems Programming")')
-	c.execute('INSERT INTO class(instructorID, title) VALUES(2, "Computer Science 162")')
+	c.execute('INSERT INTO class(instructorID, title) VALUES(1, "Graph Theory")')
+	c.execute('INSERT INTO class(instructorID, title) VALUES(1, "Systems Programming")')
+	c.execute('INSERT INTO class(instructorID, title) VALUES(1, "Computer Science 162")')
 
-	c.execute('INSERT INTO takes(userID, classID) VALUES(3, 2)')
-	c.execute('INSERT INTO takes(userID, classID) VALUES(3, 3)')
-	c.execute('INSERT INTO takes(userID, classID) VALUES(4, 1)')
+	c.execute('INSERT INTO takes(userID, classID) VALUES(2, 2)')
+	c.execute('INSERT INTO takes(userID, classID) VALUES(2, 3)')
+	c.execute('INSERT INTO takes(userID, classID) VALUES(3, 1)')
+	c.execute('INSERT INTO takes(userID, classID) VALUES(4, 2)')
+	c.execute('INSERT INTO takes(userID, classID) VALUES(5, 1)')
 	c.execute('INSERT INTO takes(userID, classID) VALUES(5, 2)')
-	c.execute('INSERT INTO takes(userID, classID) VALUES(6, 1)')
-	c.execute('INSERT INTO takes(userID, classID) VALUES(6, 2)')
-	c.execute('INSERT INTO takes(userID, classID) VALUES(6, 3)')
+	c.execute('INSERT INTO takes(userID, classID) VALUES(5, 3)')
 
 	c.execute('INSERT INTO assignment(title, body, classID) VALUES("The Royal and Most Pleasant Game of Goose","Placeholder", 1)')
 	c.execute('INSERT INTO assignment(title, body, classID) VALUES("NP Complete Graph Theory Problem","Placeholder", 1)')
