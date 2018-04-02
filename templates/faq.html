@@ -5,6 +5,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<title>C++ FAQ </title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
@@ -12,6 +13,21 @@
 	<body>
 		<div class="imgcontainer">
 			<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
+		</div>
+
+		 <div>
+         	        <p id="nav-logged">Logged in as: {{user}}</p>
+                 	 <button class="collapsible">Question?</button>
+             		 <div class="content">
+                		 <div>Answer!</div>
+                	 </div>
+          
+                 	 </div>
+                 </div>
+                 <script src="../static/collapsable_list.js"></script>
+
+		
+	
 		</div>
 	</body>
 </html>

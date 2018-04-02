@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!-- Benjamin Byrnes and Brandon lewis, help from https://www.w3schools.com/howto/howto_js_collapsible.asp -->
+<html>
+	<head>
+		<title>C++ Professor Courses</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
+		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
+	</head>
+	<body>
+		<ul>
+			<li id="nav-logo"> <img id="logo" src="../static/logo.svg"></img></li>
+			<li id="nav-title"><a id="title" href="{{url_for('courses')}}">Courses</a></li>
+			<li id="nav-sandox"><a id="sandbox" href="{{url_for('sandbox')}}">Sandbox</a></li>
+			<li id="nav-faq"><a id="faq" href="{{url_for('faq')}}">FAQ</a></li>
+			<li id="nav-logout", style="float:right"><a href="{{url_for('logout')}}"> Logout </a> </li>
+		</ul>
+		<div>
+			<p id="nav-logged">Logged in as: {{user}}</p>
+			{% for c in courses %}
+			<button class="collapsible">{{c[0]|safe}}</button>
+			<div class="content">
+				{% for a in c[1] %}
+				<button class="collapsible">{{a[0]|safe}}</button>
+				<div class="content">
+					<div>Hooplah.cpp</div>
+				</div>
+				{% endfor %}
+			</div>				
+			{% endfor %}
+		</div>
+		<script src="../static/collapsable_list.js"></script>
+	</body>
+</html>
