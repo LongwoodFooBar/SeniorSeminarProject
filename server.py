@@ -113,6 +113,11 @@ def sandbox():
 def faq():
 	return render_template('faq.html', user=session['username'])
 
+#For testing of class creation
+@app.route('/create')
+def create():
+	return render_template('addcourse.html', user=session['username'])
+
 @app.route('/forgot')
 def forgot():
 	return redirect(url_for('root'))

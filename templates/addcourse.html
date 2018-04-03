@@ -3,41 +3,48 @@
 <html>
 	<head>
 		<title>Add Class</title>
-		<meta name="viewport" content="width=device-width    , initial-scale=1">
-		<link rel="stylesheet" type="text/css" href="{{ur    l_for('static', filename='styles.css')}}">
-		<link rel="shortcut icon" href="{{url_for('static    ', filename='favicon.ico')}}">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
+		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
 	</head>
 <body>
 	<div>
 	<!-- logo div-->
 		<ul>
-			<li id="nav-logo"> <img id="logo"     src="../static/logo.svg"></img></li>
-			<li id="nav-title"><a id="title"     href="{{url_for('courses')}}">Courses</a></li>
-			<li id="nav-sandox"><a id="sandbo    x" href="{{url_for('sandbox')}}">Sandbox</a></li>
-			<li id="nav-faq"><a id="faq" href    ="{{url_for('faq')}}">FAQ</a></li>
-			<li id="nav-logout", style="float    :right"><a href="{{url_for('logout')}}"> Logout </a> </li>
+			<li id="nav-logo"> <img id="logo" src="../static/logo.svg"></img></li>
+			<li id="nav-title"><a id="title", href="{{url_for('courses')}}">Courses</a></li>
+			<li id="nav-sandox"><a id="sandbox" href="{{url_for('sandbox')}}">Sandbox</a></li>
+			<li id="nav-faq"><a id="faq" href="{{url_for('faq')}}">FAQ</a></li>
+			<li id="nav-logout", style="float:right"><a href="{{url_for('logout')}}"> Logout </a> </li>
 		</ul>
 	</div>
 		
 	<div>
 	<!-- Form -->
 		<form method="POST">
-			<h3> Add class and initial students:</h3>
-			<label for="title"><b>Title:</b></label>
+			<h3>Create New Course:</h3>
+			<label for="title"><b>Course Title:</b></label>
                         <input type="text" placeholder="Enter Title" name="title" required>
 			
-			<label for="listStudent"><b>Add Students by Username:</b></label>
+			<label for="listStudent"><b>Add Students by Email:</b></label>
 			<textarea type="text" name="listStudent"></textarea>
 			<br>
-			<h3>Add a single student to class:</h3>
-			<br>
-			<label for="singleTitle"><b>Title:</b></label>
+			<h3>Add Student to Existing Course:</h3>
+			<label for="singleTitle"><b>Course Title:</b></label>
 			<input type="text" placeholder="Enter Title" name="singleTitle" required>
 			
-			<label for="title"><b>Title:</b></label>
-			<input type="text" placeholder="Enter Email" name="title" required>
+			<label for="singleEmail"><b>Student Email:</b></label>
+			<input type="text" placeholder="Enter Email" name="singleEmail" required>
 			
-			<button type="submit"></button>
+			<h3> Remove Student From Course:</h3>
+		
+			<label for="RTitle"><b>Course Title:</b></label>
+			<input type="text" placeholder="Enter Title" name="RTitle" required>
+			
+			<label for="REmail"><b>Student Email:</b></label>
+			<input type="text" placeholder="Enter Email" name="REmail" required>
+				
+			<button type="submit">Submit</button>
 	</div>
 </body>
 </html>
