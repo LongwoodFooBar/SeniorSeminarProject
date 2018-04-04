@@ -66,5 +66,5 @@ def main():
 	createUsers()
 
 if __name__ == "__main__":
-	print("Running database creation script.")
+	print("Running database user creation script.")
 	main()
