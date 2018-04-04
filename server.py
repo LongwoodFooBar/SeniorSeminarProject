@@ -117,7 +117,7 @@ def sandbox():
 		filename = './userdirs/%s/sandbox.cpp' % session['username']
 		ofilename = './userdirs/%s/outfile' % session['username']
 		codefile = open(filename, "w")
-		codefile.write(code)
+		codefile.write(code + '\n')
 		codefile.close()
 		cpid = os.fork()
 		if cpid == 0:
@@ -125,7 +125,7 @@ def sandbox():
 			os._exit(0)
 		os.waitpid(cpid, 0)
 		opfile = open(ofilename, "r")
-		output = "NOTHING FOR NOW"
+		output = opfile.read()
 		opfile.close()
 		return render_template('sandbox.html', user=session['username'], code=code, output=output)
 	return render_template('sandbox.html', user=session['username'])
