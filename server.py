@@ -1,5 +1,7 @@
 from flask import Flask, g, render_template, request, redirect, url_for, escape, session
 import sqlite3
+import os
+from multiprocessing import Process
 from hashlib import md5
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -77,6 +79,9 @@ def signup():
 		session['username'] = request.form['email']
 		session['password'] = request.form['password']
 		session['type'] = request.form['type']
+		userdir = r'./userdirs/%s' % request.form['email']
+		if not os.path.exists(userdir):
+			os.makedirs(userdir)
 		return render_template('courses.html', user=session['username'])
 	return render_template('signup.html')
 
@@ -105,8 +110,24 @@ def courses():
 			return render_template('courses.html', user=session['username'], courses=cs)
 	return redirect(url_for('root'))
 
-@app.route('/sandbox')
+@app.route('/sandbox', methods=['GET', 'POST'])
 def sandbox():
+	if request.method == 'POST':
+		code = request.form['code']
+		filename = './userdirs/%s/sandbox.cpp' % session['username']
+		ofilename = './userdirs/%s/outfile' % session['username']
+		codefile = open(filename, "w")
+		codefile.write(code)
+		codefile.close()
+		cpid = os.fork()
+		if cpid == 0:
+			os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile && ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username'], session['username'], session['username']))
+			os._exit(0)
+		os.waitpid(cpid, 0)
+		opfile = open(ofilename, "r")
+		output = "NOTHING FOR NOW"
+		opfile.close()
+		return render_template('sandbox.html', user=session['username'], code=code, output=output)
 	return render_template('sandbox.html', user=session['username'])
 
 @app.route('/faq')
@@ -114,8 +135,10 @@ def faq():
 	return render_template('faq.html', user=session['username'])
 
 #For testing of class creation
-@app.route('/create')
+@app.route('/create', methods=['GET', 'POST'])
 def create():
+	if request.method == 'POST':
+		pass
 	return render_template('addcourse.html', user=session['username'])
 
 @app.route('/forgot')

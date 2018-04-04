@@ -1,6 +1,8 @@
+#!/bin/python3
 #!/usr/bin/env python3
 
 import sqlite3
+import os
 from hashlib import md5
 
 # Create the schema
@@ -10,14 +12,29 @@ def createUsers():
 
 	password = md5("password".encode('utf-8')).hexdigest()
 	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("Jacob", "Carney", ?, "jacobsc@gmail.com", "INSTRUCTOR")',  (password,))
+	userdir = r'./userdirs/jacobsc@gmail.com'
+	if not os.path.exists(userdir):
+		os.makedirs(userdir)
 
 	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("Tyler", "Zamora-Carden", ?, "tylerzc@gmail.com", "STUDENT")',  (password,))
+	userdir = r'./userdirs/tylerzc@gmail.com'
+	if not os.path.exists(userdir):
+		os.makedirs(userdir)
 
 	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("Heather", "Switzer", ?, "heatherms@gmail.com", "STUDENT")',  (password,))
+	userdir = r'./userdirs/heatherms@gmail.com'
+	if not os.path.exists(userdir):
+		os.makedirs(userdir)
 
 	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("Ben", "Byrnes", ?, "benb@gmail.com", "STUDENT")',  (password,))
+	userdir = r'./userdirs/benb@gmail.com'
+	if not os.path.exists(userdir):
+		os.makedirs(userdir)
 
 	c.execute('INSERT INTO login(firstName, lastName, password, email, position) VALUES("Brandon", "Lewis", ?, "brandontl@gmail.com", "STUDENT")',  (password,))
+	userdir = r'./userdirs/brandontl@gmail.com'
+	if not os.path.exists(userdir):
+		os.makedirs(userdir)
 	
 	c.execute('INSERT INTO class(instructorID, title) VALUES(1, "Graph Theory")')
 	c.execute('INSERT INTO class(instructorID, title) VALUES(1, "Systems Programming")')
