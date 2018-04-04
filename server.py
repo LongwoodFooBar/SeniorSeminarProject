@@ -134,6 +134,10 @@ def sandbox():
 def faq():
 	return render_template('faq.html', user=session['username'])
 
+@app.route('/about')
+def about():
+	return render_template('about.html', user=session['username'])
+
 #For testing of class creation
 @app.route('/create', methods=['GET', 'POST'])
 def create():
