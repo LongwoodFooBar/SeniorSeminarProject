@@ -25,25 +25,28 @@
 			<h3>Create New Course:</h3>
 			<label for="title"><b>Course Title:</b></label>
                         <input type="text" placeholder="Enter Title" name="title" required>
-			
-			<label for="listStudent"><b>Add Students by Email:</b></label>
-			<textarea type="text" name="listStudent"></textarea>
-			<br>
-			<h3>Add Student to Existing Course:</h3>
-			<label for="singleTitle"><b>Course Title:</b></label>
-			<input type="text" placeholder="Enter Title" name="singleTitle" required>
-			
-			<label for="singleEmail"><b>Student Email:</b></label>
-			<input type="text" placeholder="Enter Email" name="singleEmail" required>
-			
-			<h3> Remove Student From Course:</h3>
-		
-			<label for="RTitle"><b>Course Title:</b></label>
-			<input type="text" placeholder="Enter Title" name="RTitle" required>
-			
-			<label for="REmail"><b>Student Email:</b></label>
-			<input type="text" placeholder="Enter Email" name="REmail" required>
-				
+			<br />
+
+			<label for="secNumber"><b>Section Number</b></label>
+                        <input type="text" placeholder="Section Number" name="secNumber" required>
+			<br />
+
+			<label for="semester"><b>Choose a Semester:</b></label>
+			<input type="radio" name="semester" value="Fall"> Fall
+			<input type="radio" name="semester" value="Winter"> Winter
+			<input type="radio" name="semester" value="Spring"> Spring
+			<input type="radio" name="semester" value="Summer"> Summer 
+			<br /><br />
+
+			<label for="courseYear"><b>Year for the Course:</b></label>
+			<br />
+                        <input type="text" placeholder="Year" name="courseYear" required>
+			<br />
+
+			<label for="listStudent"><b>Add Students by Email:</b><br>(Seperate multiple emails with commas)</label>
+			<br />
+                        <input type="text" placeholder="List Student's Emails" name="listStudent">
+			<br />
 			<button type="submit">Submit</button>
 	</div>
 </body>
