@@ -114,6 +114,7 @@ def courses():
 def sandbox():
 	if request.method == 'POST':
 		code = request.form['code']
+		timeout = int(request.form['timeout'])
 		filename = './userdirs/%s/sandbox.cpp' % session['username']
 		ofilename = './userdirs/%s/outfile' % session['username']
 		codefile = open(filename, "w")
@@ -121,8 +122,15 @@ def sandbox():
 		codefile.close()
 		cpid = os.fork()
 		if cpid == 0:
-			os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile && ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username'], session['username'], session['username']))
+			#if request.form[''] == 'compile':
+			#os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
+			os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile && timeout %d ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username'], timeout, session['username'], session['username']))
 			os._exit(0)
+			#elif request.form[''] == 'run':
+			#os.system('timeout %d ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+			#os._exit(0)
+			#elif request.form[''] == 'open':
+			#elif request.form[''] == 'upload':
 		os.waitpid(cpid, 0)
 		opfile = open(ofilename, "r")
 		output = opfile.read()
