@@ -1,0 +1,59 @@
+<!-- Benjamin Byrnes -->
+
+<html>
+	<head>
+		<title>Add Class</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
+		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
+	</head>
+<body>
+	<div>
+	<!-- logo div-->
+		<ul>
+			<li id="nav-logo"> <img id="logo" src="../static/logo.svg"></img></li>
+			<li id="nav-title"><a id="title", href="{{url_for('courses')}}">Courses</a></li>
+			<li id="nav-sandox"><a id="sandbox" href="{{url_for('sandbox')}}">Sandbox</a></li>
+			<li id="nav-faq"><a id="faq" href="{{url_for('faq')}}">FAQ</a></li>
+			<li id="nav-logout", style="float:right"><a href="{{url_for('logout')}}"> Logout </a> </li>
+		</ul>
+	</div>
+		
+	<div>
+	<!-- Form -->
+		<form method="POST">
+			<h3>Create New Course:</h3>
+			<label for="title"><b>Course Title:</b></label>
+                        <input type="text" placeholder="Enter Title" name="title" required>
+			<br />
+
+			<label for="secNumber"><b>Section Number</b></label>
+                        <input type="text" placeholder="Section Number" name="secNumber" required>
+			<br />
+
+			<label for="semester"><b>Choose a Semester:</b></label>
+			<input type="radio" name="semester" value="Fall"> Fall
+			<input type="radio" name="semester" value="Winter"> Winter
+			<input type="radio" name="semester" value="Spring"> Spring
+			<input type="radio" name="semester" value="Summer"> Summer 
+			<br /><br />
+
+			<label for="courseYear"><b>Year for the Course:</b></label>
+			<br />
+                        <input type="text" placeholder="Year" name="courseYear" required>
+			<br />
+
+			<label for="listStudent"><b>Add Students by Email:</b><br>(Seperate multiple emails with commas)</label>
+			<br />
+                        <input type="text" placeholder="List Student's Emails" name="listStudent">
+			<br />
+
+			<label for="deleteStudent"><b>Delete Students by Email:</b><br>(Seperate multiple emails with commas)</label>
+			<br />
+                        <input type="text" placeholder="List Student's Emails" name="deleteStudent">
+			<br />
+			<button type="submit">Submit</button>
+	</div>
+</body>
+</html>
+
