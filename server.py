@@ -153,9 +153,14 @@ def create():
 		pass
 	return render_template('addcourse.html', user=session['username'])
 
+#edit a course page
+@app.route('/editCourse')
+def editCourse():
+	return render_template('editcourse.html', user=session['username'])
+
 @app.route('/forgot')
 def forgot():
-	return redirect(url_for('root'))
+	return render_template('forgotpw.html')
 
 @app.route('/assignments')
 def assignments():

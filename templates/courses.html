@@ -14,13 +14,15 @@
 			<li id="nav-sandox"><a id="sandbox" href="{{url_for('sandbox')}}">Sandbox</a></li>
 			<li id="nav-faq"><a id="faq" href="{{url_for('faq')}}">FAQ</a></li>
 			<li id="nav-create"><a id="create" href="{{url_for('create')}}">Create Class</a></li>
+			<li id="nav-editCourse"><a id="editCourse" href="{{url_for('editCourse')}}">Edit Class</a></li>
 			<li id="nav-about"><a href="{{url_for('about')}}">About</a> </li>
 			<li id="nav-logout", style="float:right"><a href="{{url_for('logout')}}"> Logout </a> </li>
 		</ul>
 		<div>
 			<p id="nav-logged">Logged in as: {{user}}</p>
 			{% for c in courses %}
-			<button class="collapsible">{{c[0]|safe}}</button>
+			<button class="collapsible">{{c[0]|safe}}<a href="{{url_for('editCourse')}}"><img src="../static/editButton.png" style="width:1.75%; height:1.75%; float:right"></a>
+</button>
 			<div class="content">
 				{% for a in c[1] %}
 				<a href="{{url_for('assignmentsID', assignmentID=a[1])}}"><button class="collapsible">{{a[0]|safe}}</button></a>
