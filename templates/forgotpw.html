@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!-- Heather Switzer, Ben Byrnes, Jacob Carney -->
+<!-- HTML and CSS adapted from: https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_login_form_modal -->
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
+		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
+	</head>
+	<body>
+		<form method="POST">
+			
+			<div class="imgcontainer">
+				<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
+			</div>
+			<div class="container">
+			<h2><b>Forgot Password?</b></h2>
+				<label for="username"><b>Enter your Email:</b></label>
+				<input type="text" placeholder="Enter Email" name="username" required>
+				<label for="password"><b>New Password:</b></label>
+				<input type="text" placeholder="New Password" name="password" required>
+				<label for="password2"><b>Retype New Password:</b></label>
+				<input type="text" placeholder="Retype New Password" name="password2" required>
+				<button type="submit" onclick="validate();">Reset Password</button>
+				<label>
+					<div name='errordiv' class='errmsg'>{{loginerror}}</div>
+				</label>
+				<span><a href="{{url_for('root')}}">Return to Login</a></span>
+			</div>
+		</form>
+	</body>
+</html>
