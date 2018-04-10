@@ -10,7 +10,6 @@ app.config.update(dict(
 	DATABASE="foobar.db",
 	USERNAME="admin",
 	PASSWORD="default",
-	SERVER_NAME="foobarplusplus.cs:7777"
 ))
 
 def check_logged():
