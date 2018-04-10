@@ -131,6 +131,19 @@ def sandbox():
 			#os._exit(0)
 			#elif request.form[''] == 'open':
 			#elif request.form[''] == 'upload':
+                            #BEN WAS HERE 
+                            #       db= database......    
+                            #       def upload():
+                            #           file=request.files['inputFile']
+                            #           newFile=FileContents(name=file.filename,data=file.read())
+                            #           db.session.add(newFile)
+                            #           db.session.commit()
+                            #       def download():
+                            #           file_data=FileContents.query.filter_by(id=1).first()
+                            #           return send_file(BytesIO(file_data.data), attachment_filename='example.pdf',as_attachment=true)
+                            # 
+                            #  
+                            #
 		os.waitpid(cpid, 0)
 		opfile = open(ofilename, "r")
 		output = opfile.read()
