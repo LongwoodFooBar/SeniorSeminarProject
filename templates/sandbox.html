@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
+		
 	</head>
 	<body>
 		<div>
@@ -63,5 +64,19 @@
 				<textarea disabled type="text" name="output" id="output" style="font-family:Arial; font-size:12pt; width:40%; height:60vw; float:right">{{output}}</textarea>
 			</div>
 		</form>
-	</body>
+		<script type="text/javascript">
+		var textareas = document.getElementById('code');
+		//textareas.value = "HELLO, WORLD!";
+			textareas.onkeydown = function(e){
+				if(e.keyCode==9 || e.which==9){
+					e.preventDefault();
+					var s = this.selectionStart;
+					this.value = this.value.substring(0,this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
+					this.selectionEnd = s+1; 
+				}
+			}
+		
+</script>
+
+		</body>
 </html>
