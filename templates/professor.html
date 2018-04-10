@@ -24,7 +24,7 @@
 			<a href="{{url_for('editCourse')}}"><img src="../static/editButton.png" style="width:1.75%; height:1.75%; float:right"></a>
 			</nav>
 			<div class="content">
-				{% for a in c[1] %}
+				{% for a in c[2] %}
 				<a href="{{url_for('assignmentsID', assignmentID=a[1])}}"><button class="collapsible">{{a[0]|safe}}</button></a>
 				{% endfor %}
 				<a href="{{url_for('createAssignment')}}"><button class="collapsible">+ Create New Assignment</button></a>
