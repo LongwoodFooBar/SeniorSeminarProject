@@ -60,7 +60,7 @@ def createSchema():
 		inputValue TEXT,
 		outputValue TEXT,
 		type TEXT,
-	        FOREIGN KEY (uploadID) REFERENCES uploads(uploadID)
+	    FOREIGN KEY (uploadID) REFERENCES uploads(uploadID)
         ) ''')
 
 	c.execute('''CREATE TABLE IF NOT EXISTS takes (

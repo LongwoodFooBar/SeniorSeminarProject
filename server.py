@@ -93,7 +93,7 @@ def courses():
 		db = getDB()
 		utype = db.execute("SELECT position FROM login WHERE email=?", (session['username'],)).fetchall()
 		if utype[0][0] == 'INSTRUCTOR':
-			cs = db.execute("SELECT title FROM class JOIN login on class.instructorID=login.userID WHERE login.email=?", (session['username'],)).fetchall()
+			cs = db.execute("SELECT title, classID FROM class JOIN login on class.instructorID=login.userID WHERE login.email=?", (session['username'],)).fetchall()
 			for i in range(len(cs)):
 				cs[i] = list(cs[i])
 				cs[i].append(db.execute("SELECT assignment.title, assignment.assignmentID FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (cs[i][0],)).fetchall())
