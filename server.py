@@ -12,6 +12,19 @@ app.config.update(dict(
 	PASSWORD="default",
 ))
 
+#BEN WAS HERE 
+#       db= database......    
+#       def upload():
+#           file=request.files['inputFile']
+#           newFile=FileContents(name=file.filename,data=file.read())
+#           db.session.add(newFile)
+#           db.session.commit()
+#       def download():
+#           file_data=FileContents.query.filter_by(id=1).first()
+#           return send_file(BytesIO(file_data.data), attachment_filename='example.pdf',as_attachment=true)
+# 
+#  
+#
 def check_logged():
 	if 'username' in session:
 		return True
@@ -93,7 +106,7 @@ def courses():
 		db = getDB()
 		utype = db.execute("SELECT position FROM login WHERE email=?", (session['username'],)).fetchall()
 		if utype[0][0] == 'INSTRUCTOR':
-			cs = db.execute("SELECT title, classID FROM class JOIN login on class.instructorID=login.userID WHERE login.email=?", (session['username'],)).fetchall()
+			cs = db.execute("SELECT title FROM class JOIN login on class.instructorID=login.userID WHERE login.email=?", (session['username'],)).fetchall()
 			for i in range(len(cs)):
 				cs[i] = list(cs[i])
 				cs[i].append(db.execute("SELECT assignment.title, assignment.assignmentID FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (cs[i][0],)).fetchall())
@@ -121,28 +134,15 @@ def sandbox():
 		codefile.close()
 		cpid = os.fork()
 		if cpid == 0:
-			#if request.form[''] == 'compile':
-			#	os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
-			os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile && timeout %d ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username'], timeout, session['username'], session['username']))
-			os._exit(0)
-			#elif request.form[''] == 'run':
-			#	os.system('timeout %d ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
-			#	os._exit(0)
+			if request.form['sandbox'] == 'compile':
+				os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
+			#os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile && timeout %d ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username'], timeout, session['username'], session['username']))
+				os._exit(0)
+			elif request.form['sandbox'] == 'run':
+				os.system('timeout %d ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+				os._exit(0)
 			#elif request.form[''] == 'open':
 			#elif request.form[''] == 'upload':
-                            #BEN WAS HERE 
-                            #       db= database......    
-                            #       def upload():
-                            #           file=request.files['inputFile']
-                            #           newFile=FileContents(name=file.filename,data=file.read())
-                            #           db.session.add(newFile)
-                            #           db.session.commit()
-                            #       def download():
-                            #           file_data=FileContents.query.filter_by(id=1).first()
-                            #           return send_file(BytesIO(file_data.data), attachment_filename='example.pdf',as_attachment=true)
-                            # 
-                            #  
-                            #
 		os.waitpid(cpid, 0)
 		opfile = open(ofilename, "r")
 		output = opfile.read()
