@@ -9,7 +9,8 @@ app.config.update(dict(
 	SECRET_KEY="foobardongle",
 	DATABASE="foobar.db",
 	USERNAME="admin",
-	PASSWORD="default"
+	PASSWORD="default",
+	SERVER_NAME="foobarplusplus.cs:7777"
 ))
 
 def check_logged():
@@ -19,7 +20,6 @@ def check_logged():
 
 def connectDB():
 	rv = sqlite3.connect(app.config['DATABASE'])
-	#rv.row_factory = sqlite3.Row
 	return rv
 
 def getDB():
@@ -27,15 +27,14 @@ def getDB():
 		g.sqlite_db = connectDB()
 	return g.sqlite_db
 
-@app.route('/')
-def root():
-	if 'username' in session:
-		return redirect(url_for("courses"))
-	return home()#redirect(url_for('home'))
-
-#PLACEHOLDER
 def home():
 	return redirect(url_for('login'))
+
+@app.route('/')
+def root():
+	if not check_logged():
+		return home()
+	return redirect(url_for("courses"))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -74,7 +73,6 @@ def signup():
 		password = md5(request.form['password'].encode('utf-8')).hexdigest()
 
 		db.execute('INSERT INTO login (firstName, lastName, email, password, position) VALUES (?, ?, ?, ?, ?)', (request.form['firstName'], request.form['lastName'], request.form['email'], password, request.form['type']))
-		print("%s %s %s %s %s" % (request.form['firstName'], request.form['lastName'], request.form['email'], password, request.form['type']))
 		db.commit()
 		session['username'] = request.form['email']
 		session['password'] = request.form['password']
@@ -112,6 +110,8 @@ def courses():
 
 @app.route('/sandbox', methods=['GET', 'POST'])
 def sandbox():
+	if not check_logged():
+		return home()
 	if request.method == 'POST':
 		code = request.form['code']
 		timeout = int(request.form['timeout'])
@@ -123,12 +123,12 @@ def sandbox():
 		cpid = os.fork()
 		if cpid == 0:
 			#if request.form[''] == 'compile':
-			#os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
+			#	os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
 			os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile && timeout %d ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username'], timeout, session['username'], session['username']))
 			os._exit(0)
 			#elif request.form[''] == 'run':
-			#os.system('timeout %d ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
-			#os._exit(0)
+			#	os.system('timeout %d ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+			#	os._exit(0)
 			#elif request.form[''] == 'open':
 			#elif request.form[''] == 'upload':
 		os.waitpid(cpid, 0)
@@ -140,15 +140,20 @@ def sandbox():
 
 @app.route('/faq')
 def faq():
+	if not check_logged():
+		return home()
 	return render_template('faq.html', user=session['username'])
 
 @app.route('/about')
 def about():
+	if not check_logged():
+		return home()
 	return render_template('about.html', user=session['username'])
 
-#For testing of class creation
 @app.route('/create', methods=['GET', 'POST'])
 def create():
+	if not check_logged():
+		return home()
 	if request.method == 'POST':
 		pass
 	return render_template('addcourse.html', user=session['username'])
@@ -159,14 +164,24 @@ def forgot():
 
 @app.route('/assignments')
 def assignments():
+	if not check_logged():
+		return home()
 	return "Assignments"
 
 @app.route('/assignments/<int:assignmentID>')
 def assignmentsID(assignmentID):
+	if not check_logged():
+		return home()
 	db = getDB()
 	a = list(db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall())
-	print("%s \n%s\n" % (a[0][1], a[0][2]))
 	return "<h1>%s</h1><p>%s</p>" % (a[0][1], a[0][2])
+
+@app.route('/createAssignment')
+def createAssignment():
+	if not check_logged():
+		return home()
+	db = getDB()
+	return 'Create Assignment'
 
 @app.teardown_appcontext
 def closeDB(error):
