@@ -108,6 +108,18 @@ span.psw {
 	 font-size: 15px;
 }
 
+.Profcollapsible {
+	background-color: #777;
+	color: white;
+	cursor: pointer;
+	padding: 18px;
+	width: 97%;
+	border: none;
+	text-align: left;
+	outline: none;
+	 font-size: 15px;
+}
+
 .active, .collapsible:hover {
 	background-color: #555;
 }
