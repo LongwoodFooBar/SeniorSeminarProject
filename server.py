@@ -170,7 +170,7 @@ def faq():
 	return render_template('faq.html', user=session['username'])
 
 @app.route('/test')
-def faq():
+def test():
 	if not check_logged():
 		return home()
 	return render_template('testCases.html', user=session['username'])
