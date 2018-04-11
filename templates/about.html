@@ -19,23 +19,46 @@
 			<li id="nav-about"><a href="{{url_for('about')}}">About</a> </li>
 			<li id="nav-logout", style="float:right"><a href="{{url_for('logout')}}"> Logout </a> </li>
 		</ul>
-		<div class="imgcontainer">
-			<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
-		</div>
-
-		 <div>
+		<div>
          	        <p id="nav-logged">Logged in as: {{user}}</p>
-                 	 <button class="collapsible">Question?</button>
-             		 <div class="content">
-                		 <div>Answer!</div>
-                	 </div>
-          
-                 	 </div>
-                 </div>
-                 <script src="../static/collapsable_list.js"></script>
+			<div class="imgcontainer">
+				<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
+			</div>
+			<h2><b>Meet Foobar!</b></h2>
+			<h3>Click the team member you'd like to get to know.</h3>
+                 	<button class="memcollapsible"><img style="border-radius:50%; width:5%; padding:5px; vertical-align:middle" src="{{url_for('static', filename='Ben.jpg')}}"><font size="+2"> Benjamin 'The Beard' Byrnes</font></button>
+             		<div class="content">
+                		 <div>Ben is a 72-year-old bearded wizard.</div>
+                	</div>
+                  	<button class="memcollapsible"><img style="border-radius:50%; width:5%; padding:5px; vertical-align:middle" src="{{url_for('static', filename='Jacob.jpg')}}"><font size="+2">Jacob 'Myth Wizard' Carney</font></button>
+             		<div class="content">
+                		 <div>Carney is a 20-year-old slightly-bearded wizard.</div>
+                	</div>         
+                  	<button class="memcollapsible"><img style="border-radius:50%; width:5%; padding:5px; vertical-align:middle" src="{{url_for('static', filename='Jonathan.jpg')}}"><font size="+2">Jonathan 'Gum Eater' Gunter</font></button>
+             		<div class="content">
+                		 <div>Johnathan is not a wizard, but likes to eat gum which is close enough.</div>
+                	</div>         
+                  	<button class="memcollapsible"><img style="border-radius:50%; width:5%; padding:5px; vertical-align:middle" src="{{url_for('static', filename='Joe.jpg')}}"><font size="+2">Joe 'Harpoon' Harp</font></button>
+             		<div class="content">
+                		 <div>Joe has a heart of iron and also a harpoon of iron. Don't mess with him.</div>
+                	</div>         
+                  	<button class="memcollapsible"><img style="border-radius:50%; width:5%; padding:5px; vertical-align:middle" src="{{url_for('static', filename='Brandon.jpg')}}"><font size="+2">Brandon 'BTreyL' Lewis</font></button>
+             		<div class="content">
+                		 <div>Brandon is also not a wizard but he does live in a cave somewhere in the far beyond.</div>
+                	</div>         
+                  	<button class="memcollapsible"><img style="border-radius:50%; width:5%; padding:5px; vertical-align:middle" src="{{url_for('static', filename='Heather.jpg')}}"><font size="+2">Heather 'Pisano Period' Switzer</font></button>
+             		<div class="content">
+                		 <div>Heather exists.</div>
+                	</div>         
+                  	<button class="memcollapsible"><img style="border-radius:50%; width:5%; padding:5px; vertical-align:middle" src="{{url_for('static', filename='Tyler.jpg')}}"><font size="+2">Tyler 'Trendy Man' Zamora-Carden</font></button>
+             		<div class="content">
+                		 <div>We all wish we could dress as well as Tyler. All praise Tyler's fashion choices.</div>
+                	</div>         
+                 	</div>
+                </div>
 
-		
-	
+                <script src="../static/collapsable_list.js"></script>
+
 		</div>
 	</body>
 </html>
