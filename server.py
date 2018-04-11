@@ -30,6 +30,13 @@ def check_logged():
 		return True
 	return False
 
+def check_instructor():
+	db = getDB()
+	instr = db.execute("SELECT * FROM login WHERE position='INSTRUCTOR' and email=?", (session['username'],)).fetchall()
+	if instr:
+		return True
+	return False
+
 def connectDB():
 	rv = sqlite3.connect(app.config['DATABASE'])
 	return rv
@@ -106,7 +113,7 @@ def courses():
 		db = getDB()
 		utype = db.execute("SELECT position FROM login WHERE email=?", (session['username'],)).fetchall()
 		if utype[0][0] == 'INSTRUCTOR':
-			cs = db.execute("SELECT title FROM class JOIN login on class.instructorID=login.userID WHERE login.email=?", (session['username'],)).fetchall()
+			cs = db.execute("SELECT title, classID FROM class JOIN login on class.instructorID=login.userID WHERE login.email=?", (session['username'],)).fetchall()
 			for i in range(len(cs)):
 				cs[i] = list(cs[i])
 				cs[i].append(db.execute("SELECT assignment.title, assignment.assignmentID FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (cs[i][0],)).fetchall())
@@ -179,14 +186,25 @@ def about():
 def create():
 	if not check_logged():
 		return home()
+	if not check_instructor():
+		return home()
 	if request.method == 'POST':
 		pass
 	return render_template('addcourse.html', user=session['username'])
 
 #edit a course page
-@app.route('/editCourse')
-def editCourse():
-	return render_template('editcourse.html', user=session['username'])
+@app.route('/editCourse/<int:courseID>', methods=['GET', 'POST'])
+def editCourse(courseID):
+	if not check_instructor():
+		return home()
+	db = getDB()
+	if request.method == 'POST':
+		title = request.form['title']
+		db.execute('UPDATE class SET title=? WHERE classID=?', (title, courseID))
+		db.commit()
+	info = db.execute('SELECT * FROM class WHERE classID=?', (courseID,)).fetchall()
+	print(info)
+	return render_template('editcourse.html', user=session['username'], title=info[0][2])
 
 @app.route('/forgot')
 def forgot():
@@ -209,6 +227,8 @@ def assignmentsID(assignmentID):
 @app.route('/createAssignment')
 def createAssignment():
 	if not check_logged():
+		return home()
+	if not check_instructor():
 		return home()
 	db = getDB()
 	return 'Create Assignment'
