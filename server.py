@@ -281,9 +281,19 @@ def createAssignment(courseID):
 		db.commit()
 	return render_template('createassignment.html', user=session['username'])
 
-@app.route('/editAssignment')
-def editAssignment():
-	return render_template('editassignment.html')
+@app.route('/editAssignment/<int:assignmentID>', methods=['GET', 'POST'])
+def editAssignment(assignmentID):
+	db = getDB()
+	if request.method == 'POST':
+		title = request.form['title']
+		body = request.form['assignmentDesc']
+		db.execute("UPDATE assignment SET title = ?, body = ? WHERE assignmentID = ?", (title, body, assignmentID))
+		db.commit()
+		return render_template('editassignment.html', title = title, body = body)
+	info = db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall()
+	print(info)
+	#return render_template('editassignment.html')
+	return render_template('editassignment.html', title = info[0][1], body = info[0][2])
 
 @app.teardown_appcontext
 def closeDB(error):
