@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<!-- Heather Switzer -->
+<html>
+	<head>
+<<<<<<< HEAD
+		<title>C++ Sandbox</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
+		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
+=======
+        <title>C++ Test Cases</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
+        <link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
+    </head>
+	<body>
+        <div>
+            <!-- logo div-->
+		<ul>
+			<li id="nav-logo"> <img id="logo" src="../static/logo.svg"></img></li>
+			<li id="nav-title"><a id="title" href="{{url_for('courses')}}">Courses</a></li>
+			<li id="nav-sandox"><a id="sandbox" href="{{url_for('sandbox')}}">Sandbox</a></li>
+			<li id="nav-faq"><a id="faq" href="{{url_for('faq')}}">FAQ</a></li>
+			<li id="nav-about"><a href="{{url_for('about')}}">About</a> </li>
+			<li id="nav-logout", style="float:right"><a href="{{url_for('logout')}}"> Logout </a> </li>
+		</ul>
+
+        </div>
+>>>>>>> 87daecc181a80ea85c5f49c0ca8072faacbf132f
+		
+	</head>
+	<body>
+		<div>
+			<!-- logo div-->
+			<ul>
+				<li id="nav-logo"> <img id="logo" src="../static/logo.svg"></img></li>
+				<li id="nav-title"><a id="title" href="{{url_for('courses')}}">Courses</a></li>
+				<li id="nav-sandox"><a id="sandbox" href="{{url_for('sandbox')}}">Sandbox</a></li>
+				<li id="nav-faq"><a id="faq" href="{{url_for('faq')}}">FAQ</a></li>
+				<li id="nav-logout", style="float:right"><a href="{{url_for('logout')}}"> Logout </a> </li>
+			</ul>
+		</div>
+	
+		<div>
+			<p id="nav-logged">Logged in as: {{user}}</p>
+		</div>
+		
+		<form method="POST">	
+	
+			<div>
+				<button type="submit" name="sandbox" value="test" style="width:24.7%">Test</button></a>
+			</div>
+			<div style="float:left;width:48%; height=5vw">
+				INPUT HERE:
+			</div>
+	
+			<div style="float:right;width:48%; height=5vw">
+				OUTPUT HERE:
+			</div>
+			<br>
+			<div>
+				<textarea type="text" id="code" name="code" style="font-family:Arial; font-size:12pt; width:48%; height:50vw; float:left;background-color:black;color:white">{{code}}</textarea>
+			</div>
+
+			<div>
+				<textarea type="text" name="output" id="output" style="font-family:Arial; font-size:12pt; width:48%; height:50vw; float:right;background-color:black;color:white">{{output}}</textarea>
+			</div>
+		</form>
+		<script type="text/javascript">
+		var textareas = document.getElementById('code');
+		//textareas.value = "HELLO, WORLD!";
+			textareas.onkeydown = function(e){
+				if(e.keyCode==9 || e.which==9){
+					e.preventDefault();
+					var s = this.selectionStart;
+					this.value = this.value.substring(0,this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
+					this.selectionEnd = s+1; 
+				}
+			}
+		
+</script>
+
+		</body>
+</html>
