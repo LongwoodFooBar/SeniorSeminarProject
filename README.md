@@ -32,31 +32,31 @@ This will create the database, populate it with sample accounts, and run the ser
 Every user will need to create an account initially. The two types of accounts are instructor and student. The pages that are the same regardles of account type are:
 * Login
 
-		This page is self-explanatory and does not require an account to view.
+	This page is self-explanatory and does not require an account to view.
 
 * Signup
 
-		This page is also self-explanatory and does not require an account to view.
+	This page is also self-explanatory and does not require an account to view.
 
 * Courses
 
-		Each user will be able to see the courses they are registered for in the system, whether they are teaching or taking the course.
+	Each user will be able to see the courses they are registered for in the system, whether they are teaching or taking the course.
 
 * About
 
-		The about page contains information about the course, project, and team members.
+	The about page contains information about the course, project, and team members.
 
 * FAQ
 
-		The FAQ page contains information about issues that are common enough and need to be addressed. This should be populated as more issues arise.
+	The FAQ page contains information about issues that are common enough and need to be addressed. This should be populated as more issues arise.
 
 * Forgot Password
 
-		This page allows users to change their password assuming they correctly answer their security question.
+	This page allows users to change their password assuming they correctly answer their security question.
 
 * Sandbox
 
-		The sandbox allows users to practice their programming or test out bits of code that they have written.
+	The sandbox allows users to practice their programming or test out bits of code that they have written.
 
 ### Instructor
 Instructors have the ability to create courses, edit courses, add students to and remove students from courses, create and edit assignments, and create test cases for assignments. They have access to the add course, edit course, create assignment, and edit assignment pages.
