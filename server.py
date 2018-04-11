@@ -195,7 +195,23 @@ def create():
 	if not check_instructor():
 		return home()
 	if request.method == 'POST':
-		
+		db = getDB()
+		title = request.form['title']
+		instructorID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()
+		print(instructorID)
+		db.execute("INSERT INTO class(instructorID, title) VALUES(?, ?)", (instructorID[0][0], title))
+		db.commit()
+		names = request.form['listStudent']
+		names = names.split(', ')
+		if names:
+			print(names)
+			for name in names:
+				studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
+				print(studentID)
+				classID = db.execute("SELECT classID FROM class WHERE instructorID = ? and title = ?", (instructorID[0][0], title)).fetchall()
+				print(classID)
+				db.execute('INSERT INTO takes(classID, userID) VALUES(?, ?)', (classID[0][0], studentID[0][0]))
+		db.commit()
 	return render_template('addcourse.html', user=session['username'])
 
 #edit a course page
@@ -207,6 +223,9 @@ def editCourse(courseID):
 	if request.method == 'POST':
 		title = request.form['title']
 		db.execute('UPDATE class SET title=? WHERE classID=?', (title, courseID))
+		names = request.form['listStudent']
+		if names:
+			print(names)
 		db.commit()
 	info = db.execute('SELECT * FROM class WHERE classID=?', (courseID,)).fetchall()
 	print(info)
@@ -238,9 +257,15 @@ def createAssignment(courseID):
 		return home()
 	if request.method == 'POST':
 		db = getDB()
-		title = request.form['']
+		title = request.form['title']
+		body = request.form['assignmentDesc']
+		db.execute("INSERT INTO assignment(classID, title, body) VALUES(?, ?, ?)", (courseID, title, body))
+		db.commit()
+	return render_template('createassignment.html', user=session['username'])
 
-	return 'Create Assignment'
+@app.route('/editAssignment')
+def editAssignment():
+	return render_template('editassignment.html')
 
 @app.teardown_appcontext
 def closeDB(error):

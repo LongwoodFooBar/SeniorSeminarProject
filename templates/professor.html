@@ -18,16 +18,16 @@
 		</ul>
 		<div>
 			<p id="nav-logged">Logged in as: {{user}}</p>
-			{% for c in courses %}
-		<div>
-			<button class="Profcollapsible">{{c[0]|safe}}</button>
-			<a href="{{url_for('editCourse', courseID=c[1])}}"><img style="top:5px; width:2%; height:2%" src="../static/editButton.png"></a>
 		</div>
+			{% for c in courses %}
+			<a href="{{url_for('editCourse', courseID=c[1])}}"><img style="width:2%; height:2%; float:right; margin-top:22px" src="../static/editButton.png"></a>
+			<button class="Profcollapsible">{{c[0]|safe}}</button>
 			<div class="content">
 				{% for a in c[2] %}
 				<a href="{{url_for('assignmentsID', assignmentID=a[1])}}"><button class="Profcollapsible">{{a[0]|safe}}</button></a>
+				<a href="{{url_for('editAssignment', assignment=a[1])}}"><img style="width:1.5%; height:1.5%; float:right; margin-top:20px" src="../static/editButton.png"></a>
 				{% endfor %}
-				<a href="{{url_for('createAssignment')}}"><button class="Profcollapsible"><b>+ Create New Assignment</b></button></a>
+				<a href="{{url_for('createAssignment', courseID=c[1])}}"><button class="Profcollapsible"><b>+ Create New Assignment</b></button></a>
 			</div>				
 			{% endfor %}
 			<a href="{{url_for('create')}}"><button class="Profcollapsible"><b>+ Create New Course</b></button></a>
