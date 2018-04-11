@@ -217,7 +217,12 @@ def createAssignment():
 	if not check_logged():
 		return home()
 	db = getDB()
-	return 'Create Assignment'
+	return render_template('createassignment.html', user=session['username'])
+
+@app.route('/editAssignment')
+def editAssignment():
+	return render_template('editassignment.html')
+
 
 @app.teardown_appcontext
 def closeDB(error):
