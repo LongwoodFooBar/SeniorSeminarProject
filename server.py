@@ -195,7 +195,7 @@ def create():
 	if not check_instructor():
 		return home()
 	if request.method == 'POST':
-		pass
+		
 	return render_template('addcourse.html', user=session['username'])
 
 #edit a course page
@@ -230,13 +230,16 @@ def assignmentsID(assignmentID):
 	a = list(db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall())
 	return "<h1>%s</h1><p>%s</p>" % (a[0][1], a[0][2])
 
-@app.route('/createAssignment')
-def createAssignment():
+@app.route('/createAssignment/<int:courseID>', methods=['GET', 'POST'])
+def createAssignment(courseID):
 	if not check_logged():
 		return home()
 	if not check_instructor():
 		return home()
-	db = getDB()
+	if request.method == 'POST':
+		db = getDB()
+		title = request.form['']
+
 	return 'Create Assignment'
 
 @app.teardown_appcontext
