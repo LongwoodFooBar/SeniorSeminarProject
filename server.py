@@ -203,14 +203,17 @@ def create():
 		db.commit()
 		names = request.form['listStudent']
 		names = names.split(', ')
-		if names:
+		print(len(names))
+		if names[0] != '':
 			print(names)
 			for name in names:
 				studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
 				print(studentID)
 				classID = db.execute("SELECT classID FROM class WHERE instructorID = ? and title = ?", (instructorID[0][0], title)).fetchall()
 				print(classID)
-				db.execute('INSERT INTO takes(classID, userID) VALUES(?, ?)', (classID[0][0], studentID[0][0]))
+				takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (classID[0][0], studentID[0][0])).fetchall()
+				if not takes:
+					db.execute('INSERT INTO takes(classID, userID) VALUES(?, ?)', (classID[0][0], studentID[0][0]))
 		db.commit()
 	return render_template('addcourse.html', user=session['username'])
 
@@ -223,12 +226,27 @@ def editCourse(courseID):
 	if request.method == 'POST':
 		title = request.form['title']
 		db.execute('UPDATE class SET title=? WHERE classID=?', (title, courseID))
+		instructorID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()
 		names = request.form['listStudent']
-		if names:
-			print(names)
+		names = names.split(', ')
+		if names[0] != '':
+			for name in names:
+				studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
+				classID = db.execute("SELECT classID FROM class WHERE instructorID = ? and title = ?", (instructorID[0][0], title)).fetchall()
+				takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (classID[0][0], studentID[0][0])).fetchall()
+				if not takes:
+					db.execute('INSERT INTO takes(classID, userID) VALUES(?, ?)', (classID[0][0], studentID[0][0]))
+		names = request.form['deleteStudent']
+		names = names.split(', ')
+		if names[0] != '':
+			for name in names:
+				studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
+				classID = db.execute("SELECT classID FROM class WHERE instructorID = ? and title = ?", (instructorID[0][0], title)).fetchall()
+				takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (classID[0][0], studentID[0][0])).fetchall()
+				if takes:
+					db.execute('DELETE FROM takes WHERE classID = ? and userID = ?', (classID[0][0], studentID[0][0]))
 		db.commit()
 	info = db.execute('SELECT * FROM class WHERE classID=?', (courseID,)).fetchall()
-	print(info)
 	return render_template('editcourse.html', user=session['username'], title=info[0][2])
 
 @app.route('/forgot')
