@@ -26,6 +26,9 @@ def createSchema():
 		classID INTEGER PRIMARY KEY AUTOINCREMENT,
 		instructorID INTEGER,
 		title TEXT,
+		section INTEGER,
+		semester TEXT,
+		year INTEGER,
 		FOREIGN KEY (instructorID) REFERENCES login(userID)
 	) ''')
 
@@ -36,6 +39,7 @@ def createSchema():
 		title TEXT,
 		body TEXT,
 		classID INTEGER,
+		dueDate TEXT,
 		FOREIGN KEY (classID) REFERENCES class(classID)
 	) ''')
 

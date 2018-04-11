@@ -197,19 +197,20 @@ def create():
 	if request.method == 'POST':
 		db = getDB()
 		title = request.form['title']
+		secNum = request.form['secNumber']
+		semester = request.form['semester']
+		year = request.form['courseYear']
 		instructorID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()
-		print(instructorID)
-		db.execute("INSERT INTO class(instructorID, title) VALUES(?, ?)", (instructorID[0][0], title))
+		db.execute("INSERT INTO class(instructorID, title, section, semester, year) VALUES(?, ?, ?, ?, ?)", (instructorID[0][0], title, secNum, semester, year))
 		db.commit()
 		names = request.form['listStudent']
 		names = names.split(', ')
-		print(len(names))
 		if names[0] != '':
 			print(names)
 			for name in names:
 				studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
 				print(studentID)
-				classID = db.execute("SELECT classID FROM class WHERE instructorID = ? and title = ?", (instructorID[0][0], title)).fetchall()
+				classID = db.execute("SELECT classID FROM class WHERE instructorID = ? and title = ? and section = ? and semester = ? and year = ?", (instructorID[0][0], title, secNum, semester, year)).fetchall()
 				print(classID)
 				takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (classID[0][0], studentID[0][0])).fetchall()
 				if not takes:
@@ -225,15 +226,17 @@ def editCourse(courseID):
 	db = getDB()
 	if request.method == 'POST':
 		title = request.form['title']
-		db.execute('UPDATE class SET title=? WHERE classID=?', (title, courseID))
+		secNum = request.form['secNumber']
+		semester = request.form['semester']
+		year = request.form['courseYear']
+		db.execute('UPDATE class SET title=?, section = ?, semester = ?, year = ? WHERE classID=?', (title, secNum, semester, year, courseID))
 		instructorID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()
 		names = request.form['listStudent']
 		names = names.split(', ')
 		if names[0] != '':
 			for name in names:
 				studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
-				classID = db.execute("SELECT classID FROM class WHERE instructorID = ? and title = ?", (instructorID[0][0], title)).fetchall()
-				takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (classID[0][0], studentID[0][0])).fetchall()
+				takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0])).fetchall()
 				if not takes:
 					db.execute('INSERT INTO takes(classID, userID) VALUES(?, ?)', (classID[0][0], studentID[0][0]))
 		names = request.form['deleteStudent']
@@ -242,9 +245,9 @@ def editCourse(courseID):
 			for name in names:
 				studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
 				classID = db.execute("SELECT classID FROM class WHERE instructorID = ? and title = ?", (instructorID[0][0], title)).fetchall()
-				takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (classID[0][0], studentID[0][0])).fetchall()
+				takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0])).fetchall()
 				if takes:
-					db.execute('DELETE FROM takes WHERE classID = ? and userID = ?', (classID[0][0], studentID[0][0]))
+					db.execute('DELETE FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0]))
 		db.commit()
 	info = db.execute('SELECT * FROM class WHERE classID=?', (courseID,)).fetchall()
 	return render_template('editcourse.html', user=session['username'], title=info[0][2])
@@ -277,8 +280,11 @@ def createAssignment(courseID):
 		db = getDB()
 		title = request.form['title']
 		body = request.form['assignmentDesc']
-		db.execute("INSERT INTO assignment(classID, title, body) VALUES(?, ?, ?)", (courseID, title, body))
+		date = request.form['dueDate']
+		print(date)
+		db.execute("INSERT INTO assignment(classID, title, body, dueDate) VALUES(?, ?, ?, date(?))", (courseID, title, body, date))
 		db.commit()
+		return redirect(url_for('courses'))
 	return render_template('createassignment.html', user=session['username'])
 
 @app.route('/editAssignment/<int:assignmentID>', methods=['GET', 'POST'])
@@ -287,13 +293,17 @@ def editAssignment(assignmentID):
 	if request.method == 'POST':
 		title = request.form['title']
 		body = request.form['assignmentDesc']
-		db.execute("UPDATE assignment SET title = ?, body = ? WHERE assignmentID = ?", (title, body, assignmentID))
+		unfdate = request.form['dueDate']
+		unfdate = unfdate.split("/")
+		date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
+		db.execute("UPDATE assignment SET title = ?, body = ?, dueDate=date(?) WHERE assignmentID = ?", (title, body, date, assignmentID))
 		db.commit()
 		return render_template('editassignment.html', title = title, body = body)
 	info = db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall()
-	print(info)
-	#return render_template('editassignment.html')
-	return render_template('editassignment.html', title = info[0][1], body = info[0][2])
+	unfdate = info[0][4]
+	unfdate = unfdate.split("-")
+	date = "%s/%s/%s" % (unfdate[2], unfdate[1], unfdate[0])
+	return render_template('editassignment.html', title = info[0][1], body = info[0][2], date = date)
 
 @app.teardown_appcontext
 def closeDB(error):
