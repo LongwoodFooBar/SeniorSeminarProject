@@ -26,10 +26,17 @@ This will create an empty database and run the server on port 7777 and make the 
 ### Automatic
 * Create the database - `./createDB.sh`
 * Run the application - `./runserver.sh`
+
 This will create the database, populate it with sample accounts, and run the server on port 7777 and make the server visible to the local network.
 
 ## Usage
-Every user will need to create an account initially. The two types of accounts are instructor and student. The pages that are the same regardles of account type are:
+Users can connect to the application by navigating in their browser to '<hostname>:7777'. 
+
+Every user will need to create an account initially. The two types of accounts are instructor and student. 
+
+After completing the signup, the user should be redirected to their courses page. Students will not be registered for any classes initially. A professor will need to create a course and add students by their signin email. Professors should only have the option to create a new course.
+
+The pages that are the same regardles of account type are:
 * Login
 
 	This page is self-explanatory and does not require an account to view.
