@@ -14,6 +14,9 @@ This application is intended to be run on Linux / UNIX-based machines. We do not
 * Flask for Python 3
 * SQLite3
 
+## Additional Dependencies on OS X
+* coreutils
+
 ## How to Operate it
 ### Manual
  ```bash
