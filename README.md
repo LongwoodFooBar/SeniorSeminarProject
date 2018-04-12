@@ -33,7 +33,7 @@ This will create an empty database and run the server on port 7777 and make the 
 This will create the database, populate it with sample accounts, and run the server on port 7777 and make the server visible to the local network.
 
 ## Usage
-Users can connect to the application by navigating in their browser to '<hostname>:7777'. 
+Users can connect to the application by navigating in their browser to '\<hostname\>:7777'. 
 
 Every user will need to create an account initially. The two types of accounts are instructor and student. 
 
