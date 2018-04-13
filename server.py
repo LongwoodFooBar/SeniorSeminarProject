@@ -140,17 +140,21 @@ def sandbox():
 		codefile.write(code + '\n')
 		codefile.close()
 		cpid = os.fork()
+		exitstat = 0
 		if cpid == 0:
 			if request.form['sandbox'] == 'compile':
-				os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
+				os.system('g++ -Wall ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
 			#os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile && timeout %d ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username'], timeout, session['username'], session['username']))
 				os._exit(0)
 			elif request.form['sandbox'] == 'run':
 				if platform.system() == 'Linux':
-					os.system('timeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
-					os.system('if [ $? == 124 ]; then echo "Program timed out" > outfile; fi')
+					exitstat = os.system('timeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (10, session['username'], session['username']))
+					print(exitstat)
+					if exitstat == 31744:
+						os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
 				elif platform.system() == 'Darwin':
-					os.system('gtimeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+					exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+					print(exitstat)
 				os._exit(0)
 			elif request.form['sandbox'] == 'save':
 				os._exit(0)
