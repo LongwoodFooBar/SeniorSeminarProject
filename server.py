@@ -1,7 +1,7 @@
 from flask import Flask, g, render_template, request, redirect, url_for, escape, session
 from werkzeug.utils import secure_filename
 import sqlite3
-import os
+import os, sys, platform
 from hashlib import md5
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -146,7 +146,11 @@ def sandbox():
 			#os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile && timeout %d ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username'], timeout, session['username'], session['username']))
 				os._exit(0)
 			elif request.form['sandbox'] == 'run':
-				os.system('timeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+				if platform.system() == 'Linux':
+					os.system('timeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+					os.system('if [ $? == 124 ]; then echo "Program timed out" > outfile; fi')
+				elif platform.system() == 'Darwin':
+					os.system('gtimeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
 				os._exit(0)
 			elif request.form['sandbox'] == 'save':
 				os._exit(0)
