@@ -1,7 +1,7 @@
 from flask import Flask, g, render_template, request, redirect, url_for, escape, session
 from werkzeug.utils import secure_filename
 import sqlite3
-import os
+import os, sys, platform
 from hashlib import md5
 
 UPLOAD_FOLDER = 'uploads/'
@@ -149,11 +149,19 @@ def sandbox(code='', output=''):
 		cpid = os.fork()
 		if cpid == 0:
 			if request.form['sandbox'] == 'compile':
-				os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
+				os.system('g++ -Wall ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
 			#os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile && timeout %d ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username'], timeout, session['username'], session['username']))
 				os._exit(0)
 			elif request.form['sandbox'] == 'run':
-				os.system('timeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+				if platform.system() == 'Linux':
+					exitstat = os.system('timeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+					if os.WEXITSTATUS(exitstat) == 124:
+						os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
+				elif platform.system() == 'Darwin':
+					exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+					print(exitstat)
+					if os.WEXITSTATUS(exitstat) == 124:
+						os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
 				os._exit(0)
 			elif request.form['sandbox'] == 'save':
 				os._exit(0)
