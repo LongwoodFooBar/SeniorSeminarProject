@@ -3,7 +3,11 @@ from werkzeug.utils import secure_filename
 import sqlite3
 import os
 from hashlib import md5
+
+UPLOAD_FOLDER = 'uploads/'
+ALLOWED_EXTENSIONS = (['cpp', 'h'])
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config.from_object(__name__)
 app.config.update(dict(
 	SECRET_KEY="foobardongle",
@@ -48,6 +52,9 @@ def getDB():
 
 def home():
 	return redirect(url_for('login'))
+#BRANDON - returns the file extension
+def allowed_file(filename):
+	return '.' in filename and filename.rsplit('.',1).lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def root():
@@ -101,7 +108,6 @@ def signup():
 			os.makedirs(userdir)
 		return render_template('courses.html', user=session['username'])
 	return render_template('signup.html')
-
 @app.route('/logout')
 def logout():
 	session.pop('username', None)
@@ -128,7 +134,7 @@ def courses():
 	return redirect(url_for('root'))
 
 @app.route('/sandbox', methods=['GET', 'POST'])
-def sandbox():
+def sandbox(code='', output=''):
 	if not check_logged():
 		return home()
 	if request.method == 'POST':
@@ -138,6 +144,7 @@ def sandbox():
 		ofilename = './userdirs/%s/outfile' % session['username']
 		codefile = open(filename, "w")
 		codefile.write(code + '\n')
+		r, w = os.pipe()
 		codefile.close()
 		cpid = os.fork()
 		if cpid == 0:
@@ -151,22 +158,64 @@ def sandbox():
 			elif request.form['sandbox'] == 'save':
 				os._exit(0)
 			elif request.form['sandbox'] == 'upload':
-				if 'file' not in request.files:
-					os._exit(0)
-				upfile = request.files['file']
-				if upfile.filename == '':
-					os._exit(0)
-				if upfile and isCPP(upfile.filename):
-					filename = secure_filename(upfile.filename)
-					userdir = './userdirs/%s/' % session['username']
-					upfile.save(os.path.join(userdir, filename))
-					codefile = open(os.path.join(userdir, filename))
-					code = codefile.read()
-					os._exit(0)
+				print('upload')
+				#THIS MAY BE THE ROOT OF THE PROBLEM
+				#if 'file' not in request.files:
+				#	print("no file in request")
+				#	os._exit(0)
+				#upfile = request.files['uploadfile']
+				#print('got the file: %s' % upfile.filename)
+				#print(type(upfile))
+				#if upfile.filename == '':
+				#	print('no file name')
+				#	os._exit(0)
+				#print('did i make it')
+				#if upfile and allowed_file(upfile.filename):
+				#filename = secure_filename(upfile.filename)
+				#userdir = 'userdirs/%s/' % session['username']
+				#print('still stopping here?')
+				#print('SAVING FILE FROM %s' % session['username'])
+				#upfile.save(os.path.join(userdir, filename))
+				#print('OPENING FILE...')
+				#codefile = open(os.path.join(userdir, filename))
+				#print('READING FILE...')
+				#code = codefile.read()
+				#print('oi')
+				os._exit(0)
+
 		os.waitpid(cpid, 0)
+		print('DONE WAITING!')
+		if request.form['sandbox'] == 'upload':
+			print('upload')
+			#THIS MAY BE THE ROOT OF THE PROBLEM
+			#if 'file' not in request.files:
+			#	print("no file in request")
+			#	os._exit(0)
+			upfile = request.files['uploadfile']
+			print('got the file: %s' % upfile.filename)
+			print(type(upfile))
+			if upfile.filename == '':
+				print('no file name')
+				flash('error')
+			#print('did i make it')
+			#if upfile and allowed_file(upfile.filename):
+			filename = secure_filename(upfile.filename)
+			userdir = 'userdirs/%s/' % session['username']
+			#print('still stopping here?')
+			print('SAVING FILE FROM %s' % session['username'])
+			upfile.save(os.path.join(userdir, filename))
+			print('OPENING FILE...')
+			codefile = open(os.path.join(userdir, filename))
+			print('READING FILE...')
+			code = codefile.read()
+
+		print('CURRENT CODE: %s' % code) 
+		print('READING OUTPUTS')
+
 		opfile = open(ofilename, "r")
 		output = opfile.read()
 		opfile.close()
+		print('READING CODE FROM PIPE')
 		return render_template('sandbox.html', user=session['username'], code=code, output=output)
 	return render_template('sandbox.html', user=session['username'])
 
