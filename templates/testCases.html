@@ -26,9 +26,7 @@
 		
 		<form method="POST">	
 	
-			<div>
-				<button type="submit" name="sandbox" value="test" style="width:24.7%">Test</button></a>
-			</div>
+
 			<div style="float:left;width:48%; height=5vw">
 				INPUT HERE:
 			</div>
@@ -36,13 +34,17 @@
 			<div style="float:right;width:48%; height=5vw">
 				OUTPUT HERE:
 			</div>
+
 			<br>
 			<div>
-				<textarea type="text" id="code" name="code" style="font-family:Arial; font-size:12pt; width:48%; height:50vw; float:left;background-color:black;color:white">{{code}}</textarea>
+				<textarea type="text" id="code" name="code" style="font-family:Arial; font-size:12pt; width:48%; height:1vw; float:left;background-color:white;color:black">{{code}}</textarea>
 			</div>
 
 			<div>
-				<textarea type="text" name="output" id="output" style="font-family:Arial; font-size:12pt; width:48%; height:50vw; float:right;background-color:black;color:white">{{output}}</textarea>
+				<textarea type="text" name="output" id="output" style="font-family:Arial; font-size:12pt; width:48%; height:1vw; float:right;background-color:white;color:black">{{output}}</textarea>
+			</div>
+			<div>
+				<button type="submit" name="newTest" value="newTest" style="width:24.7%">Add New Test Case</button></a>
 			</div>
 		</form>
 		<script type="text/javascript">
