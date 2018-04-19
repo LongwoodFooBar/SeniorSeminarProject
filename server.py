@@ -16,27 +16,21 @@ app.config.update(dict(
 	PASSWORD="default",
 ))
 
-#BEN WAS HERE 
-#       db= database......    
-#       def upload():
-#           file=request.files['inputFile']
-#           newFile=FileContents(name=file.filename,data=file.read())
-#           db.session.add(newFile)
-#           db.session.commit()
-#       def download():
-#           file_data=FileContents.query.filter_by(id=1).first()
-#           return send_file(BytesIO(file_data.data), attachment_filename='example.pdf',as_attachment=true)
-# 
-#  
-#
-def check_logged():
+def checkLogged():
 	if 'username' in session:
 		return True
 	return False
 
-def check_instructor():
+def checkInstructor():
 	db = getDB()
 	instr = db.execute("SELECT * FROM login WHERE position='INSTRUCTOR' and email=?", (session['username'],)).fetchall()
+	if instr:
+		return True
+	return False
+
+def check_teaches(courseID):
+	db = getDB()
+	instr = db.execute("SELECT * FROM class JOIN login ON login.userID=class.instructorID WHERE position='INSTRUCTOR' and email=? and classID=?", (session['username'], courseID)).fetchall()
 	if instr:
 		return True
 	return False
@@ -52,13 +46,13 @@ def getDB():
 
 def home():
 	return redirect(url_for('login'))
-#BRANDON - returns the file extension
-def allowed_file(filename):
+
+def allowedFile(filename):
 	return '.' in filename and filename.rsplit('.',1).lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def root():
-	if not check_logged():
+	if not checkLogged():
 		return home()
 	return redirect(url_for("courses"))
 
@@ -110,12 +104,14 @@ def signup():
 	return render_template('signup.html')
 @app.route('/logout')
 def logout():
+	if not checkLogged():
+		return home()
 	session.pop('username', None)
 	return redirect(url_for('root'))
 
 @app.route('/courses')
 def courses():
-	if check_logged():
+	if checkLogged():
 		db = getDB()
 		utype = db.execute("SELECT position FROM login WHERE email=?", (session['username'],)).fetchall()
 		if utype[0][0] == 'INSTRUCTOR':
@@ -135,7 +131,7 @@ def courses():
 
 @app.route('/sandbox', methods=['GET', 'POST'])
 def sandbox(code='', output=''):
-	if not check_logged():
+	if not checkLogged():
 		return home()
 	if request.method == 'POST':
 		code = request.form['code']
@@ -144,13 +140,12 @@ def sandbox(code='', output=''):
 		ofilename = './userdirs/%s/outfile' % session['username']
 		codefile = open(filename, "w")
 		codefile.write(code + '\n')
-		r, w = os.pipe()
+		#r, w = os.pipe()
 		codefile.close()
 		cpid = os.fork()
 		if cpid == 0:
 			if request.form['sandbox'] == 'compile':
 				os.system('g++ -Wall ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
-			#os.system('g++ ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile && timeout %d ./userdirs/%s/sandbox >> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username'], timeout, session['username'], session['username']))
 				os._exit(0)
 			elif request.form['sandbox'] == 'run':
 				if platform.system() == 'Linux':
@@ -159,97 +154,55 @@ def sandbox(code='', output=''):
 						os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
 				elif platform.system() == 'Darwin':
 					exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
-					print(exitstat)
 					if os.WEXITSTATUS(exitstat) == 124:
 						os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
 				os._exit(0)
 			elif request.form['sandbox'] == 'save':
 				os._exit(0)
-			elif request.form['sandbox'] == 'upload':
-				print('upload')
-				#THIS MAY BE THE ROOT OF THE PROBLEM
-				#if 'file' not in request.files:
-				#	print("no file in request")
-				#	os._exit(0)
-				#upfile = request.files['uploadfile']
-				#print('got the file: %s' % upfile.filename)
-				#print(type(upfile))
-				#if upfile.filename == '':
-				#	print('no file name')
-				#	os._exit(0)
-				#print('did i make it')
-				#if upfile and allowed_file(upfile.filename):
-				#filename = secure_filename(upfile.filename)
-				#userdir = 'userdirs/%s/' % session['username']
-				#print('still stopping here?')
-				#print('SAVING FILE FROM %s' % session['username'])
-				#upfile.save(os.path.join(userdir, filename))
-				#print('OPENING FILE...')
-				#codefile = open(os.path.join(userdir, filename))
-				#print('READING FILE...')
-				#code = codefile.read()
-				#print('oi')
-				os._exit(0)
-
+			os._exit(0)
 		os.waitpid(cpid, 0)
-		print('DONE WAITING!')
 		if request.form['sandbox'] == 'upload':
-			print('upload')
-			#THIS MAY BE THE ROOT OF THE PROBLEM
-			#if 'file' not in request.files:
-			#	print("no file in request")
+			if 'file' not in request.files:
+				print("no file in request")
 			#	os._exit(0)
 			upfile = request.files['uploadfile']
-			print('got the file: %s' % upfile.filename)
-			print(type(upfile))
 			if upfile.filename == '':
 				print('no file name')
-				flash('error')
-			#print('did i make it')
-			#if upfile and allowed_file(upfile.filename):
+				return render_template('sandbox.html', user=session['username'], code=code, output=output)
 			filename = secure_filename(upfile.filename)
 			userdir = 'userdirs/%s/' % session['username']
-			#print('still stopping here?')
-			print('SAVING FILE FROM %s' % session['username'])
-			upfile.save(os.path.join(userdir, filename))
-			print('OPENING FILE...')
-			codefile = open(os.path.join(userdir, filename))
-			print('READING FILE...')
+			upfile.save(os.path.join(userdir, "sandbox.cpp"))
+			codefile = open(os.path.join(userdir, "sandbox.cpp"))
 			code = codefile.read()
-
-		print('CURRENT CODE: %s' % code) 
-		print('READING OUTPUTS')
-
 		opfile = open(ofilename, "r")
 		output = opfile.read()
 		opfile.close()
-		print('READING CODE FROM PIPE')
 		return render_template('sandbox.html', user=session['username'], code=code, output=output)
 	return render_template('sandbox.html', user=session['username'])
 
 @app.route('/faq')
 def faq():
-	if not check_logged():
+	if not checkLogged():
 		return home()
 	return render_template('faq.html', user=session['username'])
 
 @app.route('/test')
 def test():
-	if not check_logged():
+	if not checkLogged():
 		return home()
 	return render_template('testCases.html', user=session['username'])
 
 @app.route('/about')
 def about():
-	if not check_logged():
+	if not checkLogged():
 		return home()
 	return render_template('about.html', user=session['username'])
 
 @app.route('/create', methods=['GET', 'POST'])
 def create():
-	if not check_logged():
+	if not checkLogged():
 		return home()
-	if not check_instructor():
+	if not checkInstructor():
 		return home()
 	if request.method == 'POST':
 		db = getDB()
@@ -275,10 +228,13 @@ def create():
 		db.commit()
 	return render_template('addcourse.html', user=session['username'])
 
-#edit a course page
 @app.route('/editCourse/<int:courseID>', methods=['GET', 'POST'])
 def editCourse(courseID):
-	if not check_instructor():
+	if not checkLogged():
+		return home()
+	if not checkInstructor():
+		return home()
+	if not check_teaches(courseID):
 		return home()
 	db = getDB()
 	if request.method == 'POST':
@@ -289,49 +245,69 @@ def editCourse(courseID):
 		db.execute('UPDATE class SET title=?, section = ?, semester = ?, year = ? WHERE classID=?', (title, secNum, semester, year, courseID))
 		instructorID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()
 		names = request.form['listStudent']
-		names = names.split(', ')
-		if names[0] != '':
+		if ',' in names:
+			names = names.split(', ')
+		if names:
 			for name in names:
 				studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
-				takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0])).fetchall()
+				if studentID:
+					takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0])).fetchall()
+				else:
+					takes = 1
 				if not takes:
-					db.execute('INSERT INTO takes(classID, userID) VALUES(?, ?)', (classID[0][0], studentID[0][0]))
+					db.execute('INSERT INTO takes(classID, userID) VALUES(?, ?)', (courseID, studentID[0][0]))
+
 		names = request.form['deleteStudent']
-		names = names.split(', ')
-		if names[0] != '':
+		if ',' in names:
+			names = names.split(', ')
+		if names:
 			for name in names:
 				studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
-				classID = db.execute("SELECT classID FROM class WHERE instructorID = ? and title = ?", (instructorID[0][0], title)).fetchall()
-				takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0])).fetchall()
+				if studentID:
+					takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0])).fetchall()
+				else:
+					takes = 0
 				if takes:
 					db.execute('DELETE FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0]))
 		db.commit()
 	info = db.execute('SELECT * FROM class WHERE classID=?', (courseID,)).fetchall()
-	return render_template('editcourse.html', user=session['username'], title=info[0][2])
+	return render_template('editcourse.html', user=session['username'], title=info[0][2],secNum=info[0][3], year=info[0][5], sem=info[0][4])
 
-@app.route('/forgot')
+@app.route('/forgot', methods=['GET', 'POST'])
 def forgot():
+	if method == "POST":
+		email = request.form['username']
+		password = request.form['password']
+		answer
+		pass
 	return render_template('forgotpw.html')
 
+'''
 @app.route('/assignments')
 def assignments():
-	if not check_logged():
+	if not checkLogged():
 		return home()
 	return "Assignments"
+'''
 
 @app.route('/assignments/<int:assignmentID>')
 def assignmentsID(assignmentID):
-	if not check_logged():
+	if not checkLogged():
 		return home()
 	db = getDB()
 	a = list(db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall())
-	return "<h1>%s</h1><p>%s</p>" % (a[0][1], a[0][2])
+	print(a)
+	unfdate = a[0][4]
+	unfdate = unfdate.split("-")
+	date = "%s/%s/%s" % (unfdate[2], unfdate[1], unfdate[0])
+	return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], dueDate = date)
+	#return "<h1>%s</h1><p>%s</p>" % (a[0][1], a[0][2])
 
 @app.route('/createAssignment/<int:courseID>', methods=['GET', 'POST'])
 def createAssignment(courseID):
-	if not check_logged():
+	if not checkLogged():
 		return home()
-	if not check_instructor():
+	if not checkInstructor():
 		return home()
 	if request.method == 'POST':
 		db = getDB()
@@ -346,6 +322,10 @@ def createAssignment(courseID):
 
 @app.route('/editAssignment/<int:assignmentID>', methods=['GET', 'POST'])
 def editAssignment(assignmentID):
+	if not checkLogged():
+		return home()
+	if not checkInstructor():
+		return home()
 	db = getDB()
 	if request.method == 'POST':
 		title = request.form['title']

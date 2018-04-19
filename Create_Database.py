@@ -16,8 +16,10 @@ def createSchema():
 		firstName TEXT,
 		lastName TEXT,
 		password TEXT,
-		email TEXT,
-		position TEXT
+		email TEXT UNIQUE,
+		position TEXT,
+		question TEXT,
+		answer TEXT
 	)''')
 
 	# Creates the class table
@@ -29,6 +31,7 @@ def createSchema():
 		section INTEGER,
 		semester TEXT,
 		year INTEGER,
+		UNIQUE(title, section, semester, year),
 		FOREIGN KEY (instructorID) REFERENCES login(userID)
 	) ''')
 
