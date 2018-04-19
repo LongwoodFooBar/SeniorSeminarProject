@@ -288,11 +288,10 @@ def assignmentsID(assignmentID):
 		return home()
 	db = getDB()
 
-	if method == "POST":
+	if request.method == "POST":
 		pass
 
 	a = list(db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall())
-	print(a)
 	unfdate = a[0][4]
 	unfdate = unfdate.split("-")
 	date = "%s/%s/%s" % (unfdate[2], unfdate[1], unfdate[0])
