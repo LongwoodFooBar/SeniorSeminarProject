@@ -282,14 +282,6 @@ def forgot():
 		pass
 	return render_template('forgotpw.html')
 
-'''
-@app.route('/assignments')
-def assignments():
-	if not checkLogged():
-		return home()
-	return "Assignments"
-'''
-
 @app.route('/assignments/<int:assignmentID>')
 def assignmentsID(assignmentID):
 	if not checkLogged():
@@ -300,8 +292,7 @@ def assignmentsID(assignmentID):
 	unfdate = a[0][4]
 	unfdate = unfdate.split("-")
 	date = "%s/%s/%s" % (unfdate[2], unfdate[1], unfdate[0])
-	return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], dueDate = date)
-	#return "<h1>%s</h1><p>%s</p>" % (a[0][1], a[0][2])
+	return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date)
 
 @app.route('/createAssignment/<int:courseID>', methods=['GET', 'POST'])
 def createAssignment(courseID):
@@ -314,7 +305,6 @@ def createAssignment(courseID):
 		title = request.form['title']
 		body = request.form['assignmentDesc']
 		date = request.form['dueDate']
-		print(date)
 		db.execute("INSERT INTO assignment(classID, title, body, dueDate) VALUES(?, ?, ?, date(?))", (courseID, title, body, date))
 		db.commit()
 		return redirect(url_for('courses'))
@@ -330,12 +320,17 @@ def editAssignment(assignmentID):
 	if request.method == 'POST':
 		title = request.form['title']
 		body = request.form['assignmentDesc']
-		unfdate = request.form['dueDate']
-		unfdate = unfdate.split("/")
+		undate = request.form['dueDate']
+		unfdate = undate.split("/")
+		if len(unfdate[0]) == 1:
+			unfdate[0] = "0" + unfdate[0]
+		if len(unfdate[1]) == 1:
+			unfdate[1] = "0" + unfdate[1]
+		undate = "%s/%s/%s" % (unfdate[0], unfdate[1], unfdate[2])
 		date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
 		db.execute("UPDATE assignment SET title = ?, body = ?, dueDate=date(?) WHERE assignmentID = ?", (title, body, date, assignmentID))
 		db.commit()
-		return render_template('editassignment.html', title = title, body = body)
+		return render_template('editassignment.html', title = title, body = body, date = undate)
 	info = db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall()
 	unfdate = info[0][4]
 	unfdate = unfdate.split("-")
