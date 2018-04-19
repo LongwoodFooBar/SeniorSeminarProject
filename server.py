@@ -282,11 +282,15 @@ def forgot():
 		pass
 	return render_template('forgotpw.html')
 
-@app.route('/assignments/<int:assignmentID>')
+@app.route('/assignments/<int:assignmentID>', methods=["GET", "POST"])
 def assignmentsID(assignmentID):
 	if not checkLogged():
 		return home()
 	db = getDB()
+
+	if method == "POST":
+		pass
+
 	a = list(db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall())
 	print(a)
 	unfdate = a[0][4]
