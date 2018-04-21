@@ -45,7 +45,7 @@ def getDB():
 	return g.sqlite_db
 
 def home():
-	return redirect(url_for('login'))
+	return redirect(url_for('root'))
 
 def allowedFile(filename):
 	return '.' in filename and filename.rsplit('.',1).lower() in ALLOWED_EXTENSIONS
@@ -53,7 +53,7 @@ def allowedFile(filename):
 @app.route('/')
 def root():
 	if not checkLogged():
-		return home()
+		return redirect(url_for('login'))
 	return redirect(url_for("courses"))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -100,7 +100,8 @@ def signup():
 		userdir = r'./userdirs/%s' % request.form['email']
 		if not os.path.exists(userdir):
 			os.makedirs(userdir)
-		return render_template('courses.html', user=session['username'])
+		#return render_template('courses.html', user=session['username'])
+		return redirect(url_for('courses'))
 	return render_template('signup.html')
 @app.route('/logout')
 def logout():
@@ -133,16 +134,17 @@ def courses():
 def sandbox(code='', output=''):
 	if not checkLogged():
 		return home()
+	code = ""
+	output = ""
+	filename = './userdirs/%s/sandbox.cpp' % session['username']
+	ofilename = './userdirs/%s/outfile' % session['username']
 	if request.method == 'POST':
 		code = request.form['code']
 		timeout = int(request.form['timeout'])
-		filename = './userdirs/%s/sandbox.cpp' % session['username']
-		ofilename = './userdirs/%s/outfile' % session['username']
 		codefile = open(filename, "w")
 		codefile.write(code + '\n')
-		#r, w = os.pipe()
 		codefile.close()
-		cpid = os.fork()
+		'''cpid = os.fork()
 		if cpid == 0:
 			if request.form['sandbox'] == 'compile':
 				os.system('g++ -Wall ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
@@ -160,8 +162,21 @@ def sandbox(code='', output=''):
 			elif request.form['sandbox'] == 'save':
 				os._exit(0)
 			os._exit(0)
-		os.waitpid(cpid, 0)
-		if request.form['sandbox'] == 'upload':
+		os.waitpid(cpid, 0)'''
+		if request.form['sandbox'] == 'compile':
+			os.system('g++ -Wall ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
+		elif request.form['sandbox'] == 'run':
+			if platform.system() == 'Linux':
+				exitstat = os.system('timeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+				if os.WEXITSTATUS(exitstat) == 124:
+					os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
+			elif platform.system() == 'Darwin':
+				exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+				if os.WEXITSTATUS(exitstat) == 124:
+					os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
+		elif request.form['sandbox'] == 'save':
+			pass
+		elif request.form['sandbox'] == 'upload':
 			if 'file' not in request.files:
 				print("no file in request")
 			#	os._exit(0)
@@ -174,11 +189,19 @@ def sandbox(code='', output=''):
 			upfile.save(os.path.join(userdir, "sandbox.cpp"))
 			codefile = open(os.path.join(userdir, "sandbox.cpp"))
 			code = codefile.read()
+			return render_template('sandbox.html', user=session['username'], code=code, output=output)
+	if os.path.exists(ofilename):
+		print("OUTPUT")
 		opfile = open(ofilename, "r")
 		output = opfile.read()
 		opfile.close()
-		return render_template('sandbox.html', user=session['username'], code=code, output=output)
-	return render_template('sandbox.html', user=session['username'])
+		os.remove(ofilename)
+	if os.path.exists(filename):
+		print("INPUT")
+		cfile = open(filename, "r")
+		code = cfile.read()
+		cfile.close()
+	return render_template('sandbox.html', user=session['username'], code=code, output=output)
 
 @app.route('/faq')
 def faq():
@@ -247,8 +270,20 @@ def editCourse(courseID):
 		names = request.form['listStudent']
 		if ',' in names:
 			names = names.split(', ')
-		if names:
-			for name in names:
+		#ADD ONE NAME
+			if names:
+				for name in names:
+					print(name)
+					studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
+					if studentID:
+						takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0])).fetchall()
+					else:
+						takes = 1
+					if not takes:
+						db.execute('INSERT INTO takes(classID, userID) VALUES(?, ?)', (courseID, studentID[0][0]))
+		elif names:
+				print(names)
+				name = names
 				studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
 				if studentID:
 					takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0])).fetchall()
@@ -293,6 +328,7 @@ def assignmentsID(assignmentID):
 
 	a = list(db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall())
 	unfdate = a[0][4]
+	print(unfdate)
 	unfdate = unfdate.split("-")
 	date = "%s/%s/%s" % (unfdate[2], unfdate[1], unfdate[0])
 	return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date)
@@ -307,7 +343,13 @@ def createAssignment(courseID):
 		db = getDB()
 		title = request.form['title']
 		body = request.form['assignmentDesc']
-		date = request.form['dueDate']
+		undate = request.form['dueDate']
+		undate = unfdate.split("/")
+		if len(undate[0]) == 1:
+			undate[0] = "0" + undate[0]
+		if len(undate[1]) == 1:
+			undate[1] = "0" + undate[1]
+		date = "%s-%s-%s" % (undate[2], undate[1], undate[0])
 		db.execute("INSERT INTO assignment(classID, title, body, dueDate) VALUES(?, ?, ?, date(?))", (courseID, title, body, date))
 		db.commit()
 		return redirect(url_for('courses'))
@@ -323,8 +365,9 @@ def editAssignment(assignmentID):
 	if request.method == 'POST':
 		title = request.form['title']
 		body = request.form['assignmentDesc']
-		undate = request.form['dueDate']
+		unfdate = request.form['dueDate']
 		unfdate = undate.split("/")
+		print(unfdate)
 		if len(unfdate[0]) == 1:
 			unfdate[0] = "0" + unfdate[0]
 		if len(unfdate[1]) == 1:
@@ -336,6 +379,7 @@ def editAssignment(assignmentID):
 		return render_template('editassignment.html', title = title, body = body, date = undate)
 	info = db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall()
 	unfdate = info[0][4]
+	print(unfdate)
 	unfdate = unfdate.split("-")
 	date = "%s/%s/%s" % (unfdate[2], unfdate[1], unfdate[0])
 	return render_template('editassignment.html', title = info[0][1], body = info[0][2], date = date)
