@@ -28,12 +28,15 @@ def checkInstructor():
 		return True
 	return False
 
-def check_teaches(courseID):
+def checkTeaches(courseID):
 	db = getDB()
 	instr = db.execute("SELECT * FROM class JOIN login ON login.userID=class.instructorID WHERE position='INSTRUCTOR' and email=? and classID=?", (session['username'], courseID)).fetchall()
 	if instr:
 		return True
 	return False
+
+def checkOwnsAssign():
+
 
 def connectDB():
 	rv = sqlite3.connect(app.config['DATABASE'])
@@ -74,9 +77,9 @@ def login():
 		else:
 			emailexists = db.execute('SELECT * FROM login where email = ?', (request.form['username'],)).fetchall()
 			if emailexists:
-			    error = "Password does not match"
+				error = "Password does not match"
 			else:
-			    error = "Username is not registered"
+				error = "Username is not registered"
 			return render_template('login.html', loginerror=error)
 	return render_template('login.html')
 
@@ -88,7 +91,7 @@ def signup():
 
 		emailexists = db.execute('SELECT * FROM login WHERE email=?', (request.form['email'],)).fetchall()
 		if emailexists:
-		    return render_template('signup.html', loginerror="That email is already registered")
+			return render_template('signup.html', loginerror="That email is already registered")
 
 		password = md5(request.form['password'].encode('utf-8')).hexdigest()
 
@@ -226,6 +229,7 @@ def create():
 				if not takes:
 					db.execute('INSERT INTO takes(classID, userID) VALUES(?, ?)', (classID[0][0], studentID[0][0]))
 		db.commit()
+		return redirect(url_for('courses'))
 	return render_template('addcourse.html', user=session['username'])
 
 @app.route('/editCourse/<int:courseID>', methods=['GET', 'POST'])
@@ -234,7 +238,7 @@ def editCourse(courseID):
 		return home()
 	if not checkInstructor():
 		return home()
-	if not check_teaches(courseID):
+	if not checkTeaches(courseID):
 		return home()
 	db = getDB()
 	if request.method == 'POST':
@@ -270,6 +274,7 @@ def editCourse(courseID):
 				if takes:
 					db.execute('DELETE FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0]))
 		db.commit()
+		return redirect(url_for('courses'))
 	info = db.execute('SELECT * FROM class WHERE classID=?', (courseID,)).fetchall()
 	return render_template('editcourse.html', user=session['username'], title=info[0][2],secNum=info[0][3], year=info[0][5], sem=info[0][4])
 
@@ -307,8 +312,25 @@ def createAssignment(courseID):
 		db = getDB()
 		title = request.form['title']
 		body = request.form['assignmentDesc']
-		date = request.form['dueDate']
-		db.execute("INSERT INTO assignment(classID, title, body, dueDate) VALUES(?, ?, ?, date(?))", (courseID, title, body, date))
+		undate = request.form['dueDate']
+		unfdate = undate.split("/")
+		if len(unfdate[0]) == 1:
+			unfdate[0] = "0" + unfdate[0]
+		if len(unfdate[1]) == 1:
+			unfdate[1] = "0" + unfdate[1]
+		if unfdate[1] > "12":
+			return render_template('createassignment.html', title = title, body = body, date = undate, error = "Bad Date")
+		if ["01", "03", "05", "07", "08", "10", "12"].count(unfdate[1]):
+			if unfdate[0] > "31":
+				return render_template('createassignment.html', title = title, body = body, date = undate, error = "Bad Date")
+		if ["04", "06", "09", "11"].count(unfdate[1]):
+			if unfdate[0] > "30":
+				return render_template('createassignment.html', title = title, body = body, date = undate, error = "Bad Date")
+		if ["02"].count(unfdate[1]):
+			if unfdate > "29":
+				return render_template('createassignment.html', title = title, body = body, date = undate, error = "Bad Date")
+		date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
+		db.execute("INSERT INTO assignment(classID, title, body, dueDate) VALUES(?, ?, ?, ?)", (courseID, title, body, date))
 		db.commit()
 		return redirect(url_for('courses'))
 	return render_template('createassignment.html', user=session['username'])
@@ -318,6 +340,8 @@ def editAssignment(assignmentID):
 	if not checkLogged():
 		return home()
 	if not checkInstructor():
+		return home()
+	if not checkOwnsAssign():
 		return home()
 	db = getDB()
 	if request.method == 'POST':
@@ -329,11 +353,22 @@ def editAssignment(assignmentID):
 			unfdate[0] = "0" + unfdate[0]
 		if len(unfdate[1]) == 1:
 			unfdate[1] = "0" + unfdate[1]
-		undate = "%s/%s/%s" % (unfdate[0], unfdate[1], unfdate[2])
-		date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
-		db.execute("UPDATE assignment SET title = ?, body = ?, dueDate=date(?) WHERE assignmentID = ?", (title, body, date, assignmentID))
+		if unfdate[1] > "12":
+			return render_template('editassignment.html', title = title, body = body, date = undate, error = "Bad Date")
+		if ["01", "03", "05", "07", "08", "10", "12"].count(unfdate[1]):
+			if unfdate[0] > "31":
+				return render_template('editassignment.html', title = title, body = body, date = undate, error = "Bad Date")
+		if ["04", "06", "09", "11"].count(unfdate[1]):
+			if unfdate[0] > "30":
+				return render_template('editassignment.html', title = title, body = body, date = undate, error = "Bad Date")
+		if ["02"].count(unfdate[1]):
+			if unfdate > "29":
+				return render_template('editassignment.html', title = title, body = body, date = undate, error = "Bad Date")
+		#undate = "%s/%s/%s" % (unfdate[0], unfdate[1], unfdate[2])
+		date = str("%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0]))
+		db.execute("UPDATE assignment SET title = ?, body = ?, dueDate=? WHERE assignmentID = ?", (title, body, date, assignmentID))
 		db.commit()
-		return render_template('editassignment.html', title = title, body = body, date = undate)
+		return redirect(url_for('courses'))
 	info = db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall()
 	unfdate = info[0][4]
 	unfdate = unfdate.split("-")
