@@ -36,7 +36,7 @@ def checkTeaches(courseID):
 	return False
 
 def checkOwnsAssign():
-
+	pass
 
 def connectDB():
 	rv = sqlite3.connect(app.config['DATABASE'])
