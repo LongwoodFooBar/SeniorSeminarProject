@@ -35,8 +35,29 @@ def checkTeaches(courseID):
 		return True
 	return False
 
-def checkOwnsAssign():
-	pass
+def checkOwnsAssign(assignmentID):
+	db = getDB()
+	instr = db.execute("SELECT * FROM assignment JOIN class ON class.classID=assignment.classID JOIN login ON login.userID=class.instructorID WHERE login.email=? AND assignmentID=?", (session['username'], assignmentID)).fetchall)()
+	if instr:
+		return True
+	return False
+
+#HAAAAAAAAH
+#I'm not funny
+def valiDate(unfdate):
+	if unfdate[1] > "12":
+		return False
+	if ["01", "03", "05", "07", "08", "10", "12"].count(unfdate[1]):
+		if unfdate[0] > "31":
+			return False
+	if ["04", "06", "09", "11"].count(unfdate[1]):
+		if unfdate[0] > "30":
+			return False
+	if ["02"].count(unfdate[1]):
+		if unfdate > "29":
+			return False
+	return True
+			
 
 def connectDB():
 	rv = sqlite3.connect(app.config['DATABASE'])
@@ -283,7 +304,12 @@ def forgot():
 	if method == "POST":
 		email = request.form['username']
 		password = request.form['password']
-		answer
+		pw = md5(password.encode('utf-8')).hexdigest()
+		db = getDB()
+		db.execute("UPDATE login SET password = ? WHERE email = ?", (pw, session['username']))
+		db.commit()
+		return redirect(url_for('root'))
+		#answer
 		pass
 	return render_template('forgotpw.html')
 
@@ -318,17 +344,8 @@ def createAssignment(courseID):
 			unfdate[0] = "0" + unfdate[0]
 		if len(unfdate[1]) == 1:
 			unfdate[1] = "0" + unfdate[1]
-		if unfdate[1] > "12":
+		if not valiDate(unfdate):
 			return render_template('createassignment.html', title = title, body = body, date = undate, error = "Bad Date")
-		if ["01", "03", "05", "07", "08", "10", "12"].count(unfdate[1]):
-			if unfdate[0] > "31":
-				return render_template('createassignment.html', title = title, body = body, date = undate, error = "Bad Date")
-		if ["04", "06", "09", "11"].count(unfdate[1]):
-			if unfdate[0] > "30":
-				return render_template('createassignment.html', title = title, body = body, date = undate, error = "Bad Date")
-		if ["02"].count(unfdate[1]):
-			if unfdate > "29":
-				return render_template('createassignment.html', title = title, body = body, date = undate, error = "Bad Date")
 		date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
 		db.execute("INSERT INTO assignment(classID, title, body, dueDate) VALUES(?, ?, ?, ?)", (courseID, title, body, date))
 		db.commit()
@@ -341,7 +358,7 @@ def editAssignment(assignmentID):
 		return home()
 	if not checkInstructor():
 		return home()
-	if not checkOwnsAssign():
+	if not checkOwnsAssign(assignmentID):
 		return home()
 	db = getDB()
 	if request.method == 'POST':
@@ -353,18 +370,8 @@ def editAssignment(assignmentID):
 			unfdate[0] = "0" + unfdate[0]
 		if len(unfdate[1]) == 1:
 			unfdate[1] = "0" + unfdate[1]
-		if unfdate[1] > "12":
+		if not valiDate(unfdate):
 			return render_template('editassignment.html', title = title, body = body, date = undate, error = "Bad Date")
-		if ["01", "03", "05", "07", "08", "10", "12"].count(unfdate[1]):
-			if unfdate[0] > "31":
-				return render_template('editassignment.html', title = title, body = body, date = undate, error = "Bad Date")
-		if ["04", "06", "09", "11"].count(unfdate[1]):
-			if unfdate[0] > "30":
-				return render_template('editassignment.html', title = title, body = body, date = undate, error = "Bad Date")
-		if ["02"].count(unfdate[1]):
-			if unfdate > "29":
-				return render_template('editassignment.html', title = title, body = body, date = undate, error = "Bad Date")
-		#undate = "%s/%s/%s" % (unfdate[0], unfdate[1], unfdate[2])
 		date = str("%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0]))
 		db.execute("UPDATE assignment SET title = ?, body = ?, dueDate=? WHERE assignmentID = ?", (title, body, date, assignmentID))
 		db.commit()
