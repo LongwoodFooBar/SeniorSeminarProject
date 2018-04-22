@@ -45,6 +45,12 @@
 			<input type="text" placeholder="Year" name="courseYear" value={{year}}>
 			<br />
 
+			<div name="students">Students in this course:<br />
+			{% for student in students %}
+			{{student[0]|safe}} {{student[1]|safe}} ({{student[2]|safe}})
+			{% endfor %}
+			</div>
+
 			<label for="listStudent"><b>Add Students by Email:</b><br>(Seperate multiple emails with commas)</label>
 			<br />
                         <input type="text" placeholder="List Student's Emails" name="listStudent">
