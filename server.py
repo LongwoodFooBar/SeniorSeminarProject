@@ -283,8 +283,10 @@ def editCourse(courseID):
 					db.execute('INSERT INTO takes(classID, userID) VALUES(?, ?)', (courseID, studentID[0][0]))
 
 		names = request.form['deleteStudent']
-		if ',' in names:
+		if ', ' in names:
 			names = names.split(', ')
+		elif ',' in names:
+			names = names.split(',')
 		if names:
 			for name in names:
 				studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
@@ -297,7 +299,8 @@ def editCourse(courseID):
 		db.commit()
 		return redirect(url_for('courses'))
 	info = db.execute('SELECT * FROM class WHERE classID=?', (courseID,)).fetchall()
-	return render_template('editcourse.html', user=session['username'], title=info[0][2],secNum=info[0][3], year=info[0][5], sem=info[0][4])
+	students = db.execute("SELECT firstName, lastName, email FROM login JOIN takes ON takes.userID=login.userID WHERE takes.classID=?", (courseID,)).fetchall()
+	return render_template('editcourse.html', user=session['username'], title=info[0][2], secNum=info[0][3], year=info[0][5], sem=info[0][4], students = students)
 
 @app.route('/forgot', methods=['GET', 'POST'])
 def forgot():
@@ -309,8 +312,6 @@ def forgot():
 		db.execute("UPDATE login SET password = ? WHERE email = ?", (pw, session['username']))
 		db.commit()
 		return redirect(url_for('root'))
-		#answer
-		pass
 	return render_template('forgotpw.html')
 
 @app.route('/assignments/<int:assignmentID>', methods=["GET", "POST"])
