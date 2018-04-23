@@ -124,7 +124,6 @@ def signup():
 		userdir = r'./userdirs/%s' % request.form['email']
 		if not os.path.exists(userdir):
 			os.makedirs(userdir)
-		#return render_template('courses.html', user=session['username'])
 		return redirect(url_for('courses'))
 	return render_template('signup.html')
 @app.route('/logout')
@@ -168,25 +167,6 @@ def sandbox(code='', output=''):
 		codefile = open(filename, "w")
 		codefile.write(code + '\n')
 		codefile.close()
-		'''cpid = os.fork()
-		if cpid == 0:
-			if request.form['sandbox'] == 'compile':
-				os.system('g++ -Wall ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
-				os._exit(0)
-			elif request.form['sandbox'] == 'run':
-				if platform.system() == 'Linux':
-					exitstat = os.system('timeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
-					if os.WEXITSTATUS(exitstat) == 124:
-						os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
-				elif platform.system() == 'Darwin':
-					exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
-					if os.WEXITSTATUS(exitstat) == 124:
-						os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
-				os._exit(0)
-			elif request.form['sandbox'] == 'save':
-				os._exit(0)
-			os._exit(0)
-		os.waitpid(cpid, 0)'''
 		if request.form['sandbox'] == 'compile':
 			os.system('g++ -Wall ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
 		elif request.form['sandbox'] == 'run':
@@ -202,11 +182,8 @@ def sandbox(code='', output=''):
 			pass
 		elif request.form['sandbox'] == 'upload':
 			if 'file' not in request.files:
-				print("no file in request")
-			#	os._exit(0)
 			upfile = request.files['uploadfile']
 			if upfile.filename == '':
-				print('no file name')
 				return render_template('sandbox.html', user=session['username'], code=code, output=output)
 			filename = secure_filename(upfile.filename)
 			userdir = 'userdirs/%s/' % session['username']
@@ -215,13 +192,11 @@ def sandbox(code='', output=''):
 			code = codefile.read()
 			return render_template('sandbox.html', user=session['username'], code=code, output=output)
 	if os.path.exists(ofilename):
-		print("OUTPUT")
 		opfile = open(ofilename, "r")
 		output = opfile.read()
 		opfile.close()
 		os.remove(ofilename)
 	if os.path.exists(filename):
-		print("INPUT")
 		cfile = open(filename, "r")
 		code = cfile.read()
 		cfile.close()
@@ -265,7 +240,6 @@ def create():
 			names = names.split(', ')
 			if names:
 				for name in names:
-					print(name)
 					studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
 					if studentID:
 						takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0])).fetchall()
@@ -273,11 +247,10 @@ def create():
 						takes = 1
 					if not takes:
 						db.execute('INSERT INTO takes(classID, userID) VALUES(?, ?)', (courseID, studentID[0][0]))
-		elif ', ' in names:
+		elif ',' in names:
 			names = names.split(',')
 			if names:
 				for name in names:
-					print(name)
 					studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
 					if studentID:
 						takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0])).fetchall()
@@ -286,7 +259,6 @@ def create():
 					if not takes:
 						db.execute('INSERT INTO takes(classID, userID) VALUES(?, ?)', (courseID, studentID[0][0]))
 		elif names:
-				print(names)
 				name = names
 				studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
 				if studentID:
@@ -320,7 +292,6 @@ def editCourse(courseID):
 			names = names.split(', ')
 			if names:
 				for name in names:
-					print(name)
 					studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
 					if studentID:
 						takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0])).fetchall()
@@ -332,7 +303,6 @@ def editCourse(courseID):
 			names = names.split(',')
 			if names:
 				for name in names:
-					print(name)
 					studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
 					if studentID:
 						takes = db.execute('SELECT * FROM takes WHERE classID = ? and userID = ?', (courseID, studentID[0][0])).fetchall()
@@ -341,7 +311,6 @@ def editCourse(courseID):
 					if not takes:
 						db.execute('INSERT INTO takes(classID, userID) VALUES(?, ?)', (courseID, studentID[0][0]))
 		elif names:
-				print(names)
 				name = names
 				studentID = db.execute("SELECT userID FROM login WHERE email=?", (name,)).fetchall()
 				if studentID:
@@ -412,7 +381,6 @@ def assignmentsID(assignmentID):
 
 	a = list(db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall())
 	unfdate = a[0][4]
-	print(unfdate)
 	unfdate = unfdate.split("-")
 	date = "%s/%s/%s" % (unfdate[2], unfdate[1], unfdate[0])
 	return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date)
@@ -455,20 +423,18 @@ def editAssignment(assignmentID):
 		body = request.form['assignmentDesc']
 		unfdate = request.form['dueDate']
 		unfdate = undate.split("/")
-		print(unfdate)
 		if len(unfdate[0]) == 1:
 			unfdate[0] = "0" + unfdate[0]
 		if len(unfdate[1]) == 1:
 			unfdate[1] = "0" + unfdate[1]
 		if not valiDate(unfdate):
 			return render_template('editassignment.html', title = title, body = body, date = undate, error = "Bad Date")
-		date = str("%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0]))
+		date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
 		db.execute("UPDATE assignment SET title = ?, body = ?, dueDate=? WHERE assignmentID = ?", (title, body, date, assignmentID))
 		db.commit()
 		return redirect(url_for('courses'))
 	info = db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall()
 	unfdate = info[0][4]
-	print(unfdate)
 	unfdate = unfdate.split("-")
 	date = "%s/%s/%s" % (unfdate[2], unfdate[1], unfdate[0])
 	return render_template('editassignment.html', title = info[0][1], body = info[0][2], date = date)
