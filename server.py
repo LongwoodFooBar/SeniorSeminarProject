@@ -37,7 +37,7 @@ def checkTeaches(courseID):
 
 def checkOwnsAssign(assignmentID):
 	db = getDB()
-	instr = db.execute("SELECT * FROM assignment JOIN class ON class.classID=assignment.classID JOIN login ON login.userID=class.instructorID WHERE login.email=? AND assignmentID=?", (session['username'], assignmentID)).fetchall)()
+	instr = db.execute("SELECT * FROM assignment JOIN class ON class.classID=assignment.classID JOIN login ON login.userID=class.instructorID WHERE login.email=? AND assignmentID=?", (session['username'], assignmentID)).fetchall()
 	if instr:
 		return True
 	return False
