@@ -396,7 +396,7 @@ def forgot():
 		password = request.form['password']
 		pw = md5(password.encode('utf-8')).hexdigest()
 		db = getDB()
-		db.execute("UPDATE login SET password = ? WHERE email = ?", (pw, session['username']))
+		db.execute("UPDATE login SET password = ? WHERE email = ?", (pw, email))
 		db.commit()
 		return redirect(url_for('root'))
 	return render_template('forgotpw.html')
