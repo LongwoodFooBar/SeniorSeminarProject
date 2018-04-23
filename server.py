@@ -391,7 +391,7 @@ def editCourse(courseID):
 
 @app.route('/forgot', methods=['GET', 'POST'])
 def forgot():
-	if method == "POST":
+	if request.method == "POST":
 		email = request.form['username']
 		password = request.form['password']
 		pw = md5(password.encode('utf-8')).hexdigest()
