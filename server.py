@@ -167,22 +167,25 @@ def sandbox(code='', output=''):
 	code = ""
 	output = ""
 	filename = './userdirs/%s/sandbox.cpp' % session['username']
+	ifilename = './userdirs/%s/infile' % session['username']
 	ofilename = './userdirs/%s/outfile' % session['username']
 	if request.method == 'POST':
 		code = request.form['code']
+		inp = request.form['input']
 		timeout = int(request.form['timeout'])
 		codefile = open(filename, "w")
+		infile = open(
 		codefile.write(code + '\n')
 		codefile.close()
 		if request.form['sandbox'] == 'compile':
 			os.system('g++ -Wall ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
 		elif request.form['sandbox'] == 'run':
 			if platform.system() == 'Linux':
-				exitstat = os.system('timeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+				exitstat = os.system('timeout %d ./userdirs/%s/sandbox < infile > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
 				if os.WEXITSTATUS(exitstat) == 124:
 					os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
 			elif platform.system() == 'Darwin':
-				exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+				exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox < infile > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
 				if os.WEXITSTATUS(exitstat) == 124:
 					os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
 			if os.path.exists("./userdirs/%s/sandbox" % (session['username'],)):
