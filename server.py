@@ -225,14 +225,16 @@ def test():
 		return home()
 	if request.method == "POST":
 		db = getDB()
-		userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0]
+		userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
 		print(userID)
 		inpV = request.form['input']
 		outV = request.form['output']
+		print(inpV)
+		print(outV)
 		db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type) VALUES(?, ?, ?, 'PRIVATE')", (inpV, outV, userID))
 		db.commit()
 	db = getDB()
-	cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCase.type='PUBLIC' OR testCases.type='private' AND login.email=?", (session['username'],)).fetchall()
+	cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR testCases.type='private' AND login.email=?", (session['username'],)).fetchall()
 	return render_template('testCases.html', user=session['username'], cases = cases)
 
 @app.route('/about')
