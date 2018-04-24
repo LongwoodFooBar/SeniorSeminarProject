@@ -402,13 +402,16 @@ def assignmentsID(assignmentID):
 		return home()
 	db = getDB()
 
-	if request.method == "POST":
-		pass
-
 	a = list(db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall())
 	unfdate = a[0][4]
 	unfdate = unfdate.split("-")
 	date = "%s/%s/%s" % (unfdate[2], unfdate[1], unfdate[0])
+	if request.method == "POST":
+		# check if passed due
+		if date.today() > date:
+			return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, error="overdue")
+		pass
+
 	return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date)
 
 @app.route('/createAssignment/<int:courseID>', methods=['GET', 'POST'])
