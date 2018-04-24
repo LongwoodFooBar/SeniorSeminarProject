@@ -221,7 +221,7 @@ def test():
 		print(userID)
 		inpV = request.form['input']
 		outV = request.form['output']
-		db.execute("INSERT INTO testCases(inputValue, outputValue, userID) VALUES(?, ?, ?)", (inpV, outV, userID))
+		db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type) VALUES(?, ?, ?, 'PRIVATE')", (inpV, outV, userID))
 		db.commit()
 	db = getDB()
 	cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCase.type='PUBLIC' OR testCases.type='private' AND login.email=?", (session['username'],)).fetchall()

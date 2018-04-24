@@ -64,11 +64,11 @@ def createSchema():
 	c.execute('''CREATE TABLE IF NOT EXISTS testCases (
 		testID INTEGER PRIMARY KEY,
 		uploadID INTEGER,
-		userID INTEGER,
 		inputValue TEXT,
 		outputValue TEXT,
+		type TEXT,
 	    FOREIGN KEY (uploadID) REFERENCES uploads(uploadID),
-	    FOREIGN KEY (userID) REFERENCES login(userID)
+	    FOREIGN KEY (userID) REFERENCES uploads(uploadID)
         ) ''')
 
 	c.execute('''CREATE TABLE IF NOT EXISTS takes (
