@@ -24,15 +24,37 @@
 		<div>
 			<p id="nav-logged">Logged in as: {{user}}</p>
 		</div>
+		
+		<h1><b>Test Cases for: {{title}}</b></h1>
 
-		<div class = "testCaseTitle">
-			INPUT
+		<form method="POST">	
+
+			<div>
+				<b>INPUT HERE:</b>
+			</div>
+	
+			<div class="testCaseInput">
+				<input type="text" name="input" placeholder="Input" required/>
+			</div>
+			<br>
+			<div>
+				<b>OUTPUT HERE:</b>
+			</div>
+
+			<div class="testCaseInput">
+				<input type="text" name="output" placeholder="Expected Output" required/>
+			</div>
+			<div name='errordiv' class='errmsg'>{{error}}</div>
+			<div>
+				<button type="submit" name="newTest" value="newTest" style="width:24.7%">Add New Test Case</button></a>
+			</div>
+		</form>
+		<div class="testCaseTitle">
+			<h3>INPUT</h3>
 		</div>
-
-		<div class = "testCaseTitle">
-			OUTPUT
+		<div class="testCaseTitle">
+			<h3>OUTPUT</h3>
 		</div>
-
 		<div>
 			{% for t in cases %}
 			<div class = "testCase">{{t[0]|safe}}</div>
@@ -40,29 +62,5 @@
 			{% endfor %}
 		</div>
 
-		<form method="POST">	
-
-			<div style="float:left;width:48%; height=5vw">
-				INPUT HERE:
-			</div>
-	
-			<div style="float:right;width:48%; height=5vw">
-				OUTPUT HERE:
-			</div>
-
-			<br>
-			<div>
-				<!--<textarea type="text" id="input" name="input" style="font-family:Arial; font-size:12pt; width:48%; height:1vw; float:left;background-color:white;color:black"></textarea>-->
-				<input type="text" name="input" />
-			</div>
-
-			<div>
-				<!--<textarea type="text" name="output" id="output" style="font-family:Arial; font-size:12pt; width:48%; height:1vw; float:right;background-color:white;color:black">{{output}}</textarea>-->
-				<input type="text" name="output" />
-			</div>
-			<div>
-				<button type="submit" name="newTest" value="newTest" style="width:24.7%">Add New Test Case</button></a>
-			</div>
-		</form>
 		</body>
 </html>
