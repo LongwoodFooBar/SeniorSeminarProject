@@ -412,7 +412,7 @@ def forgot():
 		question = request.form['question'] #MAKE REQUIRED / MAKE A LIST OF QUESTIONS
 		answer = request.form['answer']	#MAKE REQUIRED
 		db = getDB()
-		if db.execute("SELECT userID FROM login WHERE question=? AND answer=? AND email=?", (question, answer, email)).fetchall()
+		if db.execute("SELECT userID FROM login WHERE question=? AND answer=? AND email=?", (question, answer, email)).fetchall():
 			pw = md5(password.encode('utf-8')).hexdigest()
 			db.execute("UPDATE login SET password = ? WHERE email = ?", (pw, email))
 			db.commit()
