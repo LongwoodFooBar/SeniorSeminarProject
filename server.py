@@ -215,7 +215,7 @@ def faq():
 def test():
 	if not checkLogged():
 		return home()
-	if request.method = "POST":
+	if request.method == "POST":
 		db = getDB()
 		userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0]
 		print(userID)
