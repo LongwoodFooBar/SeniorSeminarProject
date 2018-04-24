@@ -265,6 +265,7 @@ def create():
 		db.execute("INSERT INTO class(instructorID, title, section, semester, year) VALUES(?, ?, ?, ?, ?)", (instructorID[0][0], title, secNum, semester, year))
 		db.commit()
 		names = request.form['listStudent']
+		courseID=db.execute("SELECT classID from class WHERE title = ? and section = ? and semester = ? and year = ? and instructorID = ?",(title,secNum,semester,year,instructorID)).fetchall()[0][0]
 		if ', ' in names:
 			names = names.split(', ')
 			if names:
