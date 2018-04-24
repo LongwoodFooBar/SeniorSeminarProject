@@ -77,7 +77,7 @@
 	</div>
 	<br />
 	<div>
-		<textarea type="text" name="cin" style="width:40%; float:right; font-family:Arial; font-size:12pt" placeholder="Input Values Here."></textarea><br /><br />
+		<textarea type="text" name="cin" class="inputBox" placeholder="Input Values Here."></textarea><br /><br />
 	</div>
 
 <br /> <br />
@@ -91,27 +91,27 @@
 		<br>
 
 		<div>
-		<textarea type="text" id="code" name="code" style="font-family:Arial; font-size:12pt; width:59%; height:60vw; float:left; background-color:black;color:white">{{code}}</textarea>
+		<textarea type="text" id="code" name="code" class="codeBox">{{code}}</textarea>
 		</div>
 
 		<div>
-		<textarea disabled type="text" name="output" id="output" style="font-family:Arial; font-size:12pt; width:40%; height:60vw; float:right">{{output}}</textarea>
+		<textarea disabled type="text" name="output" id="output" class="outputBox">{{output}}</textarea>
 		</div>
 		</form>
 		
 		<script type="text/javascript">
-		var textareas = document.getElementById('code');
-		//textareas.value = "HELLO, WORLD!";
+		var textareas = document.getelementbyid('code');
+		//textareas.value = "hello, world!";
 		textareas.onkeydown = function(e){
-			if(e.keyCode==9 || e.which==9){
-				e.preventDefault();
-				var s = this.selectionStart;
-				this.value = this.value.substring(0,this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
-				this.selectionEnd = s+1; 
+			if(e.keycode==9 || e.which==9){
+				e.preventdefault();
+				var s = this.selectionstart;
+				this.value = this.value.substring(0,this.selectionstart) + "\t" + this.value.substring(this.selectionend);
+				this.selectionend = s+1; 
 			}
 		}
-		//UPLOAD CODE STARTS HERE
-		var modal = document.getElementById('myModal');
+		//upload code starts here
+		var modal = document.getelementbyid('mymodal');
 
 					// Get the button that opens the modal
 					var btn = document.getElementById("prompt");

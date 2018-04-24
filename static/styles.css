@@ -41,6 +41,9 @@ button:hover {
 button#prompt{
 	width: 24%;
 }
+.testCaseBtn button{
+	width: 19.7%;
+}
 /* Extra styles for the cancel button */
 .cancelbtn {
     width: auto;
@@ -194,3 +197,49 @@ li a:hover {
 	color: red;
 }
 
+.testCaseTitle {
+	display:inline-block;
+	width:49%;
+	font-size:100%;
+	text-align:left;
+}
+
+.testCase {
+	display:inline-block;
+	width:49%;
+	font-size:100%;
+	text-align:left;
+}
+
+.testCaseInput input{
+    width: 50%;
+    padding: 12px 20px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.codeBox {
+	font-family:Arial;
+	font-size:100%;
+	width:59%;
+	height: 50vw;
+	float: left;
+	background-color: black;
+	color:white;
+}
+
+.outputBox {
+	font-family:Arial;
+	font-size:100%;
+	width:40%;
+	height: 50vw;
+	float: right;
+}
+
+.inputBox {
+	font-family:Arial;
+	font-size: 100%;
+	float:right;
+	width:40%;
+}
