@@ -21,8 +21,10 @@
 				<input type="text" placeholder="Enter Email" name="username" required>
 				<label for="password"><b>Password</b></label>
 				<input type="password" placeholder="Enter Password" name="password" required>
+				<div style="position:fixed; width:100%; left:25%">
 				<button type="submit" onclick="validate();">Login</button>
 				<a href="{{url_for('signup')}}"><button type="button">Sign Up</button></a>
+				</div>
 				<label>
 					<div name='errordiv' class='errmsg'>{{loginerror}}</div>
 				</label>

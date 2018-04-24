@@ -82,28 +82,25 @@
 					}
 				}
 			</script>	
-			<div>
+				<div style="width:100%; right:0.6%">
 				<nav>
-					<button type="submit" name="sandbox" value="compile" style="width:24.7%">Compile</button></a>
-					<button type="submit" name="sandbox" value="run" style="width:24.7%">Run</button></a>
-					<button type="submit" name="sandbox" value="save" style="width:24.7%">Save</button></a>
+					<button type="submit" name="sandbox" value="compile" style="width:24.7%">Compile</button>
+					<button type="submit" name="sandbox" value="run" style="width:24.7%">Run</button>
+					<button type="submit" name="sandbox" value="save" style="width:24.7%">Save</button>
+					<button id="prompt" type="button" name="sandbox" value="upload" style="width:24.7%"> Upload </button>
 					<div id="myModal" class="modal">
 
  					 	<!-- Modal content -->
 					<div class="modal-content">
-					<span class="close">&times;</span>
+					<span class="close" style="float:left">&times;</span>
     						<p>Upload file here:</p>
 						<input type="file" name="uploadfile"></input>
-						<button type="submit" name="sandbox" value="upload" style="width:24.7%">Upload</button>	
-					</div>
+						<button type="submit" value="upload" style="width:25%">Upload</button>	
 
 					</div>
-					<script>					// Get the modal
-					</script>
-
-</nav>
-</div>
-
+					</div>
+				</nav>
+			</div>
 <div style="float:left">
 	<b>Select Timeout (in seconds):</b>
 	<select name="timeout">
@@ -116,17 +113,26 @@
 	</select>
 </div>
 <br /><br />
+	<div style="float:right;width:40%; height=5vw">
+   	INPUT HERE:
+	</div>
+	<br />
+	<div>
+		<textarea type="text" name="cin" style="width:40%; float:right; font-family:Arial; font-size:12pt" placeholder="Input Values Here."></textarea><br /><br />
+	</div>
+
+<br /> <br />
 <div style="float:left;width:59%; height=5vw">
    CODE HERE:
-	  </div>
+</div>
 
 		<div style="float:right;width:40%; height=5vw">
 		OUTPUT HERE:
 		</div>
 		<br>
+
 		<div>
-		<textarea type="text" id="code" name="code" style="font-family:Arial; font-size:12pt; width:59%; height:60vw; float:left;
-		background-color:black;color:white">{{code}}</textarea>
+		<textarea type="text" id="code" name="code" style="font-family:Arial; font-size:12pt; width:59%; height:60vw; float:left; background-color:black;color:white">{{code}}</textarea>
 		</div>
 
 		<div>
