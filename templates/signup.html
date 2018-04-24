@@ -28,6 +28,10 @@
 				<input type="radio" name="type" value="INSTRUCTOR" required>Instructor<br />
 				<button type="Submit" onclick="validate();">Sign Up</button>
 				<a href="{{url_for('login')}}"><button type="button">Login</button></a>
+				<label for="question"><b>Create a Security Question</b></label>
+				<input type = "text" name = "question" />
+				<label for="answer">Answer Your Question</label>
+				<input type="text" name="answer" />
 				<label>
 					<div name='errordiv' class='errmsg'>{{loginerror}}</div>
 				</label>

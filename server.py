@@ -57,7 +57,6 @@ def valiDate(unfdate):
 		if unfdate > "29":
 			return False
 	return True
-			
 
 def connectDB():
 	rv = sqlite3.connect(app.config['DATABASE'])
@@ -178,11 +177,13 @@ def sandbox(code='', output=''):
 				exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
 				if os.WEXITSTATUS(exitstat) == 124:
 					os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
+			if os.path.exists("./userdirs/%s/sandbox" % (session['username'],)):
+				os.remove("./userdirs/%s/sandbox" % (session['username'],))
 		elif request.form['sandbox'] == 'save':
 			pass
 		elif request.form['sandbox'] == 'upload':
 			if 'file' not in request.files:
-			upfile = request.files['uploadfile']
+				upfile = request.files['uploadfile']
 			if upfile.filename == '':
 				return render_template('sandbox.html', user=session['username'], code=code, output=output)
 			filename = secure_filename(upfile.filename)
@@ -196,6 +197,8 @@ def sandbox(code='', output=''):
 		output = opfile.read()
 		opfile.close()
 		os.remove(ofilename)
+	if os.path.exists('./userdirs/%s/sandbox' % (session['username'],)):
+		os.remove('./userdirs/%s/sandbox' % (session['username'],))
 	if os.path.exists(filename):
 		cfile = open(filename, "r")
 		code = cfile.read()
@@ -208,11 +211,21 @@ def faq():
 		return home()
 	return render_template('faq.html', user=session['username'])
 
-@app.route('/test')
+@app.route('/test', methods=["GET", "POST"])
 def test():
 	if not checkLogged():
 		return home()
-	return render_template('testCases.html', user=session['username'])
+	if request.method = "POST":
+		db = getDB()
+		userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0]
+		print(userID)
+		inpV = request.form['input']
+		outV = request.form['output']
+		db.execute("INSERT INTO testCases(inputValue, outputValue, userID) VALUES(?, ?, ?)", (inpV, outV, userID))
+		db.commit()
+	db = getDB()
+	cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCase.type='PUBLIC' OR testCases.type='private' AND login.email=?", (session['username'],)).fetchall()
+	return render_template('testCases.html', user=session['username'], cases = cases)
 
 @app.route('/about')
 def about():
