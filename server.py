@@ -174,9 +174,11 @@ def sandbox(code='', output=''):
 		inp = request.form['input']
 		timeout = int(request.form['timeout'])
 		codefile = open(filename, "w")
-		infile = open(
-		codefile.write(code + '\n')
+		infile = open(ifilename, "w")
+		codefile.write(code)
 		codefile.close()
+		infile.write(inp)
+		infile.close()
 		if request.form['sandbox'] == 'compile':
 			os.system('g++ -Wall ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
 		elif request.form['sandbox'] == 'run':
@@ -262,10 +264,19 @@ def create():
 		semester = request.form['semester']
 		year = request.form['courseYear']
 		instructorID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()
-		db.execute("INSERT INTO class(instructorID, title, section, semester, year) VALUES(?, ?, ?, ?, ?)", (instructorID[0][0], title, secNum, semester, year))
-		db.commit()
+		print(title)
+		print(secNum)
+		print(semester)
+		print(year)
+		exists=db.execute("SELECT classID from class WHERE title = ? and section = ? and semester = ? and year = ?",(title,secNum,semester,year)).fetchall()
+		print(exists)
+		if not exists:	
+			db.execute("INSERT INTO class(instructorID, title, section, semester, year) VALUES(?, ?, ?, ?, ?)", (instructorID[0][0], title, secNum, semester, year))
+			db.commit()
+		else:
+			return render_template("addcourse.html", title = title, secNumber = secNum, semester = semester, year = year, error = "Class already exists")
 		names = request.form['listStudent']
-		courseID=db.execute("SELECT classID from class WHERE title = ? and section = ? and semester = ? and year = ? and instructorID = ?",(title,secNum,semester,year,instructorID)).fetchall()[0][0]
+		courseID=db.execute("SELECT classID from class WHERE title = ? and section = ? and semester = ? and year = ?",(title,secNum,semester,year)).fetchall()[0][0]
 		if ', ' in names:
 			names = names.split(', ')
 			if names:
