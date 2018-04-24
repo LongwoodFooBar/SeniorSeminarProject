@@ -3,7 +3,11 @@ from werkzeug.utils import secure_filename
 import sqlite3
 import os, sys, platform
 from hashlib import md5
-
+#added by ben
+from datetime import date
+today=date.today()
+# end ben added stuff
+print(today)
 UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = (['cpp', 'h'])
 app = Flask(__name__)
@@ -56,6 +60,10 @@ def valiDate(unfdate):
 	if ["02"].count(unfdate[1]):
 		if unfdate > "29":
 			return False
+
+	date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
+	if date < date.today:
+		return False
 	return True
 
 def connectDB():
