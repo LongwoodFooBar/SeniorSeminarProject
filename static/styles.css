@@ -25,23 +25,21 @@ input[type=text], input[type=password] {
 /* Set a style for all buttons */
 button {
     /*background-color: #4CAF50;*/
-	background-color: #4EAFC9;
+    background-color: #4EAFC9;
     color: white;
     padding: 14px 20px;
     margin: 8px 0;
     border: none;
     cursor: pointer;
-    width: 100%;
+    width: 25%;
+    font-size: 100%;
 }
 
 button:hover {
     opacity: 0.8;
 }
 button#prompt{
-	position: absolute;
-	top: 117px;
-	width: 24.7%;
-	right: 6px;
+	width: 24%;
 }
 /* Extra styles for the cancel button */
 .cancelbtn {
@@ -91,6 +89,9 @@ span.psw {
     background-color: #fefefe;
     margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
     width: 80%; /* Could be more or less, depending on screen size */
+    padding: 16px;
+    text-align: center;
+    font-size: 100%;
 }
 
 .close:hover,
@@ -119,7 +120,7 @@ span.psw {
 	border: none;
 	text-align: left;
 	outline: none;
-	 font-size: 15px;
+	font-size: 100%;
 }
 
 .Profcollapsible {
@@ -131,19 +132,19 @@ span.psw {
 	border: none;
 	text-align: left;
 	outline: none;
-	 font-size: 15px;
+	font-size: 100%;
 }
 
 .memcollapsible {
 	background-color: #777;
 	color: white;
 	cursor: pointer;
-	padding: 5px;
+	padding: 18px;
 	width: 100%;
 	border: none;
 	text-align: left;
 	outline: none;
-	 font-size: 15px;
+	font-size: 100%;
 }
 
 .active, .collapsible:hover {

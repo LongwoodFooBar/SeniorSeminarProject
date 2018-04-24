@@ -22,7 +22,6 @@
 			<h1>{{title}}</h1>
 			<h2>Due Date: {{date}}</h2>
 			<p>{{body}}</p>
-
 		</div>
 		<form method="POST" enctype=multipart/form-data >	
 			<script>
@@ -37,27 +36,26 @@
 						}
 					}
 				}
-			</script>	
-			<div>
+			</script>
+				<div style="width:100%; right:0.6%">
 				<nav>
-					<button type="submit" name="sandbox" value="compile" style="width:24%">Compile</button>
-					<button type="submit" name="sandbox" value="run" style="width:24%">Run</button>
-					<button type="submit" name="sandbox" value="save" style="width:24%">Save</button>
+					<button type="submit" name="sandbox" value="compile" style="width:24.7%">Compile</button>
+					<button type="submit" name="sandbox" value="run" style="width:24.7%">Run</button>
+					<button type="submit" name="sandbox" value="save" style="width:24.7%">Save</button>
+					<button id="prompt" type="button" name="sandbox" value="upload" style="width:24.7%"> Upload </button>
 					<div id="myModal" class="modal">
 
  					 	<!-- Modal content -->
 					<div class="modal-content">
-					<span class="close">&times;</span>
+					<span class="close" style="float:left">&times;</span>
     						<p>Upload file here:</p>
-						<input type="file" name="uploadfile"></input>
-						<button type="submit" name="sandbox" value="upload" style="width:25%">Upload</button>	
-					</div>
+						<input type="file" name="uploadfile" style="font-size:100%"></input>
+						<button type="submit" value="upload" style="width:25%">Upload</button>	
 
 					</div>
-
+					</div>
 				</nav>
 			</div>
-
 <div style="float:left">
 	<b>Select Timeout (in seconds):</b>
 	<select name="timeout">
@@ -95,10 +93,8 @@
 
 		</form>
 		
-		<button id="prompt" style="width:24%; top:258px; right: 41px;"> Upload </button>
 		<script type="text/javascript">
 		var textareas = document.getElementById('code');
-		//textareas.value = "HELLO, WORLD!";
 		textareas.onkeydown = function(e){
 			if(e.keyCode==9 || e.which==9){
 				e.preventDefault();

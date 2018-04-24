@@ -26,12 +26,15 @@
 				<label for="type"><b>Account Type</b></label><br />
 				<input type="radio" name="type" value="STUDENT" required>Student<br />
 				<input type="radio" name="type" value="INSTRUCTOR" required>Instructor<br />
-				<button type="Submit" onclick="validate();">Sign Up</button>
-				<a href="{{url_for('login')}}"><button type="button">Login</button></a>
 				<label for="question"><b>Create a Security Question</b></label>
 				<input type = "text" name = "question" />
-				<label for="answer">Answer Your Question</label>
+				<label for="answer"><b>Answer Your Question</b></label>
 				<input type="text" name="answer" />
+				<br>
+				<div style="position:fixed; width:100%; left:25%">
+				<button type="Submit" onclick="validate();">Sign Up</button>
+				<a href="{{url_for('login')}}"><button type="button">Back to Login</button></a>
+				</div>
 				<label>
 					<div name='errordiv' class='errmsg'>{{loginerror}}</div>
 				</label>
@@ -39,3 +42,4 @@
 		</form>
 	</body>
 </html>
+
