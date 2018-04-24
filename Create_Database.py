@@ -68,7 +68,7 @@ def createSchema():
 		outputValue TEXT,
 		type TEXT,
 	    FOREIGN KEY (uploadID) REFERENCES uploads(uploadID),
-	    FOREIGN KEY (userID) REFERENCES uploads(uploadID)
+	    FOREIGN KEY (userID) REFERENCES login(userID)
         ) ''')
 
 	c.execute('''CREATE TABLE IF NOT EXISTS takes (
