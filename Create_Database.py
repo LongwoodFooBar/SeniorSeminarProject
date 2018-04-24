@@ -66,6 +66,7 @@ def createSchema():
 		uploadID INTEGER,
 		inputValue TEXT,
 		outputValue TEXT,
+		userID INTEGER,
 		type TEXT,
 	    FOREIGN KEY (uploadID) REFERENCES uploads(uploadID),
 	    FOREIGN KEY (userID) REFERENCES login(userID)
