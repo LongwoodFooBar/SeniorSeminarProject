@@ -6,9 +6,10 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
+		<script type="text/javascript" src="{{url_for('static', filename=validate.js')"></script>
 	</head>
 	<body>
-		<form method="POST">
+		<form method="POST" name="signup">
 			<div class="imgcontainer">
 				<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
 			</div>
@@ -32,7 +33,7 @@
 				<input type="text" name="answer" />
 				<br>
 				<div style="position:fixed; width:100%; left:25%">
-				<button type="Submit" onclick="validate();">Sign Up</button>
+				<button type="button" onclick="valid();">Sign Up</button>
 				<a href="{{url_for('login')}}"><button type="button">Back to Login</button></a>
 				</div>
 				<label>
