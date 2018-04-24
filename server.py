@@ -3,13 +3,10 @@ from werkzeug.utils import secure_filename
 import sqlite3
 import os, sys, platform
 from hashlib import md5
-#added by ben
-from datetime import date
-today=date.today()
-# end ben added stuff
-print(today)
+from datetime import date as d
+
 UPLOAD_FOLDER = 'uploads/'
-ALLOWED_EXTENSIONS = (['cpp', 'h'])
+ALLOWED_EXTENSIONS = (['cpp', 'c'])
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config.from_object(__name__)
@@ -62,7 +59,7 @@ def valiDate(unfdate):
 			return False
 
 	date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
-	if date < date.today:
+	if date < d.today():
 		return False
 	return True
 
@@ -122,8 +119,7 @@ def signup():
 			return render_template('signup.html', loginerror="That email is already registered")
 
 		password = md5(request.form['password'].encode('utf-8')).hexdigest()
-
-		db.execute('INSERT INTO login (firstName, lastName, email, password, position) VALUES (?, ?, ?, ?, ?)', (request.form['firstName'], request.form['lastName'], request.form['email'], password, request.form['type']))
+		db.execute('INSERT INTO login (firstName, lastName, email, password, position, question, answer) VALUES (?, ?, ?, ?, ?)', (request.form['firstName'], request.form['lastName'], request.form['email'], password, request.form['type'], request.form['question'], request.form['answer']))
 		db.commit()
 		session['username'] = request.form['email']
 		session['password'] = request.form['password']
@@ -133,6 +129,7 @@ def signup():
 			os.makedirs(userdir)
 		return redirect(url_for('courses'))
 	return render_template('signup.html')
+
 @app.route('/logout')
 def logout():
 	if not checkLogged():
@@ -151,7 +148,7 @@ def courses():
 				cs[i] = list(cs[i])
 				cs[i].append(db.execute("SELECT assignment.title, assignment.assignmentID FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (cs[i][0],)).fetchall())
 			return render_template('professor.html', user=session['username'], courses=cs)
-			
+
 		elif utype[0][0] == 'STUDENT':
 			cs = db.execute("SELECT title FROM class NATURAL JOIN takes NATURAL JOIN login WHERE login.email=?", (session['username'],)).fetchall()
 			for i in range(len(cs)):
@@ -167,22 +164,27 @@ def sandbox(code='', output=''):
 	code = ""
 	output = ""
 	filename = './userdirs/%s/sandbox.cpp' % session['username']
+	ifilename = './userdirs/%s/infile' % session['username']
 	ofilename = './userdirs/%s/outfile' % session['username']
 	if request.method == 'POST':
 		code = request.form['code']
+		inp = request.form['input']
 		timeout = int(request.form['timeout'])
 		codefile = open(filename, "w")
-		codefile.write(code + '\n')
+		infile = open(ifilename, "w")
+		codefile.write(code)
 		codefile.close()
+		infile.write(inp)
+		infile.close()
 		if request.form['sandbox'] == 'compile':
 			os.system('g++ -Wall ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
 		elif request.form['sandbox'] == 'run':
 			if platform.system() == 'Linux':
-				exitstat = os.system('timeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+				exitstat = os.system('timeout %d ./userdirs/%s/sandbox < infile > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
 				if os.WEXITSTATUS(exitstat) == 124:
 					os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
 			elif platform.system() == 'Darwin':
-				exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+				exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox < infile > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
 				if os.WEXITSTATUS(exitstat) == 124:
 					os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
 			if os.path.exists("./userdirs/%s/sandbox" % (session['username'],)):
@@ -194,6 +196,8 @@ def sandbox(code='', output=''):
 				upfile = request.files['uploadfile']
 			if upfile.filename == '':
 				return render_template('sandbox.html', user=session['username'], code=code, output=output)
+			if not allowedFile(upfile):
+				return render_template('sandbox.html', user=session['username'], code=code, output=output, error = "Bad filetype")
 			filename = secure_filename(upfile.filename)
 			userdir = 'userdirs/%s/' % session['username']
 			upfile.save(os.path.join(userdir, "sandbox.cpp"))
@@ -219,8 +223,8 @@ def faq():
 		return home()
 	return render_template('faq.html', user=session['username'])
 
-@app.route('/test', methods=["GET", "POST"])
-def test():
+@app.route('/test/<int:assignmentID>', methods=["GET", "POST"])
+def test(assignmentID):
 	if not checkLogged():
 		return home()
 	if request.method == "POST":
@@ -231,14 +235,20 @@ def test():
 		outV = request.form['output']
 		print(inpV)
 		print(outV)
-		db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type) VALUES(?, ?, ?, 'PRIVATE')", (inpV, outV, userID))
+		if not inpV and outV:
+			return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") #Need to add {{}} to template
+		exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ?", (inpV, outV)).fetchall()
+		if exists:
+			return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Test Case already exists.") #Need to add {{}} to template
+		db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type, assignmentID) VALUES(?, ?, ?, 'PRIVATE')", (inpV, outV, userID, assignmentID))
 		db.commit()
 		cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (session['username'],)).fetchall()
 		print(cases)
 		return render_template('testCases.html', user=session['username'], cases = cases)
 	db = getDB()
+	title = db.execute()
 	cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR testCases.type='PRIVATE' AND login.email=?", (session['username'],)).fetchall()
-	return render_template('testCases.html', user=session['username'], cases = cases)
+	return render_template('testCases.html', user=session['username'], cases = cases, title = title)
 
 @app.route('/about')
 def about():
@@ -259,10 +269,19 @@ def create():
 		semester = request.form['semester']
 		year = request.form['courseYear']
 		instructorID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()
-		db.execute("INSERT INTO class(instructorID, title, section, semester, year) VALUES(?, ?, ?, ?, ?)", (instructorID[0][0], title, secNum, semester, year))
-		db.commit()
+		print(title)
+		print(secNum)
+		print(semester)
+		print(year)
+		exists=db.execute("SELECT classID from class WHERE title = ? and section = ? and semester = ? and year = ?",(title,secNum,semester,year)).fetchall()
+		print(exists)
+		if not exists:	
+			db.execute("INSERT INTO class(instructorID, title, section, semester, year) VALUES(?, ?, ?, ?, ?)", (instructorID[0][0], title, secNum, semester, year))
+			db.commit()
+		else:
+			return render_template("addcourse.html", title = title, secNumber = secNum, semester = semester, year = year, error = "Class already exists")
 		names = request.form['listStudent']
-		courseID=db.execute("SELECT classID from class WHERE title = ? and section = ? and semester = ? and year = ? and instructorID = ?",(title,secNum,semester,year,instructorID)).fetchall()[0][0]
+		courseID=db.execute("SELECT classID from class WHERE title = ? and section = ? and semester = ? and year = ?",(title,secNum,semester,year)).fetchall()[0][0]
 		if ', ' in names:
 			names = names.split(', ')
 			if names:
@@ -390,10 +409,15 @@ def forgot():
 	if request.method == "POST":
 		email = request.form['username']
 		password = request.form['password']
-		pw = md5(password.encode('utf-8')).hexdigest()
+		question = request.form['question'] #MAKE REQUIRED / MAKE A LIST OF QUESTIONS
+		answer = request.form['answer']	#MAKE REQUIRED
 		db = getDB()
-		db.execute("UPDATE login SET password = ? WHERE email = ?", (pw, email))
-		db.commit()
+		if db.execute("SELECT userID FROM login WHERE question=? AND answer=? AND email=?", (question, answer, email)).fetchall():
+			pw = md5(password.encode('utf-8')).hexdigest()
+			db.execute("UPDATE login SET password = ? WHERE email = ?", (pw, email))
+			db.commit()
+		else:
+			return render_template('forgotpw.html', email = email, question = question, error = 'Question or answer is incorrect') #NEED AN ERROR DIV
 		return redirect(url_for('root'))
 	return render_template('forgotpw.html')
 
@@ -409,11 +433,11 @@ def assignmentsID(assignmentID):
 	date = "%s/%s/%s" % (unfdate[2], unfdate[1], unfdate[0])
 	if request.method == "POST":
 		# check if passed due
-		if date.today() > date:
-			return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, error="overdue")
+		if d.today() > date:
+			return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, error="overdue")
 		pass
 
-	return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date)
+	return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID)
 
 @app.route('/createAssignment/<int:courseID>', methods=['GET', 'POST'])
 def createAssignment(courseID):
