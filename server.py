@@ -233,11 +233,11 @@ def test():
 		print(outV)
 		db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type) VALUES(?, ?, ?, 'PRIVATE')", (inpV, outV, userID))
 		db.commit()
-		cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR testCases.type='private' AND login.email=?", (session['username'],)).fetchall()
+		cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (session['username'],)).fetchall()
 		print(cases)
 		return render_template('testCases.html', user=session['username'], cases = cases)
 	db = getDB()
-	cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR testCases.type='private' AND login.email=?", (session['username'],)).fetchall()
+	cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR testCases.type='PRIVATE' AND login.email=?", (session['username'],)).fetchall()
 	return render_template('testCases.html', user=session['username'], cases = cases)
 
 @app.route('/about')

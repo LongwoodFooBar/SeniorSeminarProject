@@ -35,8 +35,8 @@
 
 		<div>
 			{% for t in cases %}
-				<div class = "testCase">t[0]</div>
-				<div class = "testCase">t[1]</div>
+			<div class = "testCase">{{t[0]|safe}}</div>
+			<div class = "testCase">{{t[1]|safe}}</div>
 			{% endfor %}
 		</div>
 
