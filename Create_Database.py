@@ -68,7 +68,7 @@ def createSchema():
 		outputValue TEXT,
 		userID INTEGER,
 		type TEXT,
-	    FOREIGN KEY (uploadID) REFERENCES uploads(uploadID),
+	    FOREIGN KEY (assignmentID) REFERENCES assignment(assignmentID),
 	    FOREIGN KEY (userID) REFERENCES login(userID)
         ) ''')
 
