@@ -239,6 +239,7 @@ def test(assignmentID):
 			return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") #Need to add {{}} to template
 		exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ?", (inpV, outV)).fetchall()
 		if exists:
+			cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (session['username'],)).fetchall()
 			return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Test Case already exists.") #Need to add {{}} to template
 		db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type, assignmentID) VALUES(?, ?, ?, 'PRIVATE', ?)", (inpV, outV, userID, assignmentID))
 		db.commit()
