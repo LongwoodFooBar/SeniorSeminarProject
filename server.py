@@ -59,7 +59,7 @@ def valiDate(unfdate):
 			return False
 
 	date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
-	if date < d.today():
+	if date < str(d.today()):
 		return False
 	return True
 
@@ -246,8 +246,8 @@ def test(assignmentID):
 		print(cases)
 		return render_template('testCases.html', user=session['username'], cases = cases)
 	db = getDB()
-	title = db.execute()
-	cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR testCases.type='PRIVATE' AND login.email=?", (session['username'],)).fetchall()
+	title = db.execute("SELECT title FROM assignment WHERE assignmentID=?", (assignmentID,)).fetchall()[0][0]
+	cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE assignmentID=? AND testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (assignmentID, session['username'])).fetchall()
 	return render_template('testCases.html', user=session['username'], cases = cases, title = title)
 
 @app.route('/about')
@@ -433,7 +433,7 @@ def assignmentsID(assignmentID):
 	date = "%s/%s/%s" % (unfdate[2], unfdate[1], unfdate[0])
 	if request.method == "POST":
 		# check if passed due
-		if d.today() > date:
+		if str(d.today()) > date:
 			return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, error="overdue")
 		pass
 
@@ -456,7 +456,7 @@ def createAssignment(courseID):
 		if len(unfdate[1]) == 1:
 			unfdate[1] = "0" + unfdate[1]
 		if not valiDate(unfdate):
-			return render_template('createassignment.html', title = title, body = body, date = undate, error = "Bad Date")
+			return render_template('createassignment.html', title = title, body = body, date = undate, error = "Bad Date") # NEEDS {{}}s
 		date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
 		db.execute("INSERT INTO assignment(classID, title, body, dueDate) VALUES(?, ?, ?, ?)", (courseID, title, body, date))
 		db.commit()
