@@ -247,7 +247,7 @@ def test(assignmentID):
 		return render_template('testCases.html', user=session['username'], cases = cases)
 	db = getDB()
 	title = db.execute("SELECT title FROM assignment WHERE assignmentID=?", (assignmentID,)).fetchall()[0][0]
-	cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR testCases.type='PRIVATE' AND login.email=?", (session['username'],)).fetchall()
+	cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE assignmentID=? AND testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (assignmentID, session['username'])).fetchall()
 	return render_template('testCases.html', user=session['username'], cases = cases, title = title)
 
 @app.route('/about')

@@ -63,7 +63,7 @@ def createSchema():
 	# teacher can be used by class, student by individual or class, and grading for grading
 	c.execute('''CREATE TABLE IF NOT EXISTS testCases (
 		testID INTEGER PRIMARY KEY,
-		uploadID INTEGER,
+		assignmentID INTEGER,
 		inputValue TEXT,
 		outputValue TEXT,
 		userID INTEGER,
