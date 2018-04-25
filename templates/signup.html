@@ -6,9 +6,14 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
+	<script type="text/javascript" src="{{url_for('static', filename='validate.js')}}"></script>
 	</head>
 	<body>
+<<<<<<< HEAD
 		<form name='signup' method="POST" onsubmit='event.preventDefault(); return validate();'>
+=======
+		<form method="POST" name="signup">
+>>>>>>> 569dd5997a73d1b56b1e77497ea191c3650e1b9f
 			<div class="imgcontainer">
 				<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
 			</div>
@@ -26,8 +31,16 @@
 				<label for="type"><b>Account Type</b></label><br />
 				<input type="radio" name="type" value="STUDENT" required>Student<br />
 				<input type="radio" name="type" value="INSTRUCTOR" required>Instructor<br />
-				<button type="Submit" onclick="validate();">Sign Up</button>
-				<a href="{{url_for('login')}}"><button type="button">Login</button></a>
+				<label for="question"><b>Create a Security Question</b></label>
+				<input type = "text" name = "question" />
+				<label for="answer"><b>Answer Your Question</b></label>
+				<input type="text" name="answer" />
+				<br>
+				<!--<div style="position:fixed; width:100%; left:25%">-->
+				<div>
+				<button type="button" onclick="valid();">Sign Up</button>
+				<a href="{{url_for('login')}}"><button type="button">Back to Login</button></a>
+				</div>
 				<label>
 					<div name='errordiv'id='errmsg' class='errmsg'>{{loginerror}}</div>
 				</label>
@@ -69,3 +82,4 @@
 
 	</body>
 </html>
+

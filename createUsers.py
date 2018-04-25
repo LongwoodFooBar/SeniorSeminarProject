@@ -36,9 +36,9 @@ def createUsers():
 	if not os.path.exists(userdir):
 		os.makedirs(userdir)
 	
-	c.execute('INSERT INTO class(instructorID, title) VALUES(1, "Graph Theory")')
-	c.execute('INSERT INTO class(instructorID, title) VALUES(1, "Systems Programming")')
-	c.execute('INSERT INTO class(instructorID, title) VALUES(1, "Computer Science 162")')
+	c.execute('INSERT INTO class(instructorID, title, section, semester, year) VALUES(1, "Graph Theory", 1, "Fall", 2018)')
+	c.execute('INSERT INTO class(instructorID, title, section, semester, year) VALUES(1, "Systems Programming", 1, "Fall", 2018)')
+	c.execute('INSERT INTO class(instructorID, title, section, semester, year) VALUES(1, "Computer Science 162", 1, "Fall", 2018)')
 
 	c.execute('INSERT INTO takes(userID, classID) VALUES(2, 2)')
 	c.execute('INSERT INTO takes(userID, classID) VALUES(2, 3)')
@@ -48,15 +48,15 @@ def createUsers():
 	c.execute('INSERT INTO takes(userID, classID) VALUES(5, 2)')
 	c.execute('INSERT INTO takes(userID, classID) VALUES(5, 3)')
 
-	c.execute('INSERT INTO assignment(title, body, classID) VALUES("The Royal and Most Pleasant Game of Goose","Placeholder", 1)')
-	c.execute('INSERT INTO assignment(title, body, classID) VALUES("NP Complete Graph Theory Problem","Placeholder", 1)')
-	c.execute('INSERT INTO assignment(title, body, classID) VALUES("Libraries and Linking","Placeholder", 2)')
-	c.execute('INSERT INTO assignment(title, body, classID) VALUES("Process Management","Placeholder", 2)')
-	c.execute('INSERT INTO assignment(title, body, classID) VALUES("Tiny Shell","Placeholder", 2)')
-	c.execute('INSERT INTO assignment(title, body, classID) VALUES("Pipes and the Cloud","Placeholder", 2)')
-	c.execute('INSERT INTO assignment(title, body, classID) VALUES("Date Time","Placeholder", 3)')
-	c.execute('INSERT INTO assignment(title, body, classID) VALUES("Recursive Plants","Placeholder", 3)')
-	c.execute('INSERT INTO assignment(title, body, classID) VALUES("Sorting","Placeholder", 3)')
+	c.execute('INSERT INTO assignment(title, body, classID, dueDate) VALUES("The Royal and Most Pleasant Game of Goose","Placeholder", 1, "2018-10-10")')
+	c.execute('INSERT INTO assignment(title, body, classID, dueDate) VALUES("NP Complete Graph Theory Problem","Placeholder", 1, "2018-10-10")')
+	c.execute('INSERT INTO assignment(title, body, classID, dueDate) VALUES("Libraries and Linking","Placeholder", 2, "2018-10-10")')
+	c.execute('INSERT INTO assignment(title, body, classID, dueDate) VALUES("Process Management","Placeholder", 2, "2018-10-10")')
+	c.execute('INSERT INTO assignment(title, body, classID, dueDate) VALUES("Tiny Shell","Placeholder", 2, "2018-10-10")')
+	c.execute('INSERT INTO assignment(title, body, classID, dueDate) VALUES("Pipes and the Cloud","Placeholder", 2, "2018-10-10")')
+	c.execute('INSERT INTO assignment(title, body, classID, dueDate) VALUES("Date Time","Placeholder", 3, "2018-10-10")')
+	c.execute('INSERT INTO assignment(title, body, classID, dueDate) VALUES("Recursive Plants","Placeholder", 3, "2018-10-10")')
+	c.execute('INSERT INTO assignment(title, body, classID, dueDate) VALUES("Sorting","Placeholder", 3, "2018-10-10")')
 
 	conn.commit()
 	conn.close()

@@ -29,13 +29,14 @@
 			<br /><br />
 
 			<label for="dueDate"><b>Due Date</b></label>
-			<input type="text" placeholder="DD/MM/YYYY" name="dueDate" value="{{date}}">
+			<input type="text" placeholder="Pick a Date" name="dueDate" value="{{date}}">
 			<br /><br />
 
 			<label for="assignmentDesc"><b>Assignment Details</b></label>
 			<br />
 			<input type="text" placeholder="Enter Assignment Details" name="assignmentDesc" value="{{body}}">
 			<br /><br />
+			<div name='errordiv' class='errmsg'>{{error}}</div>
 			<button type="submit">Submit</button>
 	</div>
 </body>

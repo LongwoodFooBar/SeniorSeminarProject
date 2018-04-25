@@ -30,20 +30,26 @@
 			<br />
 
 			<label for="secNumber"><b>Section Number</b></label>
-                        <input type="text" placeholder="Section Number" name="secNumber">
+			<input type="text" placeholder="Section Number" name="secNumber" value={{secNum}}>
 			<br />
 
 			<label for="semester"><b>Choose a Semester:</b></label>
-			<input type="radio" name="semester" value="Fall"> Fall
-			<input type="radio" name="semester" value="Winter"> Winter
-			<input type="radio" name="semester" value="Spring"> Spring
-			<input type="radio" name="semester" value="Summer"> Summer 
+			<input type="radio" name="semester" value="Fall" {% if sem=='Fall' %} checked="checked" {% endif %}> Fall
+			<input type="radio" name="semester" value="Winter" {% if sem=='Winter' %} checked="checked" {% endif %}> Winter
+			<input type="radio" name="semester" value="Spring" {% if sem=='Spring' %} checked="checked" {% endif %}> Spring
+			<input type="radio" name="semester" value="Summer" {% if sem=='Summer' %} checked="checked" {% endif %}> Summer 
 			<br /><br />
 
 			<label for="courseYear"><b>Year for the Course:</b></label>
 			<br />
-                        <input type="text" placeholder="Year" name="courseYear">
+			<input type="text" placeholder="Year" name="courseYear" value={{year}}>
 			<br />
+
+			<div name="students"><b>Students in this course:</b><br />
+			{% for student in students %}
+			{{student[0]|safe}} {{student[1]|safe}} ({{student[2]|safe}}) <br />
+			{% endfor %}
+			</div><br />
 
 			<label for="listStudent"><b>Add Students by Email:</b><br>(Seperate multiple emails with commas)</label>
 			<br />
@@ -56,6 +62,8 @@
 			<br />
 			<button type="submit">Submit</button>
 	</div>
+		<div name='errordiv' class='errmsg'>{{error}}</div>
+
 </body>
 </html>
 

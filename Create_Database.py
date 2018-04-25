@@ -16,8 +16,10 @@ def createSchema():
 		firstName TEXT,
 		lastName TEXT,
 		password TEXT,
-		email TEXT,
-		position TEXT
+		email TEXT UNIQUE,
+		position TEXT,
+		question TEXT,
+		answer TEXT
 	)''')
 
 	# Creates the class table
@@ -29,6 +31,7 @@ def createSchema():
 		section INTEGER,
 		semester TEXT,
 		year INTEGER,
+		UNIQUE(title, section, semester, year),
 		FOREIGN KEY (instructorID) REFERENCES login(userID)
 	) ''')
 
@@ -60,11 +63,13 @@ def createSchema():
 	# teacher can be used by class, student by individual or class, and grading for grading
 	c.execute('''CREATE TABLE IF NOT EXISTS testCases (
 		testID INTEGER PRIMARY KEY,
-		uploadID INTEGER,
+		assignmentID INTEGER,
 		inputValue TEXT,
 		outputValue TEXT,
+		userID INTEGER,
 		type TEXT,
-	    FOREIGN KEY (uploadID) REFERENCES uploads(uploadID)
+	    FOREIGN KEY (assignmentID) REFERENCES assignment(assignmentID),
+	    FOREIGN KEY (userID) REFERENCES login(userID)
         ) ''')
 
 	c.execute('''CREATE TABLE IF NOT EXISTS takes (
