@@ -85,10 +85,10 @@ def login():
 			    error = "Username is not registered"
 			return render_template('login.html', loginerror=error)
 	return render_template('login.html')
-
+	
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-	if request.method == 'POST':
+	if request.method == 'POST' and form.validate():
 		db = getDB()
 		error = None
 
@@ -98,7 +98,7 @@ def signup():
 
 		password = md5(request.form['password'].encode('utf-8')).hexdigest()
 
-		db.execute('INSERT INTO login (firstName, lastName, email, password, position) VALUES (?, ?, ?, ?, ?)', (request.form['firstName'], request.form['lastName'], request.form['email'], password, request.form['type']))
+		db.execute('INSERT INTO login (firstName, lastName, email, password, position) VALUES (?, ?, ?, ?, ?)', (request.form['firstName'], request.form['lastName'],request.form['email'], password, request.form['type']))
 		db.commit()
 		session['username'] = request.form['email']
 		session['password'] = request.form['password']
@@ -132,15 +132,15 @@ def courses():
 				cs[i].append(db.execute("SELECT assignment.title, assignment.assignmentID FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (cs[i][0],)).fetchall())
 			return render_template('courses.html', user=session['username'], courses=cs)
 	return redirect(url_for('root'))
-
 @app.route('/sandbox', methods=['GET', 'POST'])
 def sandbox(code='', output=''):
+	default_filename = './userdirs/%s/sandbox.cpp' % session['username']
 	if not check_logged():
 		return home()
 	if request.method == 'POST':
 		code = request.form['code']
 		timeout = int(request.form['timeout'])
-		filename = './userdirs/%s/sandbox.cpp' % session['username']
+		filename = default_filename
 		ofilename = './userdirs/%s/outfile' % session['username']
 		codefile = open(filename, "w")
 		codefile.write(code + '\n')

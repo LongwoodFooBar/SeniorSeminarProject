@@ -8,7 +8,7 @@
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
 	</head>
 	<body>
-		<form method="POST">
+		<form name='signup' method="POST" onsubmit='event.preventDefault(); return validate();'>
 			<div class="imgcontainer">
 				<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
 			</div>
@@ -29,9 +29,43 @@
 				<button type="Submit" onclick="validate();">Sign Up</button>
 				<a href="{{url_for('login')}}"><button type="button">Login</button></a>
 				<label>
-					<div name='errordiv' class='errmsg'>{{loginerror}}</div>
+					<div name='errordiv'id='errmsg' class='errmsg'>{{loginerror}}</div>
 				</label>
 			</div>
 		</form>
+		<script>
+			var form = document.forms['signup'];
+			var first_name = form['firstName'];
+			var last_name = form['lastName'];
+			var email = form['email'];
+			var password = form['password'];
+			var confirm_pword = form['psw2'];
+			var type = form['type'];
+			var erno = document.getElementById('errmsg')
+			function validate(){
+				var ret = true
+				erno.innerHTML = '';
+				if(first_name.value == '' || last_name.value == '' || email.value == '' || password.value == ''
+					 || confirm_pword == '' || type.value == ''){
+					erno.innerHTML += 'Must fill out all fields</br>';
+					ret = false;
+				}
+				var atpos = email.value.indexOf("@");
+				var dotpos = email.value.lastIndexOf(".");
+				if (atpos<1 || dotpos<atpos+2 || dotpos+2>=email.value.length) {
+					erno.innerHTML += "Not a valid e-mail address</br>";
+					ret = false;
+				}
+				if(password.value != confirm_pword.value){
+					erno.innerHTML += 'Passwords do not match!</br>';
+					ret = false;
+				}
+				if(ret == true){
+					form.submit();
+				}
+				return ret;
+			}
+		</script>
+
 	</body>
 </html>
