@@ -202,7 +202,12 @@ def sandbox(code='', output=''):
 			infile.close()
 		if request.form['sandbox'] == 'compile':
 			os.system('g++ -Wall ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
-			return render_template('sandbox.html', user=session['username'], code=code)
+			if os.path.exists(ofilename):
+				opfile = open(ofilename, "r")
+				output = opfile.read()
+				opfile.close()
+				os.remove(ofilename)
+			return render_template('sandbox.html', user=session['username'], code=code, output=output)
 		elif request.form['sandbox'] == 'run':
 			if platform.system() == 'Linux':
 				if inp:
@@ -218,6 +223,16 @@ def sandbox(code='', output=''):
 					exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
 				if os.WEXITSTATUS(exitstat) == 124:
 					os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
+			if os.path.exists(ofilename):
+				opfile = open(ofilename, "r")
+				output = opfile.read()
+				opfile.close()
+				os.remove(ofilename)
+			if os.path.exists(filename):
+				cfile = open(filename, "r")
+				code = cfile.read()
+				cfile.close()
+			return render_template('sandbox.html', user=session['username'], code=code, output=output)
 		elif request.form['sandbox'] == 'save':
 			pass
 		elif request.form['sandbox'] == 'upload':
