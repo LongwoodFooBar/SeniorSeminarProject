@@ -73,7 +73,12 @@ def getDB():
 	return g.sqlite_db
 
 def allowedFile(filename):
-	return '.' in filename and filename.rsplit('.',1).lower() in ALLOWED_EXTENSIONS
+	if '.' in filename:
+		fileparts = filename.rsplit('.',1)
+		print(fileparts)
+		if fileparts[len(fileparts) - 1] in ALLOWED_EXTENSIONS:
+			return True
+	return False
 
 def home():
 	return redirect(url_for('root'))
@@ -216,18 +221,19 @@ def sandbox(code='', output=''):
 		elif request.form['sandbox'] == 'save':
 			pass
 		elif request.form['sandbox'] == 'upload':
-			if 'file' not in request.files:
-				return render_template('sandbox.html', user=session['username'], code=code, output=output)
+			print("FILES: ")
+			print(request.files)
+			if 'uploadfile' not in request.files:
+				return render_template('sandbox.html', user=session['username'], code=code, output=output, error="No file selected")
 			upfile = request.files['uploadfile']
 			if upfile.filename == '':
-				return render_template('sandbox.html', user=session['username'], code=code, output=output)
-			if not allowedFile(upfile):
+				return render_template('sandbox.html', user=session['username'], code=code, output=output, error = "No file selected")
+			if not allowedFile(upfile.filename):
 				return render_template('sandbox.html', user=session['username'], code=code, output=output, error = "Bad filetype")
-			filename = secure_filename(upfile.filename)
-			userdir = 'userdirs/%s/' % session['username']
-			upfile.save(os.path.join(userdir, "sandbox.cpp"))
-			codefile = open(os.path.join(userdir, "sandbox.cpp"))
-			code = codefile.read()
+			upfile.save(filename)
+			cfile = open(filename, "r")
+			code = cfile.read()
+			cfile.close()
 			return render_template('sandbox.html', user=session['username'], code=code, output=output)
 	if os.path.exists(ofilename):
 		opfile = open(ofilename, "r")
