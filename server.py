@@ -72,11 +72,11 @@ def getDB():
 		g.sqlite_db = connectDB()
 	return g.sqlite_db
 
-def home():
-	return redirect(url_for('root'))
-
 def allowedFile(filename):
 	return '.' in filename and filename.rsplit('.',1).lower() in ALLOWED_EXTENSIONS
+
+def home():
+	return redirect(url_for('root'))
 
 @app.route('/')
 def root():
@@ -108,6 +108,13 @@ def login():
 			return render_template('login.html', loginerror=error)
 	return render_template('login.html')
 
+@app.route('/logout')
+def logout():
+	if not checkLogged():
+		return home()
+	session.pop('username', None)
+	return redirect(url_for('root'))
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
 	if request.method == 'POST':
@@ -131,12 +138,22 @@ def signup():
 		return redirect(url_for('courses'))
 	return render_template('signup.html')
 
-@app.route('/logout')
-def logout():
-	if not checkLogged():
-		return home()
-	session.pop('username', None)
-	return redirect(url_for('root'))
+@app.route('/forgot', methods=['GET', 'POST'])
+def forgot():
+	if request.method == "POST":
+		email = request.form['username']
+		password = request.form['password']
+		question = request.form['question']#MAKE REQUIRED / MAKE A LIST OF QUESTIONS
+		answer = request.form['answer']#MAKE REQUIRED
+		db = getDB()
+		if db.execute("SELECT userID FROM login WHERE question=? AND answer=? AND email=?", (question, answer, email)).fetchall():
+			pw = md5(password.encode('utf-8')).hexdigest()
+			db.execute("UPDATE login SET password = ? WHERE email = ?", (pw, email))
+			db.commit()
+		else:
+			return render_template('forgotpw.html', email = email, question = question, error = 'Question or answer is incorrect')
+		return redirect(url_for('root'))
+	return render_template('forgotpw.html')
 
 @app.route('/courses')
 def courses():
@@ -157,6 +174,7 @@ def courses():
 				cs[i].append(db.execute("SELECT assignment.title, assignment.assignmentID FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (cs[i][0],)).fetchall())
 			return render_template('courses.html', user=session['username'], courses=cs)
 	return redirect(url_for('root'))
+
 @app.route('/sandbox', methods=['GET', 'POST'])
 def sandbox(code='', output=''):
 	if not checkLogged():
@@ -216,46 +234,6 @@ def sandbox(code='', output=''):
 		code = cfile.read()
 		cfile.close()
 	return render_template('sandbox.html', user=session['username'], code=code, output=output)
-
-@app.route('/faq')
-def faq():
-	if not checkLogged():
-		return home()
-	return render_template('faq.html', user=session['username'])
-
-@app.route('/test/<int:assignmentID>', methods=["GET", "POST"])
-def test(assignmentID):
-	if not checkLogged():
-		return home()
-	if request.method == "POST":
-		db = getDB()
-		userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
-		print(userID)
-		inpV = request.form['input']
-		outV = request.form['output']
-		print(inpV)
-		print(outV)
-		if not inpV and outV:
-			return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") #Need to add {{}} to template
-		exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ?", (inpV, outV)).fetchall()
-		if exists:
-			cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (session['username'],)).fetchall()
-			return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Test Case already exists.", assignmentID=assignmentID) #Need to add {{}} to template
-		db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type, assignmentID) VALUES(?, ?, ?, 'PRIVATE', ?)", (inpV, outV, userID, assignmentID))
-		db.commit()
-		cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (session['username'],)).fetchall()
-		print(cases)
-		return render_template('testCases.html', user=session['username'], cases = cases, assignmentID=assignmentID)
-	db = getDB()
-	title = db.execute("SELECT title FROM assignment WHERE assignmentID=?", (assignmentID,)).fetchall()[0][0]
-	cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE assignmentID=? AND testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (assignmentID, session['username'])).fetchall()
-	return render_template('testCases.html', user=session['username'], cases = cases, title = title, assignmentID=assignmentID)
-
-@app.route('/about')
-def about():
-	if not checkLogged():
-		return home()
-	return render_template('about.html', user=session['username'])
 
 @app.route('/create', methods=['GET', 'POST'])
 def create():
@@ -405,23 +383,6 @@ def editCourse(courseID):
 	students = db.execute("SELECT firstName, lastName, email FROM login JOIN takes ON takes.userID=login.userID WHERE takes.classID=?", (courseID,)).fetchall()
 	return render_template('editcourse.html', user=session['username'], title=info[0][2], secNum=info[0][3], year=info[0][5], sem=info[0][4], students = students)
 
-@app.route('/forgot', methods=['GET', 'POST'])
-def forgot():
-	if request.method == "POST":
-		email = request.form['username']
-		password = request.form['password']
-		question = request.form['question']#MAKE REQUIRED / MAKE A LIST OF QUESTIONS
-		answer = request.form['answer']#MAKE REQUIRED
-		db = getDB()
-		if db.execute("SELECT userID FROM login WHERE question=? AND answer=? AND email=?", (question, answer, email)).fetchall():
-			pw = md5(password.encode('utf-8')).hexdigest()
-			db.execute("UPDATE login SET password = ? WHERE email = ?", (pw, email))
-			db.commit()
-		else:
-			return render_template('forgotpw.html', email = email, question = question, error = 'Question or answer is incorrect')
-		return redirect(url_for('root'))
-	return render_template('forgotpw.html')
-
 @app.route('/assignments/<int:assignmentID>', methods=["GET", "POST"])
 def assignmentsID(assignmentID):
 	if not checkLogged():
@@ -493,6 +454,46 @@ def editAssignment(assignmentID):
 	unfdate = unfdate.split("-")
 	date = "%s/%s/%s" % (unfdate[2], unfdate[1], unfdate[0])
 	return render_template('editassignment.html', title = info[0][1], body = info[0][2], date = date)
+
+@app.route('/test/<int:assignmentID>', methods=["GET", "POST"])
+def test(assignmentID):
+	if not checkLogged():
+		return home()
+	if request.method == "POST":
+		db = getDB()
+		userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
+		print(userID)
+		inpV = request.form['input']
+		outV = request.form['output']
+		print(inpV)
+		print(outV)
+		if not inpV and outV:
+			return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") #Need to add {{}} to template
+		exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ?", (inpV, outV)).fetchall()
+		if exists:
+			cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (session['username'],)).fetchall()
+			return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Test Case already exists.", assignmentID=assignmentID) #Need to add {{}} to template
+		db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type, assignmentID) VALUES(?, ?, ?, 'PRIVATE', ?)", (inpV, outV, userID, assignmentID))
+		db.commit()
+		cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (session['username'],)).fetchall()
+		print(cases)
+		return render_template('testCases.html', user=session['username'], cases = cases, assignmentID=assignmentID)
+	db = getDB()
+	title = db.execute("SELECT title FROM assignment WHERE assignmentID=?", (assignmentID,)).fetchall()[0][0]
+	cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE assignmentID=? AND testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (assignmentID, session['username'])).fetchall()
+	return render_template('testCases.html', user=session['username'], cases = cases, title = title, assignmentID=assignmentID)
+
+@app.route('/faq')
+def faq():
+	if not checkLogged():
+		return home()
+	return render_template('faq.html', user=session['username'])
+
+@app.route('/about')
+def about():
+	if not checkLogged():
+		return home()
+	return render_template('about.html', user=session['username'])
 
 @app.teardown_appcontext
 def closeDB(error):
