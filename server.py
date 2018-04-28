@@ -59,15 +59,22 @@ def valiDate(unfdate):
 			return False
 
 	date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
-	if checkToday():
+	if checkToday(date):
 		return False
 	return True
 
 #checks if date is before today
 def checkToday(date):
 	today = d.today()
-	print(today)
-	darray = date.split("/")
+	darray = date.split("-")
+	tarray = str(today).split("-")
+	tarray[2] = tarray[2].split(" ")[0]
+
+	if int(darray[0]) <= int(tarray[0]):
+		if int(darray[1]) <= int(tarray[1]):
+			if int(darray[2]) <= int(tarray[2]):
+				return False
+	return True
 
 def connectDB():
 	rv = sqlite3.connect(app.config['DATABASE'])
@@ -81,7 +88,6 @@ def getDB():
 def allowedFile(filename):
 	if '.' in filename:
 		fileparts = filename.rsplit('.',1)
-		print(fileparts)
 		if fileparts[len(fileparts) - 1] in ALLOWED_EXTENSIONS:
 			return True
 	return False
@@ -418,23 +424,21 @@ def assignmentsID(assignmentID):
 	db = getDB()
 	a = list(db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall())
 	unfdate = a[0][4]
-	unfdate = unfdate.split("-")
-	date = "%s/%s/%s" % (unfdate[2], unfdate[1], unfdate[0])
+	undate = unfdate.split("-")
+	date = "%s/%s/%s" % (undate[2], undate[1], undate[0])
 	utype = db.execute("SELECT position FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
 	if utype == "STUDENT":
 		code = ""
 		output = ""
 		userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
 		filename = './userdirs/%s/assignment%s-%s.cpp' % (session['username'], assignmentID, userID)
-		print(filename)
 		ifilename = './userdirs/%s/infile' % session['username']
 		ofilename = './userdirs/%s/outfile' % session['username']
 		exe = './userdirs/%s/assignment%s-%s' % (session['username'], assignmentID, userID)
 		if request.method == "POST":
-			if checkToday(date):
+			if not checkToday(unfdate):
 				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, error="Overdue")
 			code = request.form['code']
-			print(code)
 			inp = request.form.get('cin')
 			timeout = int(request.form['timeout'])
 			codefile = open(filename, "w")
