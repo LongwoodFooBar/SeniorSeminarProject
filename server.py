@@ -411,15 +411,15 @@ def forgot():
 	if request.method == "POST":
 		email = request.form['username']
 		password = request.form['password']
-		question = request.form['question'] #MAKE REQUIRED / MAKE A LIST OF QUESTIONS
-		answer = request.form['answer']	#MAKE REQUIRED
+		question = request.form['question']#MAKE REQUIRED / MAKE A LIST OF QUESTIONS
+		answer = request.form['answer']#MAKE REQUIRED
 		db = getDB()
 		if db.execute("SELECT userID FROM login WHERE question=? AND answer=? AND email=?", (question, answer, email)).fetchall():
 			pw = md5(password.encode('utf-8')).hexdigest()
 			db.execute("UPDATE login SET password = ? WHERE email = ?", (pw, email))
 			db.commit()
 		else:
-			return render_template('forgotpw.html', email = email, question = question, error = 'Question or answer is incorrect') #NEED AN ERROR DIV
+			return render_template('forgotpw.html', email = email, question = question, error = 'Question or answer is incorrect')
 		return redirect(url_for('root'))
 	return render_template('forgotpw.html')
 
@@ -437,7 +437,7 @@ def assignmentsID(assignmentID):
 		# check if passed due
 		if str(d.today()) > date:
 			return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, error="overdue")
-		pass
+		pass #DO THIS
 
 	return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID)
 
