@@ -6,16 +6,18 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
-	<script type="text/javascript" src="{{url_for('static', filename='validate.js')}}"></script>
+		<script type="text/javascript" src="{{url_for('static', filename='validate.js')}}"></script>
 	</head>
 	<body>
+		<form name='signup' method="POST" id='signup' onsubmit='event.preventDefault(); return validate();'>
 		<form method="POST" name="signup">
+
 			<div class="imgcontainer">
 				<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
 			</div>
 			<div class="container">
 				<label for="email"><b>Email</b></label>
-				<input type="text" placeholder="Enter Email" name="email" required>      
+				<input type="text" placeholder="Enter Email" name="email" required>
 				<label for="firstName"><b>First Name</b></label>
 				<input type="text" placeholder="Enter First Name" name="firstName" required>
 				<label for="lastName"><b>Last Name</b></label>
@@ -38,10 +40,11 @@
 				<a href="{{url_for('login')}}"><button type="button">Back to Login</button></a>
 				</div>
 				<label>
-					<div name='errordiv' class='errmsg'>{{loginerror}}</div>
+					<div name='errordiv'id='errmsg' class='errmsg'>{{loginerror}}</div>
 				</label>
 			</div>
 		</form>
+
+
 	</body>
 </html>
-

@@ -5,50 +5,8 @@
 		<title>C++ Sandbox</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">	
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
-		<style>
-
-			/* The Modal (background) */
-		.modal {
-		    display: none; /* Hidden by default */
-		    position: fixed; /* Stay in place */
-		    z-index: 1; /* Sit on top */
-		    padding-top: 100px; /* Location of the box */
-		    left: 0;
-		    top: 0;
-		    width: 100%; /* Full width */
-		    height: 100%; /* Full height */
-		    overflow: auto; /* Enable scroll if needed */
-		    background-color: rgb(0,0,0); /* Fallback color */
-		    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-		}
-
-		/* Modal Content */
-		.modal-content {
-		    background-color: #fefefe;
-		    margin: auto;
-		    padding: 20px;
-		    border: 1px solid #888;
-		    width: 80%;
-		}
-
-		/* The Close Button */
-		.close {
-		    color: #aaaaaa;
-		    float: right;
-		    font-size: 28px;
-		    font-weight: bold;
-		}
-
-		.close:hover,
-		.close:focus {
-		    color: #000;
-		    text-decoration: none;
-		    cursor: pointer;
-		}
-		</style>
-		
+		<script type="text/javascript" src="{{url_for('static', filename='tab.js')}}"></script>
 	</head>
 	<body>
 		<div>
@@ -90,10 +48,10 @@
 					<button id="prompt" type="button" value="upload" style="width:24.7%"> Upload </button>
 					<div id="myModal" class="modal">
 
- 					 	<!-- Modal content -->
+						<!-- Modal content -->
 					<div class="modal-content">
 					<span class="close" style="float:left">&times;</span>
-    						<p>Upload file here:</p>
+							<p>Upload file here:</p>
 						<input type="file" name="uploadfile"></input>
 						<button type="submit" name="sandbox" value="upload" style="width:25%">Upload</button>	
 
@@ -114,7 +72,7 @@
 </div>
 <br /><br />
 	<div style="float:right;width:40%; height=5vw">
-   	INPUT HERE:
+	INPUT HERE:
 	</div>
 	<br />
 	<div>
@@ -139,47 +97,6 @@
 		<textarea disabled type="text" name="output" id="output" class="outputBox">{{output}}</textarea>
 		</div>
 		</form>
-		
-		<script type="text/javascript">
-		var textareas = document.getElementById('code');
-		//textareas.value = "HELLO, WORLD!";
-		textareas.onkeydown = function(e){
-			if(e.keyCode==9 || e.which==9){
-				e.preventDefault();
-				var s = this.selectionStart;
-				this.value = this.value.substring(0,this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
-				this.selectionEnd = s+1; 
-			}
-		}
-		//UPLOAD CODE STARTS HERE
-		var modal = document.getElementById('myModal');
-
-					// Get the button that opens the modal
-					var btn = document.getElementById("prompt");
-
-					// Get the <span> element that closes the modal
-					var span = document.getElementsByClassName("close")[0];
-
-					// When the user clicks the button, open the modal 
-					btn.onclick = function() {
-						modal.style.display = "block";
-					}
-
-					// When the user clicks on <span> (x), close the modal
-					span.onclick = function() {
-					modal.style.display = "none";
-					}
-
-			// When the user clicks anywhere outside of the modal, close it
-					window.onclick = function(event) {
-						if (event.target == modal) {
-							modal.style.display = "none";
-						}
-					}
-
-
-</script>
 		<div name='errordiv' class='errmsg'>{{error}}</div>
-
-</body>
+	</body>
 </html>
