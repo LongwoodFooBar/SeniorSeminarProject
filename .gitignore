@@ -1,0 +1,5 @@
+.git/
+__pycache__
+server.pyc
+foobar.db
+userdirs/
