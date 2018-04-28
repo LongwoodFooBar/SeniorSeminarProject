@@ -217,7 +217,8 @@ def sandbox(code='', output=''):
 			pass
 		elif request.form['sandbox'] == 'upload':
 			if 'file' not in request.files:
-				upfile = request.files['uploadfile']
+				return render_template('sandbox.html', user=session['username'], code=code, output=output)
+			upfile = request.files['uploadfile']
 			if upfile.filename == '':
 				return render_template('sandbox.html', user=session['username'], code=code, output=output)
 			if not allowedFile(upfile):
