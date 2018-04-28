@@ -6,18 +6,3 @@ function tab(t, e) {
         t.selectionEnd = s + 1;
 	}
 }
-/*
-function modalOn() {
-	document.getElementById('myModal').style.display = "block";
-}
-
-function modalOff() {
-	document.getElementById('myModal').style.display = "none"
-}
-
-window.onclick = function(event) {
-	if (event.target == modal) {
-		modal.style.display = "none";
-	}
-}
-*/
