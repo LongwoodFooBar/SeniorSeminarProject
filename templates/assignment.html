@@ -25,39 +25,16 @@
 			<p>{{body}}</p>
 		</div>
 
-
 		<form method="POST" enctype=multipart/form-data >
-			<script>
-				function file_upload(){
-				var x = document.getElementById("projectFile");
-					if('files' in x){
-						if(x.files.length == 0){
-							//error
-						}
-						else{
-
-						}
-					}
-				}
-			</script>
-				<div style="width:100%; right:0.6%">
+			<div style="width:100%; right:0.6%">
 				<nav class="testCaseBtn">
 					<button type="submit" name="sandbox" value="compile">Compile</button>
 					<button type="submit" name="sandbox" value="run">Run</button>
 					<button type="submit" name="sandbox" value="runTest">Run Test Cases</button>
 					<button type="submit" name="sandbox" value="save">Save</button>
-					<button style="width:19.7%" id="prompt" type="button" value="upload">Upload</button>
-
-					<div id="myModal" class="modal">
-
- 					 	<!-- Modal content -->
-					<div class="modal-content">
-					<span class="close" style="float:left">&times;</span>
-							<p>Upload file here:</p>
-						<input type="file" name="uploadfile"></input>
-						<button type="submit" name="sandbox" value="upload" style="width:25%">Upload</button>
-
-					</div>
+					<div id="uploadBox" style="display:inline">
+					<button type="submit" name="sandbox" value="upload">Upload</button>
+					<input type="file" name="uploadfile" style="width:19.7%"></input>
 					</div>
 				</nav>
 			</div>
@@ -91,13 +68,14 @@
 		</div>
 		<br>
 
-		<div>
-		<textarea type="text" id="code" name="code" class="codeBox">{{code}}</textarea>
-		</div>
 
-		<div>
-		<textarea disabled type="text" name="output" id="output" class="outputBox">{{output}}</textarea>
-		</div>
+			<div>
+				<textarea type="text" id="code" name="code" class="codeBox" onkeydown="tab(this, event);">{{code}}</textarea>
+			</div>
+
+			<div>
+				<textarea disabled type="text" name="output" id="output" class="outputBox">{{output}}</textarea>
+			</div>
 		</form>
 		<div name='errordiv' class='errmsg'>{{error}}</div>
 	</body>
