@@ -26,8 +26,16 @@
 				<label for="type"><b>Account Type</b></label><br />
 				<input type="radio" name="type" value="STUDENT" required>Student<br />
 				<input type="radio" name="type" value="INSTRUCTOR" required>Instructor<br />
-				<label for="question"><b>Create a Security Question</b></label>
-				<input type = "text" name = "question" />
+				<label for="Security Question:"><b>Choose a question:</b></label>
+				<br />
+				<select name="securityQuestion">
+					<option value="maidenName" selected> What is your mothers maiden name? </option>
+					<option value="petName"> What was the name of your first pet? </option>
+					<option value="firstStreet"> What is the name of the street on which you grew up? </option>
+					<option value="elemSchool"> What is the name of your elementary school </option>
+					<option value="firstCar"> What is the name of your first car? </option>
+				</select>
+				<br />
 				<label for="answer"><b>Answer Your Question</b></label>
 				<input type="text" name="answer" />
 				<br>
