@@ -19,7 +19,6 @@
 		<div>
 			<p id="nav-logged">Logged in as: {{user}}</p>
 			<a href="{{url_for('test', assignmentID=assignmentID)}}"><button type="button" name="testCases" value="testCases" style="width:20%; float:right">My Test Cases</button></a>
-			<button type="submit" name="submit" value="assignment" style="width:20%; float:right">Submit Assignment</button>
 			<h1>{{title}}</h1>
 			<h2>Due Date: {{date}}</h2>
 			<p>{{body}}</p>
@@ -36,6 +35,7 @@
 					<button type="submit" name="sandbox" value="upload">Upload</button>
 					<input type="file" name="uploadfile" style="width:19.7%"></input>
 					</div>
+					<button type="submit" name="sandbox" value="assignment" style="width:20%; float:right">Submit Assignment</button>
 				</nav>
 			</div>
 			<div style="float:left">
