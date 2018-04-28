@@ -418,7 +418,7 @@ def createAssignment(courseID):
 		if len(unfdate[1]) == 1:
 			unfdate[1] = "0" + unfdate[1]
 		if not valiDate(unfdate):
-			return render_template('createassignment.html', title = title, body = body, date = undate, error = "Bad Date") # NEEDS {{}}s
+			return render_template('createassignment.html', title = title, body = body, date = undate, error = "Bad Date") 
 		date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
 		db.execute("INSERT INTO assignment(classID, title, body, dueDate) VALUES(?, ?, ?, ?)", (courseID, title, body, date))
 		db.commit()
@@ -468,11 +468,11 @@ def test(assignmentID):
 		print(inpV)
 		print(outV)
 		if not inpV and outV:
-			return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") #Need to add {{}} to template
+			return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") 
 		exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ?", (inpV, outV)).fetchall()
 		if exists:
 			cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (session['username'],)).fetchall()
-			return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Test Case already exists.", assignmentID=assignmentID) #Need to add {{}} to template
+			return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Test Case already exists.", assignmentID=assignmentID) 
 		db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type, assignmentID) VALUES(?, ?, ?, 'PRIVATE', ?)", (inpV, outV, userID, assignmentID))
 		db.commit()
 		cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (session['username'],)).fetchall()

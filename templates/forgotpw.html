@@ -22,6 +22,8 @@
 				<input type="password" placeholder="New Password" name="password" required>
 				<label for="password2"><b>Retype New Password:</b></label>
 				<input type="password" placeholder="Retype New Password" name="password2" required>
+				<label for="answer"><b>{{question}}</b></label>
+				<input type="text" placeholder="Answer the Security Question." name="answer" required>
 				<button type="submit" onclick="validate();">Reset Password</button>
 				<label>
 					<div name='errordiv' class='errmsg'>{{loginerror}}</div>
