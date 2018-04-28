@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 import sqlite3
 import os, sys, platform
 from hashlib import md5
-from datetime import date as d
+from datetime import datetime as d
 
 UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = (['cpp', 'c'])
@@ -59,9 +59,15 @@ def valiDate(unfdate):
 			return False
 
 	date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
-	if date < str(d.today()):
+	if checkToday():
 		return False
 	return True
+
+#checks if date is before today
+def checkToday(date):
+	today = d.today()
+	print(today)
+	darray = date.split("/")
 
 def connectDB():
 	rv = sqlite3.connect(app.config['DATABASE'])
@@ -164,15 +170,15 @@ def forgot():
 def courses():
 	if checkLogged():
 		db = getDB()
-		utype = db.execute("SELECT position FROM login WHERE email=?", (session['username'],)).fetchall()
-		if utype[0][0] == 'INSTRUCTOR':
+		utype = db.execute("SELECT position FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
+		if utype == 'INSTRUCTOR':
 			cs = db.execute("SELECT title, classID FROM class JOIN login on class.instructorID=login.userID WHERE login.email=?", (session['username'],)).fetchall()
 			for i in range(len(cs)):
 				cs[i] = list(cs[i])
 				cs[i].append(db.execute("SELECT assignment.title, assignment.assignmentID FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (cs[i][0],)).fetchall())
 			return render_template('professor.html', user=session['username'], courses=cs)
 
-		elif utype[0][0] == 'STUDENT':
+		elif utype == 'STUDENT':
 			cs = db.execute("SELECT title FROM class NATURAL JOIN takes NATURAL JOIN login WHERE login.email=?", (session['username'],)).fetchall()
 			for i in range(len(cs)):
 				cs[i] = list(cs[i])
@@ -189,6 +195,7 @@ def sandbox(code='', output=''):
 	filename = './userdirs/%s/sandbox.cpp' % session['username']
 	ifilename = './userdirs/%s/infile' % session['username']
 	ofilename = './userdirs/%s/outfile' % session['username']
+	exe = './userdirs/%s/sandbox' % session['username']
 	if request.method == 'POST':
 		code = request.form['code']
 		inp = request.form.get('cin')
@@ -201,7 +208,7 @@ def sandbox(code='', output=''):
 			infile.write(inp)
 			infile.close()
 		if request.form['sandbox'] == 'compile':
-			os.system('g++ -Wall ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
+			os.system('g++ -Wall %s -o %s 2> %s' % (filename, exe, ofilename))
 			if os.path.exists(ofilename):
 				opfile = open(ofilename, "r")
 				output = opfile.read()
@@ -211,18 +218,18 @@ def sandbox(code='', output=''):
 		elif request.form['sandbox'] == 'run':
 			if platform.system() == 'Linux':
 				if inp:
-					exitstat = os.system('timeout %d ./userdirs/%s/sandbox < %s > ./userdirs/%s/outfile' % (timeout, session['username'], ifilename, session['username']))
+					exitstat = os.system('timeout %d %s < %s > %s' % (timeout, exe, ifilename, ofilename))
 				else:
-					exitstat = os.system('timeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+					exitstat = os.system('timeout %d %s > %s' % (timeout, exe, ofilename))
 				if os.WEXITSTATUS(exitstat) == 124:
-					os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
+					os.system('echo "Program timed out" > %s' % ofilename)
 			elif platform.system() == 'Darwin':
 				if inp:
-					exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox < %s > ./userdirs/%s/outfile' % (timeout, session['username'], ifilename, session['username']))
+					exitstat = os.system('gtimeout %d %s < %s > %s' % (timeout, exe, ifilename, ofilename))
 				else:
 					exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
 				if os.WEXITSTATUS(exitstat) == 124:
-					os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
+					os.system('echo "Program timed out" > %s' % ofilename)
 			if os.path.exists(ofilename):
 				opfile = open(ofilename, "r")
 				output = opfile.read()
@@ -234,10 +241,8 @@ def sandbox(code='', output=''):
 				cfile.close()
 			return render_template('sandbox.html', user=session['username'], code=code, output=output)
 		elif request.form['sandbox'] == 'save':
-			pass
+			return render_template('sandbox.html', user=session['username'], code=code, output=output)
 		elif request.form['sandbox'] == 'upload':
-			print("FILES: ")
-			print(request.files)
 			if 'uploadfile' not in request.files:
 				return render_template('sandbox.html', user=session['username'], code=code, output=output, error="No file selected")
 			upfile = request.files['uploadfile']
@@ -276,12 +281,7 @@ def create():
 		semester = request.form['semester']
 		year = request.form['courseYear']
 		instructorID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()
-		print(title)
-		print(secNum)
-		print(semester)
-		print(year)
 		exists=db.execute("SELECT classID from class WHERE title = ? and section = ? and semester = ? and year = ?",(title,secNum,semester,year)).fetchall()
-		print(exists)
 		if not exists:
 			db.execute("INSERT INTO class(instructorID, title, section, semester, year) VALUES(?, ?, ?, ?, ?)", (instructorID[0][0], title, secNum, semester, year))
 			db.commit()
@@ -416,18 +416,91 @@ def assignmentsID(assignmentID):
 	if not checkLogged():
 		return home()
 	db = getDB()
-
 	a = list(db.execute("SELECT * FROM assignment WHERE assignmentID = ?", (assignmentID,)).fetchall())
 	unfdate = a[0][4]
 	unfdate = unfdate.split("-")
 	date = "%s/%s/%s" % (unfdate[2], unfdate[1], unfdate[0])
-	if request.method == "POST":
-		# check if passed due
-		if str(d.today()) > date:
-			return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, error="overdue")
-		pass #DO THIS
-
-	return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID)
+	utype = db.execute("SELECT position FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
+	if utype == "STUDENT":
+		code = ""
+		output = ""
+		userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
+		filename = './userdirs/%s/assignment%s-%s.cpp' % (session['username'], assignmentID, userID)
+		print(filename)
+		ifilename = './userdirs/%s/infile' % session['username']
+		ofilename = './userdirs/%s/outfile' % session['username']
+		exe = './userdirs/%s/assignment%s-%s' % (session['username'], assignmentID, userID)
+		if request.method == "POST":
+			if checkToday(date):
+				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, error="Overdue")
+			code = request.form['code']
+			print(code)
+			inp = request.form.get('cin')
+			timeout = int(request.form['timeout'])
+			codefile = open(filename, "w")
+			codefile.write(code)
+			codefile.close()
+			if inp:
+				infile = open(ifilename, "w")
+				infile.write(inp)
+				infile.close()
+			if request.form['sandbox'] == 'compile':
+				os.system('g++ -Wall %s -o %s 2> %s' % (filename, exe, ofilename))
+				if os.path.exists(ofilename):
+					opfile = open(ofilename, "r")
+					output = opfile.read()
+					opfile.close()
+					os.remove(ofilename)
+				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
+			elif request.form['sandbox'] == 'run':
+				if platform.system() == 'Linux':
+					if inp:
+						exitstat = os.system('timeout %d %s < %s > %s' % (timeout, exe, ifilename, ofilename))
+					else:
+						exitstat = os.system('timeout %d %s > %s' % (timeout, exe, ofilename))
+					if os.WEXITSTATUS(exitstat) == 124:
+						os.system('echo "Program timed out" > %s' % ofilename)
+				elif platform.system() == 'Darwin':
+					if inp:
+						exitstat = os.system('gtimeout %d %s < %s > %s' % (timeout, exe, ifilename, ofilename))
+					else:
+						exitstat = os.system('gtimeout %d %s > %s' % (timeout, exe, ofilename))
+					if os.WEXITSTATUS(exitstat) == 124:
+						os.system('echo "Program timed out" > %s' % ofilename)
+					if os.path.exists(ofilename):
+						opfile = open(ofilename, "r")
+						output = opfile.read()
+						opfile.close()
+						os.remove(ofilename)
+					if os.path.exists(filename):
+						cfile = open(filename, "r")
+						code = cfile.read()
+						cfile.close()
+					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
+			elif request.form['sandbox'] == 'save':
+				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
+			elif request.form['sandbox'] == 'upload':
+				if 'uploadfile' not in request.files:
+					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output, error="No file selected")
+				upfile = request.files['uploadfile']
+				if upfile.filename == '':
+					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output, error = "No file selected")
+				if not allowedFile(upfile.filename):
+					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output, error = "Bad filetype")
+				upfile.save(filename)
+				cfile = open(filename, "r")
+				code = cfile.read()
+				cfile.close()
+				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
+			elif request.form['sandbox'] == 'submit':
+				pass
+		if os.path.exists(filename):
+			cfile = open(filename, "r")
+			code = cfile.read()
+			cfile.close()
+		return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code)
+	elif utype == "INSTRUCTOR":
+		return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID)
 
 @app.route('/createAssignment/<int:courseID>', methods=['GET', 'POST'])
 def createAssignment(courseID):
@@ -487,29 +560,44 @@ def editAssignment(assignmentID):
 def test(assignmentID):
 	if not checkLogged():
 		return home()
-	if request.method == "POST":
-		db = getDB()
-		userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
-		print(userID)
-		inpV = request.form['input']
-		outV = request.form['output']
-		print(inpV)
-		print(outV)
-		if not inpV and outV:
-			return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") 
-		exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ?", (inpV, outV)).fetchall()
-		if exists:
-			cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (session['username'],)).fetchall()
-			return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Test Case already exists.", assignmentID=assignmentID) 
-		db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type, assignmentID) VALUES(?, ?, ?, 'PRIVATE', ?)", (inpV, outV, userID, assignmentID))
-		db.commit()
-		cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (session['username'],)).fetchall()
-		print(cases)
-		return render_template('testCases.html', user=session['username'], cases = cases, assignmentID=assignmentID)
 	db = getDB()
-	title = db.execute("SELECT title FROM assignment WHERE assignmentID=?", (assignmentID,)).fetchall()[0][0]
-	cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE assignmentID=? AND testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (assignmentID, session['username'])).fetchall()
-	return render_template('testCases.html', user=session['username'], cases = cases, title = title, assignmentID=assignmentID)
+	utype = db.execute("SELECT position FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
+	if utype == "STUDENT":
+		if request.method == "POST":
+			userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
+			inpV = request.form['input']
+			outV = request.form['output']
+			if not inpV and outV:
+				return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") 
+			exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ?", (inpV, outV)).fetchall()
+			if exists:
+				cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (session['username'],)).fetchall()
+				return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Test Case already exists.", assignmentID=assignmentID) 
+			db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type, assignmentID) VALUES(?, ?, ?, 'PRIVATE', ?)", (inpV, outV, userID, assignmentID))
+			db.commit()
+			cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (session['username'],)).fetchall()
+			return render_template('testCases.html', user=session['username'], cases = cases, assignmentID=assignmentID)
+		db = getDB()
+		title = db.execute("SELECT title FROM assignment WHERE assignmentID=?", (assignmentID,)).fetchall()[0][0]
+		cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE assignmentID=? AND testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (assignmentID, session['username'])).fetchall()
+		return render_template('testCases.html', user=session['username'], cases = cases, title = title, assignmentID=assignmentID)
+	elif utype == "INSTRUCTOR":
+		db = getDB()
+		if request.method == "POST":
+			userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
+			inpV = request.form['input']
+			outV = request.form['output']
+			if not inpV and outV:
+				return render_template('professorCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") 
+			exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ? AND type <> 'HIDDEN'", (inpV, outV)).fetchall()
+			if exists:
+				cases = db.execute("SELECT inputValue, outputValue FROM testCases WHERE testCases.type='PUBLIC' OR testCases.type='HIDDEN')", (session['username'],)).fetchall()
+				return render_template('professorCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Test Case already exists.", assignmentID=assignmentID) 
+			db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type, assignmentID) VALUES(?, ?, ?, 'PUBLIC', ?)", (inpV, outV, userID, assignmentID))
+			db.commit()
+		title = db.execute("SELECT title FROM assignment WHERE assignmentID=?", (assignmentID,)).fetchall()[0][0]
+		cases = db.execute("SELECT inputValue, outputValue FROM testCases WHERE assignmentID=? AND testCases.type='PUBLIC' OR testCases.type='HIDDEN'", (assignmentID,)).fetchall()
+		return render_template('professorCases.html', user=session['username'], cases = cases, title = title, assignmentID=assignmentID)
 
 @app.route('/faq')
 def faq():
