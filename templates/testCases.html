@@ -45,8 +45,9 @@
 				<input type="text" name="output" placeholder="Expected Output" required/>
 			</div>
 			<div name='errordiv' class='errmsg'>{{error}}</div>
-			<div>
+			<div style="width:100%; left:25%">
 				<button type="submit" name="newTest" value="newTest" style="width:24.7%">Add New Test Case</button></a>
+			<a href="{{url_for('assignmentsID', assignmentID=assignmentID)}}"><button type="button" name="testCases" value="testCases">Return to Assignment</button></a>
 			</div>
 		</form>
 		<div class="testCaseTitle">

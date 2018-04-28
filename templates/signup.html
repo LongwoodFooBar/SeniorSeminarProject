@@ -9,7 +9,7 @@
 		<script type="text/javascript" src="{{url_for('static', filename='validate.js')}}"></script>
 	</head>
 	<body>
-		<form name='signup' method="POST" id='signup' onsubmit='event.preventDefault(); return validate();'>
+		<form name='signup' id='signup' method='POST'>
 		<form method="POST" name="signup">
 
 			<div class="imgcontainer">
@@ -40,7 +40,7 @@
 				<a href="{{url_for('login')}}"><button type="button">Back to Login</button></a>
 				</div>
 				<label>
-					<div name='errordiv'id='errmsg' class='errmsg'>{{loginerror}}</div>
+					<div name='errordiv' id='errmsg' class='errmsg'>{{loginerror}}</div>
 				</label>
 			</div>
 		</form>
