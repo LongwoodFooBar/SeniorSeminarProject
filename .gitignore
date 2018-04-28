@@ -5,3 +5,4 @@ foobar.db
 userdirs/
 *.log
 *.pyc
+.DS_Store
