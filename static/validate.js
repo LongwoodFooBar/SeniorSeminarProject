@@ -7,7 +7,7 @@ function emailValidate(email) {
 function passwordValidate(password) {
 	var passwordRegex = /[A-Za-z0-9]+/
 	if (passwordRegex.test(password)) {
-		if (length(password)) {
+		if (length(password) > 8) {
 			return true;
 		}
 	}
@@ -15,7 +15,7 @@ function passwordValidate(password) {
 }
 
 function valid() {
-	console.log("VALID");
+	/*console.log("VALID");
 	if (emailValidate(document.getElementByName('email')) == true) {
 		console.log("EMAIL");
 		if (passwordValidate(document.getElementsByName(password))) {
@@ -33,4 +33,7 @@ function valid() {
 		console.log("EMAIL WRONG");
 				document.getElementByName('errordiv').innerHTML = "Email is not a valid format.";
 	}
+	*/
+	document.getElementById('signup').submit();
+	return true;
 }
