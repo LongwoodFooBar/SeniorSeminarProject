@@ -168,27 +168,33 @@ def sandbox(code='', output=''):
 	ofilename = './userdirs/%s/outfile' % session['username']
 	if request.method == 'POST':
 		code = request.form['code']
-		inp = request.form['input']
+		inp = request.form.get('cin')
 		timeout = int(request.form['timeout'])
 		codefile = open(filename, "w")
-		infile = open(ifilename, "w")
 		codefile.write(code)
 		codefile.close()
-		infile.write(inp)
-		infile.close()
+		if inp:
+			infile = open(ifilename, "w")
+			infile.write(inp)
+			infile.close()
 		if request.form['sandbox'] == 'compile':
 			os.system('g++ -Wall ./userdirs/%s/sandbox.cpp -o ./userdirs/%s/sandbox 2> ./userdirs/%s/outfile' % (session['username'], session['username'], session['username']))
+			return render_template('sandbox.html', user=session['username'], code=code)
 		elif request.form['sandbox'] == 'run':
 			if platform.system() == 'Linux':
-				exitstat = os.system('timeout %d ./userdirs/%s/sandbox < infile > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+				if inp:
+					exitstat = os.system('timeout %d ./userdirs/%s/sandbox < %s > ./userdirs/%s/outfile' % (timeout, session['username'], ifilename, session['username']))
+				else:
+					exitstat = os.system('timeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
 				if os.WEXITSTATUS(exitstat) == 124:
 					os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
 			elif platform.system() == 'Darwin':
-				exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox < infile > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
+				if inp:
+					exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox < %s > ./userdirs/%s/outfile' % (timeout, session['username'], ifilename, session['username']))
+				else:
+					exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
 				if os.WEXITSTATUS(exitstat) == 124:
 					os.system('echo "Program timed out" > ./userdirs/%s/outfile' % (session['username'],))
-			if os.path.exists("./userdirs/%s/sandbox" % (session['username'],)):
-				os.remove("./userdirs/%s/sandbox" % (session['username'],))
 		elif request.form['sandbox'] == 'save':
 			pass
 		elif request.form['sandbox'] == 'upload':
