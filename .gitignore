@@ -3,3 +3,5 @@ __pycache__
 server.pyc
 foobar.db
 userdirs/
+*.log
+*.pyc
