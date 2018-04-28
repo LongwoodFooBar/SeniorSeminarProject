@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- Heather Switzer -->
 <html>
 	<head>
 		<title>C++ Sandbox</title>
@@ -21,40 +20,24 @@
 		</ul>
 
 		</div>
-	
 		<div>
 			<p id="nav-logged">Logged in as: {{user}}</p>
 		</div>
-		
-		<form method="POST" enctype=multipart/form-data >	
-			<script>
-				function file_upload(){
-				var x = document.getElementById("projectFile");
-					if('files' in x){
-						if(x.files.length == 0){
-							//error
-						}
-						else{
-
-						}
-					}
-				}
-			</script>	
+		<form method="POST" enctype=multipart/form-data >
 				<div style="width:100%; right:0.6%">
 				<nav>
 					<button type="submit" name="sandbox" value="compile" style="width:24.7%">Compile</button>
 					<button type="submit" name="sandbox" value="run" style="width:24.7%">Run</button>
 					<button type="submit" name="sandbox" value="save" style="width:24.7%">Save</button>
-					<button id="prompt" type="button" value="upload" style="width:24.7%"> Upload </button>
+					<button id="prompt" type="button" value="upload" onclick="modalOn()" style="width:24.7%"> Upload </button>
 					<div id="myModal" class="modal">
 
 						<!-- Modal content -->
 					<div class="modal-content">
-					<span class="close" style="float:left">&times;</span>
+					<span class="close" style="float:left" onclick="modalOff()">&times;</span>
 							<p>Upload file here:</p>
 						<input type="file" name="uploadfile"></input>
-						<button type="submit" name="sandbox" value="upload" style="width:25%">Upload</button>	
-
+						<button type="submit" name="sandbox" value="upload" style="width:25%">Upload</button>
 					</div>
 					</div>
 				</nav>
@@ -72,7 +55,7 @@
 </div>
 <br /><br />
 	<div style="float:right;width:40%; height=5vw">
-	INPUT HERE:
+	<h3>INPUT HERE:</h3>
 	</div>
 	<br />
 	<div>
@@ -81,20 +64,17 @@
 
 <br /> <br />
 <div style="float:left;width:59%; height=5vw">
-   CODE HERE:
+   <h3>CODE HERE:</h3>
 </div>
-
 		<div style="float:right;width:40%; height=5vw">
-		OUTPUT HERE:
+		<h3>OUTPUT HERE:</h3>
 		</div>
 		<br>
-
 		<div>
-		<textarea type="text" id="code" name="code" class="codeBox">{{code}}</textarea>
+			<textarea type="text" id="code" name="code" class="codeBox" onkeydown="tab(event.keyCode)">{{code}}</textarea>
 		</div>
-
 		<div>
-		<textarea disabled type="text" name="output" id="output" class="outputBox">{{output}}</textarea>
+			<textarea disabled type="text" name="output" id="output" class="outputBox">{{output}}</textarea>
 		</div>
 		</form>
 		<div name='errordiv' class='errmsg'>{{error}}</div>
