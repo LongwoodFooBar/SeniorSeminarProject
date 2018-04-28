@@ -23,79 +23,52 @@
 			<h2>Due Date: {{date}}</h2>
 			<p>{{body}}</p>
 		</div>
-
-
-		<form method="POST" enctype=multipart/form-data >
-			<script>
-				function file_upload(){
-				var x = document.getElementById("projectFile");
-					if('files' in x){
-						if(x.files.length == 0){
-							//error
-						}
-						else{
-
-						}
-					}
-				}
-			</script>
+		<form method="POST" enctype=multipart/form-data>
 				<div style="width:100%; right:0.6%">
 				<nav class="testCaseBtn">
 					<button type="submit" name="sandbox" value="compileRun">Compile and Run</button>
 					<button type="submit" name="sandbox" value="runTest">Run Test Cases</button>
-					<button style="width:19.7%" id="prompt" type="button" value="upload">Upload</button>
 					<button type="submit" name="sandbox" value="grade">Grade</button>
-
-					<div id="myModal" class="modal">
-
- 					 	<!-- Modal content -->
-					<div class="modal-content">
-					<span class="close" style="float:left">&times;</span>
-							<p>Upload file here:</p>
+					<div id="uploadBox">
+						<p>Upload file here:</p>
 						<input type="file" name="uploadfile"></input>
 						<button type="submit" name="sandbox" value="upload" style="width:25%">Upload</button>
-
-					</div>
 					</div>
 				</nav>
 			</div>
-<div style="float:left">
-	<b>Select Timeout (in seconds):</b>
-	<select name="timeout">
-		<option value="30">30</option>
-		<option value="60">60</option>
-		<option value="120">120</option>
-		<option value="300">300</option>
-		<option value="600">600</option>
-		<option value="1200">1200</option>
-	</select>
-</div>
-<br /><br />
-	<div style="float:right;width:40%; height=5vw">
-	INPUT HERE:
-	</div>
-	<br />
-	<div>
-		<textarea type="text" name="cin" class="inputBox" placeholder="Input Values Here."></textarea><br /><br />
-	</div>
-
-<br /> <br />
-<div style="float:left;width:59%; height=5vw">
-   CODE HERE:
-</div>
-
-		<div style="float:right;width:40%; height=5vw">
-		OUTPUT HERE:
-		</div>
-		<br>
-
-		<div>
-		<textarea type="text" id="code" name="code" class="codeBox">{{code}}</textarea>
-		</div>
-
-		<div>
-		<textarea disabled type="text" name="output" id="output" class="outputBox">{{output}}</textarea>
-		</div>
+			<div style="float:left">
+				<b>Select Timeout (in seconds):</b>
+				<select name="timeout">
+					<option value="30">30</option>
+					<option value="60">60</option>
+					<option value="120">120</option>
+					<option value="300">300</option>
+					<option value="600">600</option>
+					<option value="1200">1200</option>
+				</select>
+			</div>
+			<br /><br />
+			<div style="float:right;width:40%; height=5vw">
+				<h3>INPUT HERE:</h3>
+			</div>
+			<br />
+			<div>
+				<textarea type="text" name="cin" class="inputBox" placeholder="Input Values Here."></textarea><br /><br />
+			</div>
+			<br /> <br />
+			<div style="float:left;width:59%; height=5vw">
+   				<h3>CODE HERE:</h3>
+			</div>
+			<div style="float:right;width:40%; height=5vw">
+				<h3>OUTPUT HERE:</h3>
+			</div>
+			<br>
+			<div>
+				<textarea type="text" id="code" name="code" class="codeBox">{{code}}</textarea>
+			</div>
+			<div>
+				<textarea disabled type="text" name="output" id="output" class="outputBox">{{output}}</textarea>
+			</div>
 		</form>
 		<div name='errordiv' class='errmsg'>{{error}}</div>
 	</body>
