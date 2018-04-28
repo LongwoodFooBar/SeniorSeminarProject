@@ -25,15 +25,15 @@
 			<p id="nav-logged">Logged in as: {{user}}</p>
 		</div>
 		<form method="POST" enctype=multipart/form-data >
-			<div style="width:100%; right:0.6%">
-				<nav>
-					<button type="submit" name="sandbox" value="compile" style="width:24.7%">Compile</button>
-					<button type="submit" name="sandbox" value="run" style="width:24.7%">Run</button>
-					<button type="submit" name="sandbox" value="save" style="width:24.7%">Save</button>
+			<div style="width:100%">
+				<nav class="testCaseBtn">
+					<button type="submit" name="sandbox" value="compile">Compile</button>
+					<button type="submit" name="sandbox" value="run">Run</button>
+					<button type="submit" name="sandbox" value="save">Save</button>
 					<div id="uploadBox">
 						<p>Upload file here:</p>
-						<input type="file" name="uploadfile"></input>
-						<button type="submit" name="sandbox" value="upload" style="width:25%">Upload</button>
+						<button type="submit" name="sandbox" value="upload">Upload</button>
+						<input type="file" name="uploadfile" style="width:19.7%"></input>
 					</div>
 				</nav>
 			</div>
