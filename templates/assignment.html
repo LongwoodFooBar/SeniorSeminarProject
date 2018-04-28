@@ -60,6 +60,7 @@
 					</div>
 				</nav>
 			</div>
+<br /> <br />
 <div style="float:left">
 	<b>Select Timeout (in seconds):</b>
 	<select name="timeout">
@@ -71,47 +72,45 @@
 		<option value="1200">1200</option>
 	</select>
 </div>
-<br /><br />
-	<div style="float:right;width:40%; height=5vw">
-   	INPUT HERE:
-	</div>
-	<br />
-	<div>
-		<textarea type="text" name="cin" class="inputBox" placeholder="Input Values Here."></textarea><br /><br />
-	</div>
-
 <br /> <br />
 <div style="float:left;width:59%; height=5vw">
-   CODE HERE:
+   <b>CODE HERE:</b>
 </div>
-
 		<div style="float:right;width:40%; height=5vw">
-		OUTPUT HERE:
+		<b>INPUT HERE:</b>
 		</div>
+
 		<br>
 
 		<div>
 		<textarea type="text" id="code" name="code" class="codeBox">{{code}}</textarea>
 		</div>
 
+
 		<div>
+		<textarea type="text" name="cin" class="inputBox" placeholder="Input Values Here."></textarea>
+		<div style="float:right;width:40%; height=5vw">
+		<br />
+		<b>OUTPUT HERE:</b>
+		</div>
+
 		<textarea disabled type="text" name="output" id="output" class="outputBox">{{output}}</textarea>
 		</div>
 		</form>
 		
 		<script type="text/javascript">
-		var textareas = document.getelementbyid('code');
-		//textareas.value = "hello, world!";
+		var textareas = document.getElementById('code');
+		//textareas.value = "HELLO, WORLD!";
 		textareas.onkeydown = function(e){
-			if(e.keycode==9 || e.which==9){
-				e.preventdefault();
-				var s = this.selectionstart;
-				this.value = this.value.substring(0,this.selectionstart) + "\t" + this.value.substring(this.selectionend);
-				this.selectionend = s+1; 
+			if(e.keyCode==9 || e.which==9){
+				e.preventDefault();
+				var s = this.selectionStart;
+				this.value = this.value.substring(0,this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
+				this.selectionEnd = s+1; 
 			}
 		}
-		//upload code starts here
-		var modal = document.getelementbyid('mymodal');
+		//UPLOAD CODE STARTS HERE
+		var modal = document.getElementById('myModal');
 
 					// Get the button that opens the modal
 					var btn = document.getElementById("prompt");
@@ -124,21 +123,8 @@
 						modal.style.display = "block";
 					}
 
-					// When the user clicks on <span> (x), close the modal
-					span.onclick = function() {
-					modal.style.display = "none";
-					}
-
-			// When the user clicks anywhere outside of the modal, close it
-					window.onclick = function(event) {
-						if (event.target == modal) {
-							modal.style.display = "none";
-						}
-					}
-
-
 </script>
-	<div name='errordiv' class='errmsg'>{{error}}</div>
+		<div name='errordiv' class='errmsg'>{{error}}</div>
 
-	</body>
+</body>
 </html>
