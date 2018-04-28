@@ -107,10 +107,10 @@ def login():
 				error = "Username is not registered"
 			return render_template('login.html', loginerror=error)
 	return render_template('login.html')
-	
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-	if request.method == 'POST' and form.validate():
+	if request.method == 'POST':
 		db = getDB()
 		error = None
 
@@ -120,8 +120,7 @@ def signup():
 
 		password = md5(request.form['password'].encode('utf-8')).hexdigest()
 
-		db.execute('INSERT INTO login (firstName, lastName, email, password, position) VALUES (?, ?, ?, ?, ?)', (request.form['firstName'], request.form['lastName'],request.form['email'], password, request.form['type']))
-		db.execute('INSERT INTO login (firstName, lastName, email, password, position, question, answer) VALUES (?, ?, ?, ?, ?)', (request.form['firstName'], request.form['lastName'], request.form['email'], password, request.form['type'], request.form['question'], request.form['answer']))
+		db.execute('INSERT INTO login (firstName, lastName, email, password, position, question, answer) VALUES (?, ?, ?, ?, ?, ?, ?)', (request.form['firstName'], request.form['lastName'], request.form['email'], password, request.form['type'], request.form['question'], request.form['answer']))
 		db.commit()
 		session['username'] = request.form['email']
 		session['password'] = request.form['password']
@@ -277,7 +276,7 @@ def create():
 		print(year)
 		exists=db.execute("SELECT classID from class WHERE title = ? and section = ? and semester = ? and year = ?",(title,secNum,semester,year)).fetchall()
 		print(exists)
-		if not exists:	
+		if not exists:
 			db.execute("INSERT INTO class(instructorID, title, section, semester, year) VALUES(?, ?, ?, ?, ?)", (instructorID[0][0], title, secNum, semester, year))
 			db.commit()
 		else:

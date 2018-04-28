@@ -6,20 +6,18 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
-	<script type="text/javascript" src="{{url_for('static', filename='validate.js')}}"></script>
+		<script type="text/javascript" src="{{url_for('static', filename='validate.js')}}"></script>
 	</head>
 	<body>
-<<<<<<< HEAD
-		<form name='signup' method="POST" onsubmit='event.preventDefault(); return validate();'>
-=======
+		<form name='signup' method="POST" id='signup' onsubmit='event.preventDefault(); return validate();'>
 		<form method="POST" name="signup">
->>>>>>> 569dd5997a73d1b56b1e77497ea191c3650e1b9f
+
 			<div class="imgcontainer">
 				<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
 			</div>
 			<div class="container">
 				<label for="email"><b>Email</b></label>
-				<input type="text" placeholder="Enter Email" name="email" required>      
+				<input type="text" placeholder="Enter Email" name="email" required>
 				<label for="firstName"><b>First Name</b></label>
 				<input type="text" placeholder="Enter First Name" name="firstName" required>
 				<label for="lastName"><b>Last Name</b></label>
@@ -46,40 +44,7 @@
 				</label>
 			</div>
 		</form>
-		<script>
-			var form = document.forms['signup'];
-			var first_name = form['firstName'];
-			var last_name = form['lastName'];
-			var email = form['email'];
-			var password = form['password'];
-			var confirm_pword = form['psw2'];
-			var type = form['type'];
-			var erno = document.getElementById('errmsg')
-			function validate(){
-				var ret = true
-				erno.innerHTML = '';
-				if(first_name.value == '' || last_name.value == '' || email.value == '' || password.value == ''
-					 || confirm_pword == '' || type.value == ''){
-					erno.innerHTML += 'Must fill out all fields</br>';
-					ret = false;
-				}
-				var atpos = email.value.indexOf("@");
-				var dotpos = email.value.lastIndexOf(".");
-				if (atpos<1 || dotpos<atpos+2 || dotpos+2>=email.value.length) {
-					erno.innerHTML += "Not a valid e-mail address</br>";
-					ret = false;
-				}
-				if(password.value != confirm_pword.value){
-					erno.innerHTML += 'Passwords do not match!</br>';
-					ret = false;
-				}
-				if(ret == true){
-					form.submit();
-				}
-				return ret;
-			}
-		</script>
+
 
 	</body>
 </html>
-
