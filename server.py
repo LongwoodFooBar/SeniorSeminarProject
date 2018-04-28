@@ -63,7 +63,6 @@ def valiDate(unfdate):
 		return False
 	return True
 
-#checks if date is before today
 def checkToday(date):
 	today = d.today()
 	darray = date.split("-")
@@ -266,8 +265,10 @@ def sandbox(code='', output=''):
 		output = opfile.read()
 		opfile.close()
 		os.remove(ofilename)
-	if os.path.exists('./userdirs/%s/sandbox' % (session['username'],)):
-		os.remove('./userdirs/%s/sandbox' % (session['username'],))
+	if os.path.exists(exe):
+		os.remove(exe)
+	if os.path.exists(ifilename):
+		os.remove(ifilename)
 	if os.path.exists(filename):
 		cfile = open(filename, "r")
 		code = cfile.read()
