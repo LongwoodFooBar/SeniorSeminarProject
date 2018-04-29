@@ -1,0 +1,5 @@
+1: Fix Private & Grading in professorCases.html - selecting one currently gives an internal server error
+
+2: Buttons and styling on assignments.html
+
+3: Grading in profAssignments.html (Pop-up window? Dropdown? IDK)

@@ -2,11 +2,12 @@
 <html>
 <head>
 <title>Assignment</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
-<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
-<script type="text/javascript" src="{{url_for('static', filename='tab.js')}}"></script>
-</head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
+		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
+		<script type="text/javascript" src="{{url_for('static', filename='tab.js')}}"></script>
+		<script type="text/javascript" src="{{url_for('static', filename='upload.js')}}"></script>
+	</head>
 <body>
 <ul>
    <li id="nav-logo"> <img id="logo" src="../static/logo.svg"></img></li>
@@ -24,13 +25,16 @@
    <p>{{body}}</p>
 </div>
 <form method="POST" enctype=multipart/form-data>
-   <div style="width:100%; right:0.6%">
-      <nav class="testCaseBtn">
-	 <button type="submit" name="sandbox" value="compileRun">Compile and Run</button>
-	 <button type="submit" name="sandbox" value="runTest">Run Test Cases</button>
-	 <button type="submit" name="sandbox" value="grade">Grade</button>
-      </nav>
+
+   <div style="float:left">
+   <b>Select student to grade:</b>
+   <select name="student">
+	<option value="default">None selected</option>
+   </select>
    </div>
+
+   <br /></br /><br />
+
    <div style="float:left">
       <b>Select Timeout (in seconds):</b>
       <select name="timeout">
@@ -42,25 +46,32 @@
 	 <option value="1200">1200</option>
       </select>
    </div>
-   <br /><br />
-   <div style="float:right;width:40%; height:5vw;">
-      <h3>INPUT HERE:</h3>
-      <textarea type="text" name="cin" class="inputBox" placeholder="Input Values Here."></textarea><br /><br /><br />
+
+   <br /><br /><br />
+
+   <div style="width:100%">
+      <nav class="testCaseBtn">
+	 <button type="submit" name="sandbox" value="compileRun">Compile and Run</button>
+	 <button type="submit" name="sandbox" value="runPublicTest">Run Public Cases</button>
+	 <button type="submit" name="sandbox" value="runPrivateTest">Run Private Cases</button>
+	 <button type="submit" name="sandbox" value="grade">Grade</button>
+      </nav>
    </div>
-   <br /><br /> <br />
-   <div style="float:left;width:59%; height:5vw;">
-      <h3>CODE HERE:</h3>
-   </div>
-   <div style="float:right;width:40%; height:5vw;">
-      <br />
-      <h3>OUTPUT HERE:</h3>
-   </div>
+
+   <br />
+
    <div>
-      <textarea type="text" id="code" name="code" class="codeBox">{{code}}</textarea>
-   </div>
-   <div>
+      <label for="code" style="width:59%"><b>CODE HERE:</b></label>
+      <label for="cin" style="display:inline-block; width:59.5%; float:left"><b>INPUT HERE:</b></label><br/>
+	<textarea type="text" id="code" name="code" class="codeBox" onkeydown="tab(this, event);">{{code}}</textarea>
+
+      <textarea type="text" name="cin" class="inputBox" placeholder="Input Values Here."></textarea>
+      <br /> <br /> <br />
+      <label for="output"><b>OUTPUT HERE:</b></label>
       <textarea disabled type="text" name="output" id="output" class="outputBox">{{output}}</textarea>
+
    </div>
+
 </form>
 <div name='errordiv' class='errmsg'>{{error}}</div>
 </body>
