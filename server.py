@@ -497,8 +497,13 @@ def assignmentsID(assignmentID):
 				code = cfile.read()
 				cfile.close()
 				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
-			elif request.form['sandbox'] == 'submit':
-				pass
+			elif request.form['sandbox'] == 'assignment':
+				profUser = db.execute("SELECT login.email FROM login JOIN class ON login.userID=class.instructorID JOIN assignment ON class.classID=assignment.classID WHERE assignment.assignmentID = ?", (assignmentID,)).fetchall()[0][0]
+				savelocation = "./userdirs/%s/assignment%s-%s.cpp" % (profUser, assignmentID, userID)
+				submitFile = open(savelocation, "w")
+				submitFile.write(code)
+				submitFile.close()
+				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
 		if os.path.exists(filename):
 			cfile = open(filename, "r")
 			code = cfile.read()
