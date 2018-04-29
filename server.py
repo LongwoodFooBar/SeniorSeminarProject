@@ -503,6 +503,11 @@ def assignmentsID(assignmentID):
 				submitFile = open(savelocation, "w")
 				submitFile.write(code)
 				submitFile.close()
+				userID = db.execute("SELECT userID FROM login WHERE email = ?", (session['username'],)).fetchall()[0][0]
+				submitted = db.execute("SELECT uploadID FROM uploads WHERE assignmentID = ? AND userID = ?", (assignmentID, userID)).fetchall()
+				if not submitted:
+					db.execute("INSERT INTO uploads(userID, assignmentID, fileLocation, type) VALUES(?, ?, ?, 'SUBMISSION')", (userID, assignmentID, savelocation))
+					db.commit()
 				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
 		if os.path.exists(filename):
 			cfile = open(filename, "r")
@@ -510,7 +515,9 @@ def assignmentsID(assignmentID):
 			cfile.close()
 		return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code)
 	elif utype == "INSTRUCTOR":
-		return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID)
+		uploads = db.execute("SELECT login.firstName, login.lastName, uploads.fileLocation FROM login NATURAL JOIN uploads WHERE uploads.assignmentID = ?", (assignmentID,)).fetchall()
+		print(uploads)
+		return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, uploads=uploads)
 
 @app.route('/createAssignment/<int:courseID>', methods=['GET', 'POST'])
 def createAssignment(courseID):
