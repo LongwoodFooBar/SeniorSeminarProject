@@ -472,45 +472,45 @@ def assignmentsID(assignmentID):
 						exitstat = os.system('gtimeout %d %s > %s' % (timeout, exe, ofilename))
 					if os.WEXITSTATUS(exitstat) == 124:
 						os.system('echo "Program timed out" > %s' % ofilename)
-					if os.path.exists(ofilename):
-						opfile = open(ofilename, "r")
-						output = opfile.read()
-						opfile.close()
-						os.remove(ofilename)
-					if os.path.exists(filename):
-						cfile = open(filename, "r")
-						code = cfile.read()
-						cfile.close()
-					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
+				if os.path.exists(ofilename):
+					opfile = open(ofilename, "r")
+					output = opfile.read()
+					opfile.close()
+					os.remove(ofilename)
+				if os.path.exists(filename):
+					cfile = open(filename, "r")
+					code = cfile.read()
+					cfile.close()
+				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
 			elif request.form['sandbox'] == 'runTest':
 				userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
 				tests = db.execute("SELECT testCases.inputValue, testCases.outputValue FROM testCases NATURAL JOIN login WHERE assignmentID = ? AND (type = 'PUBLIC' OR (type = 'PRIVATE' AND userID = ?))", (assignmentID, userID)).fetchall()
-				print(tests)
 				diffFile = "./userdirs/%s/diffFile" % session['username']
 				if os.path.exists(diffFile):
 					os.remove(diffFile)
+				if os.path.exists(ofilename):
+					os.remove(ofilename)
+				eOutFile = "./userdirs/%s/expectedOut" % session['username']
+				eOut = open(eOutFile, "w")
 				for t in tests:
-					print(t[0])
-					print(t[1])
 					infile = open(ifilename, "w")
 					infile.write(t[0])
 					infile.close()
-					eOutFile = "./userdirs/%s/expectedOut" % session['username']
-					eOut = open(eOutFile, "w")
 					eOut.write(t[1])
-					eOut.close()
 					if platform.system() == 'Linux':
-						exitstat = os.system('timeout %d %s < %s > %s | diff %s >> %s', % (request.form['timeout'], filename, ifilename, ofilename, eOutFile, diffFile))
+						exitstat = os.system('timeout %d %s < %s >> %s' % (int(request.form['timeout']), exe, ifilename, ofilename))
 						if os.WEXITSTATUS(exitstat) == 124:
 							os.system('echo "Program timed out on test %s" >> %s' % (t[0], diffFile))
 					elif platform.system() == 'Darwin':
-						exitstat = os.system('gtimeout %d %s < %s > %s | diff %s >> %s', % (request.form['timeout'], filename, ifilename, ofilename, eOutFile, diffFile))
+						exitstat = os.system('gtimeout %d %s < %s >> %s' % (int(request.form['timeout']), exe, ifilename, ofilename))
 						if os.WEXITSTATUS(exitstat) == 124:
 							os.system('echo "Program timed out on test %s" >> %s' % (t[0], diffFile))
-					outfile = open(diffFile, "r")
-					output = outfile.read()
-					outfile.close()
-					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
+				eOut.close()
+				os.system('diff %s %s > %s' % (ofilename, eOutFile, diffFile))
+				outfile = open(diffFile, "r")
+				output = outfile.read()
+				outfile.close()
+				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
 			elif request.form['sandbox'] == 'save':
 				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
 			elif request.form['sandbox'] == 'upload':
@@ -611,8 +611,8 @@ def test(assignmentID):
 	if utype == "STUDENT":
 		if request.method == "POST":
 			userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
-			inpV = request.form['input']
-			outV = request.form['output']
+			inpV = request.form['input'] + '\n'
+			outV = request.form['output'] + '\n'
 			if not inpV and outV:
 				return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") 
 			exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ?", (inpV, outV)).fetchall()
