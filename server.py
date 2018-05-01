@@ -550,17 +550,26 @@ def assignmentsID(assignmentID):
 		print(uploads)
 		if request.method == 'POST':
 			if request.form['sandbox'] == 'compile':
+				filename = ""
+				ofilename = './userdirs/%s/outfile' % session['username']
+				exe = ""
 				userID = request.form['student']
+				if userID == "default":
+					return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, uploads=uploads)
 				for u in uploads:
-					if u[2] == userID:
+					if int(u[2]) == int(userID):
 						filename = u[3]
+						exe = filename.rsplit('.', 1)[0]
 				os.system('g++ -Wall %s -o %s 2> %s' % (filename, exe, ofilename))
 				if os.path.exists(ofilename):
 					opfile = open(ofilename, "r")
 					output = opfile.read()
 					opfile.close()
 					os.remove(ofilename)
-				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, uploads=uploads)
+				cfile = open(filename, "r")
+				code = cfile.read()
+				cfile.close()
+				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, code = code, assignmentID = assignmentID, uploads=uploads)
 			elif request.form['sandbox'] == 'runCases':
 				pass
 		return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, uploads=uploads)
