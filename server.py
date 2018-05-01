@@ -59,7 +59,7 @@ def valiDate(unfdate):
 			return False
 
 	date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
-	if checkToday(date):
+	if not checkToday(date):
 		return False
 	return True
 
@@ -69,10 +69,12 @@ def checkToday(date):
 	tarray = str(today).split("-")
 	tarray[2] = tarray[2].split(" ")[0]
 
-	if int(darray[0]) <= int(tarray[0]):
-		if int(darray[1]) <= int(tarray[1]):
-			if int(darray[2]) <= int(tarray[2]):
-				return False
+	if int(darray[0]) < int(tarray[0]):
+		return False
+	elif int(darray[0]) == int(tarray[0]) and int(darray[1]) < int(tarray[1]):
+		return False
+	elif int(darray[0]) == int(tarray[0]) and int(darray[1]) == int(tarray[1]) and int(darray[2]) < int(tarray[2]):
+		return False
 	return True
 
 def connectDB():
@@ -546,6 +548,9 @@ def assignmentsID(assignmentID):
 	elif utype == "INSTRUCTOR":
 		uploads = db.execute("SELECT login.firstName, login.lastName, uploads.fileLocation FROM login NATURAL JOIN uploads WHERE uploads.assignmentID = ?", (assignmentID,)).fetchall()
 		print(uploads)
+		if request.method == 'POST':
+			if request.form['sandbox'] == 'runTest':
+				pass
 		return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, uploads=uploads)
 
 @app.route('/createAssignment/<int:courseID>', methods=['GET', 'POST'])
