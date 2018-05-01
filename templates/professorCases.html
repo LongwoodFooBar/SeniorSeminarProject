@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>C++ Sandbox</title>
+		<title>Test Cases</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
 	</head>
 	<body>
 		<div>
-			<!-- logo div-->
+			<!--Navigation Bar-->
 		<ul>
 			<li id="nav-logo"> <img id="logo" src="../static/logo.svg"></img></li>
 			<li id="nav-title"><a id="title" href="{{url_for('courses')}}">Courses</a></li>
@@ -21,6 +21,7 @@
 		<div>
 			<p id="nav-logged">Logged in as: {{user}}</p>
 		</div>
+		<!--Create new test case form-->
 		<h1><b>Test Cases for: {{title}}</b></h1>
 		<form method="POST">
 			<h2>Create a New Test Case:</h2>
@@ -36,9 +37,8 @@
 			<br/>
 			<div>
 				<b>Type of Test Case:</b><br/>
-				<input type="radio" name="caseType" value="publicCase">Public Case</input>
-				<input type="radio" name="caseType" value="privateCase">Private Case</input>
-				<input type="radio" name="caseType" value="gradingCase">Grading Case</input>
+				<input type="radio" name="caseType" value="PUBLIC">Public Case</input>
+				<input type="radio" name="caseType" value="HIDDEN">Hidden Case</input>
 			</div>
 			<br/> <br/>
 			<div name='errordiv' class='errmsg'>{{error}}</div>
@@ -48,6 +48,7 @@
 			</div>
 		</form>
 		<br/>
+		<!--List of current test cases-->
 		<h2>Current Test Cases:</h2>
 		<div class="testCaseTitle">
 			<h3>INPUT</h3>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>C++ Sandbox</title>
+		<title>FooBar Sandbox</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
@@ -10,7 +10,7 @@
 	</head>
 	<body>
 		<div>
-			<!-- logo div-->
+			<!--Navigation Bar-->
 		<ul>
 			<li id="nav-logo"> <img id="logo" src="../static/logo.svg"></img></li>
 			<li id="nav-title"><a id="title" href="{{url_for('courses')}}">Courses</a></li>
@@ -25,6 +25,7 @@
 			<p id="nav-logged">Logged in as: {{user}}</p>
 		</div>
 		<form method="POST" enctype=multipart/form-data >
+			<!--Compile, Run and Save buttons-->
 			<div style="width:100%">
 				<nav class="testCaseBtn">
 					<button type="submit" name="sandbox" value="compile">Compile</button>
@@ -37,6 +38,7 @@
 				</nav>
 			</div>
 <br />
+			<!--Select timeout for programs (used for infinite loops)-->
 			<div style="float:left">
 				<b>Select Timeout (in seconds):</b>
 				<select name="timeout">
@@ -50,9 +52,10 @@
 			</div>
 <br/><br/><br /><br />
 
+   <!--Code input/output areas-->
    <div>
       <label for="code" style="width:59%"><b>CODE HERE:</b></label>
-      <label for="cin" style="display:inline-block; width:59.5%; float:left"><b>INPUT HERE:</b></label><br/>
+      <label for="cin" style="display:inline-block; width:40%; float:right"><b>INPUT HERE:</b></label><br/>
 	<textarea type="text" id="code" name="code" class="codeBox" onkeydown="tab(this, event);">{{code}}</textarea>
 
       <textarea type="text" name="cin" class="inputBox" placeholder="Input Values Here."></textarea>

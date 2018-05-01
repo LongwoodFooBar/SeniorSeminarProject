@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>C++ Courses</title>
+		<title>My Courses</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
 	</head>
 	<body>
+		<!--Navigation Bar-->
 		<ul>
 			<li id="nav-logo"> <img id="logo" src="../static/logo.svg"></img></li>
 			<li id="nav-title"><a id="title" href="{{url_for('courses')}}">Courses</a></li>
@@ -18,6 +19,7 @@
 		<div>
 			<p id="nav-logged">Logged in as: {{user}}</p>
 		</div>
+		<!--Autofilled courses drop down menu with editing option button-->
 			{% for c in courses %}
 			<a href="{{url_for('editCourse', courseID=c[1])}}"><img style="width:2%; height:2%; float:right; margin-top:22px" src="../static/editButton.png"></a>
 			<button class="Profcollapsible">{{c[0]|safe}}</button>

@@ -27,7 +27,7 @@ function valid() {
 				document.getElementsByName('errordiv')[0].innerHTML = "Passwords do not match.";
 			}
 		} else {
-				document.getElementsByName('errordiv')[0].innerHTML = "Password does not meet requirements";
+				document.getElementsByName('errordiv')[0].innerHTML = "Password does not meet requirements. Must Contain at least 8 characters.";
 		}
 	} else {
 		console.log("EMAIL WRONG");

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<title>Sign Up</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
@@ -9,6 +10,7 @@
 	<body>
 		<form name='signup' id='signup' method='POST'>
 		<form method="POST" name="signup">
+			<!--Signup form-->
 			<div class="imgcontainer">
 				<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
 			</div>
@@ -29,10 +31,10 @@
 				<label for="Security Question:"><b>Choose a question:</b></label>
 				<br />
 				<select name="securityQuestion">
-					<option value="maidenName" selected> What is your mothers maiden name? </option>
+					<option value="maidenName" selected> What is your mother's maiden name? </option>
 					<option value="petName"> What was the name of your first pet? </option>
 					<option value="firstStreet"> What is the name of the street on which you grew up? </option>
-					<option value="elemSchool"> What is the name of your elementary school </option>
+					<option value="elemSchool"> What is the name of your elementary school? </option>
 					<option value="firstCar"> What is the name of your first car? </option>
 				</select>
 				<br />

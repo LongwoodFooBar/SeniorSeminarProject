@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>C++ FAQ </title>
+		<title>Meet the Team!</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
 	</head>
 	<body>
+		<!--Navigation bar and the top of the page-->
 		<ul>
 			<li id="nav-logo"> <img id="logo" src="../static/logo.svg"></img></li>
 			<li id="nav-title"><a id="title" href="{{url_for('courses')}}">Courses</a></li>
 			<li id="nav-sandox"><a id="sandbox" href="{{url_for('sandbox')}}">Sandbox</a></li>
 			<li id="nav-faq"><a id="faq" href="{{url_for('faq')}}">FAQ</a></li>
 			<li id="nav-about"><a href="{{url_for('about')}}">About</a> </li>
-			<li id="nav-logout", style="float:right"><a href="{{url_for('logout')}}"> Logout </a> </li>
+			<li id="nav-logout", style="float:right"><a href="{{url_for('logout')}}">Logout</a></li>
 		</ul>
+		<!--Meet the Team drop down Menu-->
 		<div>
          	        <p id="nav-logged">Logged in as: {{user}}</p>
 			<div class="imgcontainer">
