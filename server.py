@@ -487,6 +487,7 @@ def assignmentsID(assignmentID):
 			elif request.form['sandbox'] == 'runTest':
 				userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
 				tests = db.execute("SELECT testCases.inputValue, testCases.outputValue FROM testCases NATURAL JOIN login WHERE assignmentID = ? AND (type = 'PUBLIC' OR (type = 'PRIVATE' AND userID = ?))", (assignmentID, userID)).fetchall()
+				print(tests)
 				diffFile = "./userdirs/%s/diffFile" % session['username']
 				if os.path.exists(diffFile):
 					os.remove(diffFile)
@@ -570,7 +571,7 @@ def assignmentsID(assignmentID):
 				cfile.close()
 				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, code = code, output=output, assignmentID = assignmentID, uploads=uploads)
 			elif request.form['sandbox'] == 'runCases':
-				tests = db.execute("SELECT inputValue, outputValue FROM testCases WHERE type = 'PUBLIC' OR type = 'HIDDEN'").fetchall()
+				tests = db.execute("SELECT inputValue, outputValue FROM testCases WHERE (type = 'PUBLIC' OR type = 'HIDDEN')").fetchall()
 				diffFile = "./userdirs/%s/diffFile" % session['username']
 				if os.path.exists(diffFile):
 					os.remove(diffFile)
@@ -604,7 +605,7 @@ def assignmentsID(assignmentID):
 					os.remove(diffFile)
 				if os.path.exists(ifilename):
 					os.remove(ifilename)
-				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, code = request.form['code'], assignmentID = assignmentID, uploads=uploads)
+				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, code = request.form['code'], output = output, assignmentID = assignmentID, uploads=uploads)
 		return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, uploads=uploads)
 
 @app.route('/createAssignment/<int:courseID>', methods=['GET', 'POST'])
@@ -674,7 +675,7 @@ def test(assignmentID):
 			outV = request.form['output'] + '\n'
 			if not inpV and outV:
 				return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") 
-			exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ?", (inpV, outV)).fetchall()
+			exists = db.execute("SELECT testID FROM testCases WHERE (inputValue = ? AND outputValue = ? AND userID = ?) OR type == 'PUBLIC'", (inpV, outV, userID)).fetchall()
 			if exists:
 				cases = db.execute("SELECT inputValue, outputValue FROM testCases JOIN login ON login.userID=testCases.userID WHERE testCases.type='PUBLIC' OR (testCases.type='PRIVATE' AND login.email=?)", (session['username'],)).fetchall()
 				return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Test Case already exists.", assignmentID=assignmentID) 
@@ -690,8 +691,8 @@ def test(assignmentID):
 		db = getDB()
 		if request.method == "POST":
 			userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
-			inpV = request.form['input']
-			outV = request.form['output']
+			inpV = request.form['input'] + '\n'
+			outV = request.form['output'] + '\n'
 			if not inpV and outV:
 				return render_template('professorCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") 
 			exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ? AND (type = 'HIDDEN' OR type = 'PUBLIC')", (inpV, outV)).fetchall()
