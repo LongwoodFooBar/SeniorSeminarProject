@@ -32,10 +32,11 @@
 					<button type="submit" name="sandbox" value="save">Save</button>
 					<div id="uploadBox" style="display:inline">
 						<button type="submit" name="sandbox" value="upload">Upload</button>
-						<input type="file" name="uploadfile" style="width:19.7%"></input>
+						<input type="file" name="uploadfile"></input>
 					</div>
 				</nav>
 			</div>
+<br />
 			<div style="float:left">
 				<b>Select Timeout (in seconds):</b>
 				<select name="timeout">
@@ -47,29 +48,21 @@
 					<option value="1200">1200</option>
 				</select>
 			</div>
+<br/><br/><br /><br />
 
-			<div style="float:right;width:40%; height=5vw">
-				<h3>INPUT HERE:</h3>
-				<textarea type="text" name="cin" class="inputBox" placeholder="Input Values Here."></textarea>
-			</div>
-			<br/><br/><br/><br/>
-			<div style="float:left;width:59%; height=5vw">
-				<h3>CODE HERE:</h3>
-			</div>
+   <div>
+      <label for="code" style="width:59%"><b>CODE HERE:</b></label>
+      <label for="cin" style="display:inline-block; width:59.5%; float:left"><b>INPUT HERE:</b></label><br/>
+	<textarea type="text" id="code" name="code" class="codeBox" onkeydown="tab(this, event);">{{code}}</textarea>
 
-			<div style="float:right;width:40%; height=5vw">
-				<h3>OUTPUT HERE:</h3>
-			</div>
-			<br>
+      <textarea type="text" name="cin" class="inputBox" placeholder="Input Values Here."></textarea>
+      <br /> <br /> <br />
+      <label for="output"><b>OUTPUT HERE:</b></label>
+      <textarea disabled type="text" name="output" id="output" class="outputBox">{{output}}</textarea>
 
-			<div>
-				<textarea type="text" id="code" name="code" class="codeBox" onkeydown="tab(this, event);">{{code}}</textarea>
-			</div>
+   </div>
 
-			<div>
-				<textarea disabled type="text" name="output" id="output" class="outputBox">{{output}}</textarea>
-			</div>
-		</form>
-		<div name='errordiv' class='errmsg'>{{error}}</div>
-	</body>
+</form>
+<div name='errordiv' class='errmsg'>{{error}}</div>
+</body>
 </html>

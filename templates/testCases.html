@@ -23,25 +23,25 @@
 		</div>
 		<h1><b>Test Cases for: {{title}}</b></h1>
 		<form method="POST">
-			<div>
-				<b>INPUT HERE:</b>
-			</div>
+			<h2>Create a New Test Case:</h2>
+
 			<div class="testCaseInput">
+				<b>Input: </b> &ensp;
 				<input type="text" name="input" placeholder="Input" required/>
-			</div>
-			<br>
-			<div>
-				<b>OUTPUT HERE:</b>
-			</div>
-			<div class="testCaseInput">
+			<br/>
+				<b>Output:</b>
 				<input type="text" name="output" placeholder="Expected Output" required/>
+			<br/>
 			</div>
+			<br/>
 			<div name='errordiv' class='errmsg'>{{error}}</div>
 			<div style="width:100%; left:25%">
 				<button type="submit" name="newTest" value="newTest" style="width:24.7%">Add New Test Case</button></a>
 				<a href="{{url_for('assignmentsID', assignmentID=assignmentID)}}"><button type="button" name="testCases" value="testCases">Return to Assignment</button></a>
 			</div>
 		</form>
+		<br/>
+		<h2>Current Test Cases:</h2>
 		<div class="testCaseTitle">
 			<h3>INPUT</h3>
 		</div>
