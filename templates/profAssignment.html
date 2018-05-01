@@ -32,7 +32,7 @@
 		<select name="student">
 		<option value="default">None selected</option>
 		{% for u in uploads %}
-		<option value="{{u[0]|safe}}{{u[1]|safe}}">{{u[0] | safe}} {{u[1] | safe}}</option>
+		<option value="{{u[2] | safe}}">{{u[0] | safe}} {{u[1] | safe}}</option>
 		{% endfor %}
 		</select>
 	</div>
@@ -56,9 +56,8 @@
 	<!--Button options-->
 	<div style="width:100%">
 	<nav class="testCaseBtn">
-		<button type="submit" name="sandbox" value="compileRun">Compile and Run</button>
-		<button type="submit" name="sandbox" value="runPublicTest">Run Public Cases</button>
-		<button type="submit" name="sandbox" value="runPrivateTest">Run Private Cases</button>
+		<button type="submit" name="sandbox" value="compile">Compile</button>
+		<button type="submit" name="sandbox" value="runCases">Run Test Cases</button>
 		<button type="submit" name="sandbox" value="grade">Grade</button>
 	</nav>
 	</div>
@@ -68,7 +67,7 @@
 	<!--Code display/input/output-->
 	<div>
 	<label for="code" style="width:59%"><b>CODE HERE:</b></label>
-	<label for="cin" style="display:inline-block; width:59.5%; float:left"><b>INPUT HERE:</b></label><br/>
+	<label for="cin" style="display:inline-block; width:40%; float:right"><b>INPUT HERE:</b></label><br/>
 	<textarea type="text" id="code" name="code" class="codeBox" onkeydown="tab(this, event);">{{code}}</textarea>
 
 	<textarea type="text" name="cin" class="inputBox" placeholder="Input Values Here."></textarea>

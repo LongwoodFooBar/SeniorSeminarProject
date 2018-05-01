@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>C++ FAQ </title>
+		<title>FooBar FAQ </title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
@@ -15,19 +15,56 @@
 			<li id="nav-about"><a href="{{url_for('about')}}">About</a> </li>
 			<li id="nav-logout", style="float:right"><a href="{{url_for('logout')}}"> Logout </a> </li>
 		</ul>
+
 		<div>
 			<p id="nav-logged">Logged in as: {{user}}</p>
 
-			<div class="imgcontainer">
-				<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
-			</div>
-		 	<div>
-    			<button class="collapsible">How do I get access to a course?</button>
-				<div class="content">
-            		<div>Contact your instructor for them to add you to the course.</div>
-				</div>
-		 	</div>
+		<div class="imgcontainer">
+			<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
 		</div>
-    	<script src="../static/collapsable_list.js"></script>
+
+		 <div>
+                 	 <button class="collapsible">How do I get access to a course?</button>
+					<div class="content">
+			    		 <div>Contact your instructor for them to add you to the course.</div>
+						 </div>
+					</div>
+				 
+					<button class="collapsible">How do I get removed from a course?</button>
+                    <div class="content">
+                         <div>Contact the instructor of that course for them to remove you.</div>
+                         </div>
+                    </div>
+				
+				   	<button class="collapsible">Where can I view my assignments? </button>
+                    <div class="content">
+                         <div>Assignments can be viewed within each course page. The assignments are created and managed by your instructor. If you have any questions about contents of an assignment please contact your instructor. </div>
+                         </div>
+                    </div>
+					<button class="collapsible">How do I run my code from the sandbox?</button>
+                    <div class="content">
+                         <div>After you write your code in the sandbox you must first compile your code with the compile button. If your code compiles with no errors you can run your code with the run button. If your code has errors you must first correct any errors for your code to be ran.</div>
+                         </div>
+                    </div>
+					
+					<button class="collapsible">Am I able code in any languages besides C++?</button>
+                    <div class="content">
+                         <div>C++ is the only language that is compatible with FooBar++ as of right now.</div>
+                         </div>
+                    </div>
+					
+					<button class="collapsible">How do I logout?</button>
+                    <div class="content">
+                         <div>On the top right of the page there is a button to logout called "Logout".</div>
+                         </div>
+                    </div>
+	
+					
+		 </div>
+                 <script src="../static/collapsable_list.js"></script>
+
+		
+	
+		</div>
 	</body>
 </html>
