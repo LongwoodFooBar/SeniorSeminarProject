@@ -8,9 +8,6 @@ def createSchema():
 	conn = sqlite3.connect('foobar.db')
 	c = conn.cursor()
 
-	# Creates the login table
-	# Position used to denote teacher or student
-	# password possibly stored as a hash?
 	c.execute('''CREATE TABLE IF NOT EXISTS login (
 		userID INTEGER PRIMARY KEY AUTOINCREMENT,
 		firstName TEXT,
@@ -22,8 +19,6 @@ def createSchema():
 		answer TEXT
 	)''')
 
-	# Creates the class table
-	# instructor is who is the main teacher (handles student teacher cases)
 	c.execute('''CREATE TABLE IF NOT EXISTS class (
 		classID INTEGER PRIMARY KEY AUTOINCREMENT,
 		instructorID INTEGER,
@@ -35,8 +30,6 @@ def createSchema():
 		FOREIGN KEY (instructorID) REFERENCES login(userID)
 	) ''')
 
-	# Creates the assignment table
-	# Mostly connects the tables together with the test cases along with searching
 	c.execute('''CREATE TABLE IF NOT EXISTS assignment (
 		assignmentID INTEGER PRIMARY KEY AUTOINCREMENT,
 		title TEXT,
@@ -58,9 +51,6 @@ def createSchema():
 		FOREIGN KEY (assignmentID) REFERENCES assignment(assignmentID)
         ) ''')
 
-	# Creates the test cases table
-	# Type is to denote if test case is teacher, student, or secret
-	# teacher can be used by class, student by individual or class, and grading for grading
 	c.execute('''CREATE TABLE IF NOT EXISTS testCases (
 		testID INTEGER PRIMARY KEY,
 		assignmentID INTEGER,
@@ -78,6 +68,16 @@ def createSchema():
 	    FOREIGN KEY (userID) REFERENCES login(userID),
 	    FOREIGN KEY (classID) REFERENCES class(classID),
 	    PRIMARY KEY (userID, classID)
+	)''')
+
+	c.execute('''CREATE TABLE IF NOT EXISTS grades (
+		userID INTEGER,
+		classID INTEGER,
+		grade INTEGER,
+		comment TEXT,
+		FOREIGN KEY (userID) REFERENCES login(userID),
+		FOREIGN KEY (classID) REFERENCES class(classID),
+		PRIMARY KEY (userID, classID)
 	)''')
 
 	conn.commit()
