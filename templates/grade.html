@@ -12,28 +12,29 @@
 	<div>
 	<!-- logo div-->
 	<ul>
-		<li id="nav-logo"> <img id="logo" src="../static/logo.svg"></img></li>
+		<li id="nav-logo"> <img id="logo" src="{{url_for('static', filename='logo.svg')}}"></img></li>
 		<li id="nav-title"><a id="title" href="{{url_for('courses')}}">Courses</a></li>
 		<li id="nav-sandox"><a id="sandbox" href="{{url_for('sandbox')}}">Sandbox</a></li>
 		<li id="nav-faq"><a id="faq" href="{{url_for('faq')}}">FAQ</a></li>
 		<li id="nav-about"><a href="{{url_for('about')}}">About</a> </li>
 		<li id="nav-logout", style="float:right"><a href="{{url_for('logout')}}"> Logout </a> </li>
 	</ul>
+			<p id="nav-logged">Logged in as: {{user}}</p>
 
 	</div>
 	<br />
 	<br />
 	
-	<form action="/action_page.php">
+	<form method="POST">
 		<div>
 			<label for="grade"><b>Grade:</b></label>
- 			<input type="text" name="grade"id="grade"><br>
+			<input type="text" name="grade" id="grade" value="{{grade}}" required><br>
 		</div>
 	<br />
 	<br />
 		<div>
 			<label for="comment"><b>Comment:</b></label>
-   			<textarea  type="text" name="comment" id="comment"></textarea>
+			<textarea  type="text" name="comment" id="comment">{{comment}}</textarea>
 		</div>			
 				  <input type="submit" value="Submit">
 

@@ -159,7 +159,8 @@ def signup():
 @app.route('/forgot', methods=['GET', 'POST'])
 def forgot():
 	if request.method == "POST":
-		email = request.form['username']
+		db = getDB()
+		'''email = request.form['username']
 		password = request.form['password']
 		question = request.form['securityQuestion']#MAKE REQUIRED / MAKE A LIST OF QUESTIONS
 		answer = request.form['answer']#MAKE REQUIRED
@@ -170,8 +171,42 @@ def forgot():
 			db.commit()
 		else:
 			return render_template('forgotpw.html', email = email, question = question, error = 'Question or answer is incorrect')
-		return redirect(url_for('root'))
+		return redirect(url_for('root'))'''
+		email = request.form['username']
+		exists = db.execute("SELECT userID FROM login WHERE email=?", (email,)).fetchall()
+		print(exists)
+		if exists:
+			userID = exists[0][0]
+			return redirect(url_for('forgot2', userID=userID))
+		return render_template('forgotpw.html', error="That user does not exists.")
 	return render_template('forgotpw.html')
+
+@app.route('/forgot2/<int:userID>', methods=['GET', 'POST'])
+def forgot2(userID):
+	db = getDB()
+	question = db.execute("SELECT question FROM login WHERE userID = ?", (userID,)).fetchall()[0][0]
+	q = ""
+	if question == 'petName':
+		q = 'What was the name of your first pet?'
+	elif question == 'maidenName':
+		q = "What is your mother's maiden name?"
+	elif question == 'firstStreet':
+		q = "What is the name of the street on which you grew up?"
+	elif question == 'elemSchool':
+		q = "What is the name of your elementary school?"
+	elif question == 'firstCar':
+		q = "What is the name of your first car?"
+	if request.method == "POST":
+		ans = db.execute("SELECT answer FROM login WHERE userID=?", (userID,)).fetchall()[0][0]
+		if ans == request.form['answer']:
+			password = request.form['password']
+			pw = md5(password.encode('utf-8')).hexdigest()
+			db.execute("UPDATE login SET password = ? WHERE userID = ?", (pw, userID))
+			db.commit()
+			return redirect(url_for('login'))
+		else:
+			return render_template('forgotpw2.html', question = q, error="Answer to security question is wrong")
+	return render_template('forgotpw2.html', question = q)
 
 @app.route('/courses')
 def courses():
@@ -433,14 +468,20 @@ def assignmentsID(assignmentID):
 	if utype == "STUDENT":
 		code = ""
 		output = ""
+		comment = ""
+		grade = ""
 		userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
 		filename = './userdirs/%s/assignment%s-%s.cpp' % (session['username'], assignmentID, userID)
 		ifilename = './userdirs/%s/infile' % session['username']
 		ofilename = './userdirs/%s/outfile' % session['username']
 		exe = './userdirs/%s/assignment%s-%s' % (session['username'], assignmentID, userID)
+		ugrade = db.execute("SELECT grade, comment FROM grades WHERE userID=? AND assignmentID=?", (userID, assignmentID)).fetchall()
+		if ugrade:
+			grade = ugrade[0][0]
+			comment = ugrade[0][1]
 		if request.method == "POST":
 			if not checkToday(unfdate):
-				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, error="Overdue")
+				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, error="Overdue")
 			code = request.form['code']
 			inp = request.form.get('cin')
 			timeout = int(request.form['timeout'])
@@ -458,7 +499,7 @@ def assignmentsID(assignmentID):
 					output = opfile.read()
 					opfile.close()
 					os.remove(ofilename)
-				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
+				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output)
 			elif request.form['sandbox'] == 'run':
 				if platform.system() == 'Linux':
 					if inp:
@@ -483,11 +524,10 @@ def assignmentsID(assignmentID):
 					cfile = open(filename, "r")
 					code = cfile.read()
 					cfile.close()
-				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
+				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output)
 			elif request.form['sandbox'] == 'runTest':
 				userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
 				tests = db.execute("SELECT testCases.inputValue, testCases.outputValue FROM testCases NATURAL JOIN login WHERE assignmentID = ? AND (type = 'PUBLIC' OR (type = 'PRIVATE' AND userID = ?))", (assignmentID, userID)).fetchall()
-				print(tests)
 				diffFile = "./userdirs/%s/diffFile" % session['username']
 				if os.path.exists(diffFile):
 					os.remove(diffFile)
@@ -513,22 +553,22 @@ def assignmentsID(assignmentID):
 				outfile = open(diffFile, "r")
 				output = outfile.read()
 				outfile.close()
-				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
+				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output)
 			elif request.form['sandbox'] == 'save':
-				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
+				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output)
 			elif request.form['sandbox'] == 'upload':
 				if 'uploadfile' not in request.files:
-					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output, error="No file selected")
+					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output, grade=grade, comment=comment, error="No file selected")
 				upfile = request.files['uploadfile']
 				if upfile.filename == '':
 					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output, error = "No file selected")
 				if not allowedFile(upfile.filename):
-					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output, error = "Bad filetype")
+					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output, grade=grade, comment=comment, error = "Bad filetype")
 				upfile.save(filename)
 				cfile = open(filename, "r")
 				code = cfile.read()
 				cfile.close()
-				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
+				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output)
 			elif request.form['sandbox'] == 'assignment':
 				profUser = db.execute("SELECT login.email FROM login JOIN class ON login.userID=class.instructorID JOIN assignment ON class.classID=assignment.classID WHERE assignment.assignmentID = ?", (assignmentID,)).fetchall()[0][0]
 				savelocation = "./userdirs/%s/assignment%s-%s.cpp" % (profUser, assignmentID, userID)
@@ -540,23 +580,25 @@ def assignmentsID(assignmentID):
 				if not submitted:
 					db.execute("INSERT INTO uploads(userID, assignmentID, fileLocation, type) VALUES(?, ?, ?, 'SUBMISSION')", (userID, assignmentID, savelocation))
 					db.commit()
-				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
+				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output)
 		if os.path.exists(filename):
 			cfile = open(filename, "r")
 			code = cfile.read()
 			cfile.close()
-		return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code)
+		return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code)
 	elif utype == "INSTRUCTOR":
 		uploads = db.execute("SELECT login.firstName, login.lastName, login.userID, uploads.fileLocation FROM login NATURAL JOIN uploads WHERE uploads.assignmentID = ?", (assignmentID,)).fetchall()
+		userID = request.form.get('student')
+		if userID == "default" or userID == None:
+			userID = -1
 		if request.method == 'POST':
 			filename = ""
 			ofilename = './userdirs/%s/outfile' % session['username']
 			ifilename = './userdirs/%s/infile' % session['username']
 			exe = "./userdirs/%s/assignment%s" % (session['username'], assignmentID)
 			if request.form['sandbox'] == 'compile':
-				userID = request.form['student']
-				if userID == "default":
-					return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, uploads=uploads)
+				if userID == -1:
+					return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, userID=userID, uploads=uploads)
 				for u in uploads:
 					if int(u[2]) == int(userID):
 						filename = u[3]
@@ -569,7 +611,7 @@ def assignmentsID(assignmentID):
 				cfile = open(filename, "r")
 				code = cfile.read()
 				cfile.close()
-				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, code = code, output=output, assignmentID = assignmentID, uploads=uploads)
+				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, code = code, output=output, assignmentID = assignmentID, userID=userID, uploads=uploads)
 			elif request.form['sandbox'] == 'runCases':
 				tests = db.execute("SELECT inputValue, outputValue FROM testCases WHERE (type = 'PUBLIC' OR type = 'HIDDEN')").fetchall()
 				diffFile = "./userdirs/%s/diffFile" % session['username']
@@ -605,8 +647,8 @@ def assignmentsID(assignmentID):
 					os.remove(diffFile)
 				if os.path.exists(ifilename):
 					os.remove(ifilename)
-				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, code = request.form['code'], output = output, assignmentID = assignmentID, uploads=uploads)
-		return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, uploads=uploads)
+				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, code = request.form['code'], output = output, assignmentID = assignmentID, userID=userID, uploads=uploads)
+		return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, userID = userID, uploads=uploads)
 
 @app.route('/createAssignment/<int:courseID>', methods=['GET', 'POST'])
 def createAssignment(courseID):
@@ -704,6 +746,36 @@ def test(assignmentID):
 		title = db.execute("SELECT title FROM assignment WHERE assignmentID=?", (assignmentID,)).fetchall()[0][0]
 		cases = db.execute("SELECT inputValue, outputValue FROM testCases WHERE assignmentID=? AND testCases.type='PUBLIC' OR testCases.type='HIDDEN'", (assignmentID,)).fetchall()
 		return render_template('professorCases.html', user=session['username'], cases = cases, title = title, assignmentID=assignmentID)
+
+@app.route('/grade/<int:assignmentID>/<int:userID>', methods=['GET', 'POST'])
+def grade(assignmentID, userID):
+	if not checkLogged():
+		return home()
+	if not checkInstructor():
+		return home()
+	if not checkOwnsAssign(assignmentID):
+		return home()
+	if userID < 0:
+		return redirect(url_for('/assignment', assignmentID=assignmentID))
+	grade = ""
+	comment = ""
+	db = getDB()
+	exists = db.execute("SELECT grade, comment FROM grades WHERE userID = ? AND assignmentID =?", (userID, assignmentID)).fetchall()
+	if exists:
+		grade = exists[0][0]
+		comment = exists[0][1]
+	if request.method == "POST":
+		grade = int(request.form['grade'])
+		comment = request.form.get('comment')
+		if grade > 100 or grade < 0:
+			return render_template('grade.html', user=session['username'], grade=grade, comment=comment, error="Grade not in 0 - 100 range")
+		if exists:
+			db.execute("UPDATE grades SET grade = ?, comment = ? WHERE userID =? AND assignmentID=?", (grade, comment, userID, assignmentID))
+		else:
+			db.execute("INSERT INTO grades(userID, assignmentID, grade, comment) VALUES(?, ?, ?, ?)", (userID, assignmentID, grade, comment))
+		db.commit()
+		return render_template('grade.html', user=session['username'], grade=grade, comment=comment)
+	return render_template('grade.html', user=session['username'], grade=grade, comment=comment)
 
 @app.route('/faq')
 def faq():

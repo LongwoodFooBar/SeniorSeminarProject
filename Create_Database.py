@@ -72,12 +72,12 @@ def createSchema():
 
 	c.execute('''CREATE TABLE IF NOT EXISTS grades (
 		userID INTEGER,
-		classID INTEGER,
+		assignmentID INTEGER,
 		grade INTEGER,
 		comment TEXT,
 		FOREIGN KEY (userID) REFERENCES login(userID),
-		FOREIGN KEY (classID) REFERENCES class(classID),
-		PRIMARY KEY (userID, classID)
+		FOREIGN KEY (assignmentID) REFERENCES assignment(assignmentID),
+		PRIMARY KEY (userID, assignmentID)
 	)''')
 
 	conn.commit()
