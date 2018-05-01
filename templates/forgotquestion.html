@@ -1,31 +1,28 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>FooBar Login</title>
+		<title>Forgot Password?</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
 	</head>
 	<body>
-  
 		<form method="POST">
+
 			<div class="imgcontainer">
 				<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
 			</div>
-
 			<div class="container">
-				<label for="username"><b>Email</b></label>
-				<input type="text" placeholder="Enter Email" name="username" required>
-				<label for="password"><b>Password</b></label>
-				<input type="password" placeholder="Enter Password" name="password" required>
-				<div style="position:fixed; width:100%; left:25%">
-				<button type="submit" onclick="validate();">Login</button>
-				<a href="{{url_for('signup')}}"><button type="button">Sign Up</button></a>
-				</div>
+			<h2><b>Forgot Password?</b></h2>
+				<label for="password2"><b>Retype New Password:</b></label>
+				<input type="password" placeholder="Retype New Password" name="password2" required>
+				<label for="answer"><b>{{question}}</b></label>
+				<input type="text" placeholder="Answer the Security Question." name="answer" required>
+				<button type="submit" onclick="validate();">Reset Password</button>
 				<label>
 					<div name='errordiv' class='errmsg'>{{loginerror}}</div>
 				</label>
-				<span ><a href="{{url_for('forgot')}}">Forgot Password?</a></span>
+				<span><a href="{{url_for('root')}}">Return to Login</a></span>
 			</div>
 		</form>
 	</body>
