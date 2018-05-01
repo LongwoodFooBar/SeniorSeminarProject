@@ -547,19 +547,18 @@ def assignmentsID(assignmentID):
 		return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code)
 	elif utype == "INSTRUCTOR":
 		uploads = db.execute("SELECT login.firstName, login.lastName, login.userID, uploads.fileLocation FROM login NATURAL JOIN uploads WHERE uploads.assignmentID = ?", (assignmentID,)).fetchall()
-		print(uploads)
 		if request.method == 'POST':
+			filename = ""
+			ofilename = './userdirs/%s/outfile' % session['username']
+			ifilename = './userdirs/%s/infile' % session['username']
+			exe = "./userdirs/%s/assignment%s" % (session['username'], assignmentID)
 			if request.form['sandbox'] == 'compile':
-				filename = ""
-				ofilename = './userdirs/%s/outfile' % session['username']
-				exe = ""
 				userID = request.form['student']
 				if userID == "default":
 					return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, uploads=uploads)
 				for u in uploads:
 					if int(u[2]) == int(userID):
 						filename = u[3]
-						exe = filename.rsplit('.', 1)[0]
 				os.system('g++ -Wall %s -o %s 2> %s' % (filename, exe, ofilename))
 				if os.path.exists(ofilename):
 					opfile = open(ofilename, "r")
@@ -569,9 +568,43 @@ def assignmentsID(assignmentID):
 				cfile = open(filename, "r")
 				code = cfile.read()
 				cfile.close()
-				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, code = code, assignmentID = assignmentID, uploads=uploads)
+				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, code = code, output=output, assignmentID = assignmentID, uploads=uploads)
 			elif request.form['sandbox'] == 'runCases':
-				pass
+				tests = db.execute("SELECT inputValue, outputValue FROM testCases WHERE type = 'PUBLIC' OR type = 'HIDDEN'").fetchall()
+				diffFile = "./userdirs/%s/diffFile" % session['username']
+				if os.path.exists(diffFile):
+					os.remove(diffFile)
+				if os.path.exists(ofilename):
+					os.remove(ofilename)
+				eOutFile = "./userdirs/%s/expectedOut" % session['username']
+				eOut = open(eOutFile, "w")
+				for t in tests:
+					infile = open(ifilename, "w")
+					infile.write(t[0])
+					infile.close()
+					eOut.write(t[1])
+					if platform.system() == 'Linux':
+						exitstat = os.system('timeout %d %s < %s >> %s' % (int(request.form['timeout']), exe, ifilename, ofilename))
+						if os.WEXITSTATUS(exitstat) == 124:
+							os.system('echo "Program timed out on test %s" >> %s' % (t[0], diffFile))
+					elif platform.system() == 'Darwin':
+						exitstat = os.system('gtimeout %d %s < %s >> %s' % (int(request.form['timeout']), exe, ifilename, ofilename))
+						if os.WEXITSTATUS(exitstat) == 124:
+							os.system('echo "Program timed out on test %s" >> %s' % (t[0], diffFile))
+				eOut.close()
+				os.system('diff %s %s > %s' % (ofilename, eOutFile, diffFile))
+				outfile = open(diffFile, "r")
+				output = outfile.read()
+				outfile.close()
+				if os.path.exists(exe):
+					os.remove(exe)
+				if os.path.exists(ofilename):
+					os.remove(ofilename)
+				if os.path.exists(diffFile):
+					os.remove(diffFile)
+				if os.path.exists(ifilename):
+					os.remove(ifilename)
+				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, code = request.form['code'], assignmentID = assignmentID, uploads=uploads)
 		return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, uploads=uploads)
 
 @app.route('/createAssignment/<int:courseID>', methods=['GET', 'POST'])
