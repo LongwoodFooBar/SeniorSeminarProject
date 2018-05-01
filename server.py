@@ -145,7 +145,7 @@ def signup():
 
 		password = md5(request.form['password'].encode('utf-8')).hexdigest()
 
-		db.execute('INSERT INTO login (firstName, lastName, email, password, position, question, answer) VALUES (?, ?, ?, ?, ?, ?, ?)', (request.form['firstName'], request.form['lastName'], request.form['email'], password, request.form['type'], request.form['question'], request.form['answer']))
+		db.execute('INSERT INTO login (firstName, lastName, email, password, position, question, answer) VALUES (?, ?, ?, ?, ?, ?, ?)', (request.form['firstName'], request.form['lastName'], request.form['email'], password, request.form['type'], request.form['securityQuestion'], request.form['answer']))
 		db.commit()
 		session['username'] = request.form['email']
 		session['password'] = request.form['password']
@@ -161,7 +161,7 @@ def forgot():
 	if request.method == "POST":
 		email = request.form['username']
 		password = request.form['password']
-		question = request.form['question']#MAKE REQUIRED / MAKE A LIST OF QUESTIONS
+		question = request.form['securityQuestion']#MAKE REQUIRED / MAKE A LIST OF QUESTIONS
 		answer = request.form['answer']#MAKE REQUIRED
 		db = getDB()
 		if db.execute("SELECT userID FROM login WHERE question=? AND answer=? AND email=?", (question, answer, email)).fetchall():
@@ -661,11 +661,11 @@ def test(assignmentID):
 			outV = request.form['output']
 			if not inpV and outV:
 				return render_template('professorCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") 
-			exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ? AND type <> 'HIDDEN'", (inpV, outV)).fetchall()
+			exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ? AND (type = 'HIDDEN' OR type = 'PUBLIC')", (inpV, outV)).fetchall()
 			if exists:
 				cases = db.execute("SELECT inputValue, outputValue FROM testCases WHERE testCases.type='PUBLIC' OR testCases.type='HIDDEN')", (session['username'],)).fetchall()
 				return render_template('professorCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Test Case already exists.", assignmentID=assignmentID) 
-			db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type, assignmentID) VALUES(?, ?, ?, 'PUBLIC', ?)", (inpV, outV, userID, assignmentID))
+			db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type, assignmentID) VALUES(?, ?, ?, ?, ?)", (inpV, outV, userID, request.form['caseType'], assignmentID))
 			db.commit()
 		title = db.execute("SELECT title FROM assignment WHERE assignmentID=?", (assignmentID,)).fetchall()[0][0]
 		cases = db.execute("SELECT inputValue, outputValue FROM testCases WHERE assignmentID=? AND testCases.type='PUBLIC' OR testCases.type='HIDDEN'", (assignmentID,)).fetchall()
