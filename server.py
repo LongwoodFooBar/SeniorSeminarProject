@@ -59,7 +59,7 @@ def valiDate(unfdate):
 			return False
 
 	date = "%s-%s-%s" % (unfdate[2], unfdate[1], unfdate[0])
-	if checkToday(date):
+	if not checkToday(date):
 		return False
 	return True
 
@@ -69,10 +69,12 @@ def checkToday(date):
 	tarray = str(today).split("-")
 	tarray[2] = tarray[2].split(" ")[0]
 
-	if int(darray[0]) <= int(tarray[0]):
-		if int(darray[1]) <= int(tarray[1]):
-			if int(darray[2]) <= int(tarray[2]):
-				return False
+	if int(darray[0]) < int(tarray[0]):
+		return False
+	elif int(darray[0]) == int(tarray[0]) and int(darray[1]) < int(tarray[1]):
+		return False
+	elif int(darray[0]) == int(tarray[0]) and int(darray[1]) == int(tarray[1]) and int(darray[2]) < int(tarray[2]):
+		return False
 	return True
 
 def connectDB():
@@ -143,7 +145,7 @@ def signup():
 
 		password = md5(request.form['password'].encode('utf-8')).hexdigest()
 
-		db.execute('INSERT INTO login (firstName, lastName, email, password, position, question, answer) VALUES (?, ?, ?, ?, ?, ?, ?)', (request.form['firstName'], request.form['lastName'], request.form['email'], password, request.form['type'], request.form['question'], request.form['answer']))
+		db.execute('INSERT INTO login (firstName, lastName, email, password, position, question, answer) VALUES (?, ?, ?, ?, ?, ?, ?)', (request.form['firstName'], request.form['lastName'], request.form['email'], password, request.form['type'], request.form['securityQuestion'], request.form['answer']))
 		db.commit()
 		session['username'] = request.form['email']
 		session['password'] = request.form['password']
@@ -159,7 +161,7 @@ def forgot():
 	if request.method == "POST":
 		email = request.form['username']
 		password = request.form['password']
-		question = request.form['question']#MAKE REQUIRED / MAKE A LIST OF QUESTIONS
+		question = request.form['securityQuestion']#MAKE REQUIRED / MAKE A LIST OF QUESTIONS
 		answer = request.form['answer']#MAKE REQUIRED
 		db = getDB()
 		if db.execute("SELECT userID FROM login WHERE question=? AND answer=? AND email=?", (question, answer, email)).fetchall():
@@ -472,16 +474,45 @@ def assignmentsID(assignmentID):
 						exitstat = os.system('gtimeout %d %s > %s' % (timeout, exe, ofilename))
 					if os.WEXITSTATUS(exitstat) == 124:
 						os.system('echo "Program timed out" > %s' % ofilename)
-					if os.path.exists(ofilename):
-						opfile = open(ofilename, "r")
-						output = opfile.read()
-						opfile.close()
-						os.remove(ofilename)
-					if os.path.exists(filename):
-						cfile = open(filename, "r")
-						code = cfile.read()
-						cfile.close()
-					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
+				if os.path.exists(ofilename):
+					opfile = open(ofilename, "r")
+					output = opfile.read()
+					opfile.close()
+					os.remove(ofilename)
+				if os.path.exists(filename):
+					cfile = open(filename, "r")
+					code = cfile.read()
+					cfile.close()
+				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
+			elif request.form['sandbox'] == 'runTest':
+				userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
+				tests = db.execute("SELECT testCases.inputValue, testCases.outputValue FROM testCases NATURAL JOIN login WHERE assignmentID = ? AND (type = 'PUBLIC' OR (type = 'PRIVATE' AND userID = ?))", (assignmentID, userID)).fetchall()
+				diffFile = "./userdirs/%s/diffFile" % session['username']
+				if os.path.exists(diffFile):
+					os.remove(diffFile)
+				if os.path.exists(ofilename):
+					os.remove(ofilename)
+				eOutFile = "./userdirs/%s/expectedOut" % session['username']
+				eOut = open(eOutFile, "w")
+				for t in tests:
+					infile = open(ifilename, "w")
+					infile.write(t[0])
+					infile.close()
+					eOut.write(t[1])
+					if platform.system() == 'Linux':
+						exitstat = os.system('timeout %d %s < %s >> %s' % (int(request.form['timeout']), exe, ifilename, ofilename))
+						if os.WEXITSTATUS(exitstat) == 124:
+							os.system('echo "Program timed out on test %s" >> %s' % (t[0], diffFile))
+					elif platform.system() == 'Darwin':
+						exitstat = os.system('gtimeout %d %s < %s >> %s' % (int(request.form['timeout']), exe, ifilename, ofilename))
+						if os.WEXITSTATUS(exitstat) == 124:
+							os.system('echo "Program timed out on test %s" >> %s' % (t[0], diffFile))
+				eOut.close()
+				os.system('diff %s %s > %s' % (ofilename, eOutFile, diffFile))
+				outfile = open(diffFile, "r")
+				output = outfile.read()
+				outfile.close()
+				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
 			elif request.form['sandbox'] == 'save':
 				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
 			elif request.form['sandbox'] == 'upload':
@@ -503,6 +534,11 @@ def assignmentsID(assignmentID):
 				submitFile = open(savelocation, "w")
 				submitFile.write(code)
 				submitFile.close()
+				userID = db.execute("SELECT userID FROM login WHERE email = ?", (session['username'],)).fetchall()[0][0]
+				submitted = db.execute("SELECT uploadID FROM uploads WHERE assignmentID = ? AND userID = ?", (assignmentID, userID)).fetchall()
+				if not submitted:
+					db.execute("INSERT INTO uploads(userID, assignmentID, fileLocation, type) VALUES(?, ?, ?, 'SUBMISSION')", (userID, assignmentID, savelocation))
+					db.commit()
 				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output)
 		if os.path.exists(filename):
 			cfile = open(filename, "r")
@@ -510,7 +546,66 @@ def assignmentsID(assignmentID):
 			cfile.close()
 		return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code)
 	elif utype == "INSTRUCTOR":
-		return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID)
+		uploads = db.execute("SELECT login.firstName, login.lastName, login.userID, uploads.fileLocation FROM login NATURAL JOIN uploads WHERE uploads.assignmentID = ?", (assignmentID,)).fetchall()
+		if request.method == 'POST':
+			filename = ""
+			ofilename = './userdirs/%s/outfile' % session['username']
+			ifilename = './userdirs/%s/infile' % session['username']
+			exe = "./userdirs/%s/assignment%s" % (session['username'], assignmentID)
+			if request.form['sandbox'] == 'compile':
+				userID = request.form['student']
+				if userID == "default":
+					return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, uploads=uploads)
+				for u in uploads:
+					if int(u[2]) == int(userID):
+						filename = u[3]
+				os.system('g++ -Wall %s -o %s 2> %s' % (filename, exe, ofilename))
+				if os.path.exists(ofilename):
+					opfile = open(ofilename, "r")
+					output = opfile.read()
+					opfile.close()
+					os.remove(ofilename)
+				cfile = open(filename, "r")
+				code = cfile.read()
+				cfile.close()
+				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, code = code, output=output, assignmentID = assignmentID, uploads=uploads)
+			elif request.form['sandbox'] == 'runCases':
+				tests = db.execute("SELECT inputValue, outputValue FROM testCases WHERE type = 'PUBLIC' OR type = 'HIDDEN'").fetchall()
+				diffFile = "./userdirs/%s/diffFile" % session['username']
+				if os.path.exists(diffFile):
+					os.remove(diffFile)
+				if os.path.exists(ofilename):
+					os.remove(ofilename)
+				eOutFile = "./userdirs/%s/expectedOut" % session['username']
+				eOut = open(eOutFile, "w")
+				for t in tests:
+					infile = open(ifilename, "w")
+					infile.write(t[0])
+					infile.close()
+					eOut.write(t[1])
+					if platform.system() == 'Linux':
+						exitstat = os.system('timeout %d %s < %s >> %s' % (int(request.form['timeout']), exe, ifilename, ofilename))
+						if os.WEXITSTATUS(exitstat) == 124:
+							os.system('echo "Program timed out on test %s" >> %s' % (t[0], diffFile))
+					elif platform.system() == 'Darwin':
+						exitstat = os.system('gtimeout %d %s < %s >> %s' % (int(request.form['timeout']), exe, ifilename, ofilename))
+						if os.WEXITSTATUS(exitstat) == 124:
+							os.system('echo "Program timed out on test %s" >> %s' % (t[0], diffFile))
+				eOut.close()
+				os.system('diff %s %s > %s' % (ofilename, eOutFile, diffFile))
+				outfile = open(diffFile, "r")
+				output = outfile.read()
+				outfile.close()
+				if os.path.exists(exe):
+					os.remove(exe)
+				if os.path.exists(ofilename):
+					os.remove(ofilename)
+				if os.path.exists(diffFile):
+					os.remove(diffFile)
+				if os.path.exists(ifilename):
+					os.remove(ifilename)
+				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, code = request.form['code'], assignmentID = assignmentID, uploads=uploads)
+		return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, uploads=uploads)
 
 @app.route('/createAssignment/<int:courseID>', methods=['GET', 'POST'])
 def createAssignment(courseID):
@@ -548,7 +643,7 @@ def editAssignment(assignmentID):
 	if request.method == 'POST':
 		title = request.form['title']
 		body = request.form['assignmentDesc']
-		unfdate = request.form['dueDate']
+		undate = request.form['dueDate']
 		unfdate = undate.split("/")
 		if len(unfdate[0]) == 1:
 			unfdate[0] = "0" + unfdate[0]
@@ -575,8 +670,8 @@ def test(assignmentID):
 	if utype == "STUDENT":
 		if request.method == "POST":
 			userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
-			inpV = request.form['input']
-			outV = request.form['output']
+			inpV = request.form['input'] + '\n'
+			outV = request.form['output'] + '\n'
 			if not inpV and outV:
 				return render_template('testCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") 
 			exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ?", (inpV, outV)).fetchall()
@@ -599,11 +694,11 @@ def test(assignmentID):
 			outV = request.form['output']
 			if not inpV and outV:
 				return render_template('professorCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Please add an input and output.") 
-			exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ? AND type <> 'HIDDEN'", (inpV, outV)).fetchall()
+			exists = db.execute("SELECT testID FROM testCases WHERE inputValue = ? AND outputValue = ? AND (type = 'HIDDEN' OR type = 'PUBLIC')", (inpV, outV)).fetchall()
 			if exists:
 				cases = db.execute("SELECT inputValue, outputValue FROM testCases WHERE testCases.type='PUBLIC' OR testCases.type='HIDDEN')", (session['username'],)).fetchall()
 				return render_template('professorCases.html', user=session['username'], cases = cases, input = inpV, output = outV, error = "Test Case already exists.", assignmentID=assignmentID) 
-			db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type, assignmentID) VALUES(?, ?, ?, 'PUBLIC', ?)", (inpV, outV, userID, assignmentID))
+			db.execute("INSERT INTO testCases(inputValue, outputValue, userID, type, assignmentID) VALUES(?, ?, ?, ?, ?)", (inpV, outV, userID, request.form['caseType'], assignmentID))
 			db.commit()
 		title = db.execute("SELECT title FROM assignment WHERE assignmentID=?", (assignmentID,)).fetchall()[0][0]
 		cases = db.execute("SELECT inputValue, outputValue FROM testCases WHERE assignmentID=? AND testCases.type='PUBLIC' OR testCases.type='HIDDEN'", (assignmentID,)).fetchall()
