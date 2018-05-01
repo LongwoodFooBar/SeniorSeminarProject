@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>C++ Sandbox</title>
+		<title>Test Cases</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles.css')}}">
 		<link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
 	</head>
 	<body>
 		<div>
-			<!-- logo div-->
+			<!--Navigation Bar-->
 		<ul>
 			<li id="nav-logo"> <img id="logo" src="../static/logo.svg"></img></li>
 			<li id="nav-title"><a id="title" href="{{url_for('courses')}}">Courses</a></li>
@@ -23,25 +23,25 @@
 		</div>
 		<h1><b>Test Cases for: {{title}}</b></h1>
 		<form method="POST">
-			<div>
-				<b>INPUT HERE:</b>
-			</div>
+			<h2>Create a New Test Case:</h2>
+			<!--Create new test cases form-->
 			<div class="testCaseInput">
+				<b>Input: </b> &ensp;
 				<input type="text" name="input" placeholder="Input" required/>
-			</div>
-			<br>
-			<div>
-				<b>OUTPUT HERE:</b>
-			</div>
-			<div class="testCaseInput">
+			<br/>
+				<b>Output:</b>
 				<input type="text" name="output" placeholder="Expected Output" required/>
+			<br/>
 			</div>
+			<br/>
 			<div name='errordiv' class='errmsg'>{{error}}</div>
 			<div style="width:100%; left:25%">
 				<button type="submit" name="newTest" value="newTest" style="width:24.7%">Add New Test Case</button></a>
 				<a href="{{url_for('assignmentsID', assignmentID=assignmentID)}}"><button type="button" name="testCases" value="testCases">Return to Assignment</button></a>
 			</div>
 		</form>
+		<br/>
+		<h2>Current Test Cases:</h2>
 		<div class="testCaseTitle">
 			<h3>INPUT</h3>
 		</div>

@@ -13,9 +13,15 @@
 				<img src="{{url_for('static', filename='logo.svg')}}" alt="Avatar" class="avatar">
 			</div>
 			<div class="container">
-			<h2><b>Forgot Password?</b></h2>
-				<label for="username"><b>Enter your Email:</b></label>
-				<input type="text" placeholder="Enter Email" name="username" required>
+			<h2><b>Question</b></h2>
+				
+				<label for="answer"><b>{{question}}</b></label>
+				<input type="text" placeholder="Answer the Security Question." name="answer" required>
+				<label for="password"><b>New Password:</b></label>
+				<input type="password" placeholder="New Password" name="password" required>
+				<label for="password2"><b>Retype New Password:</b></label>
+				<input type="password" placeholder="Retype New Password" name="password2" required>
+
 				<button type="submit" onclick="validate();">Reset Password</button>
 				<label>
 					<div name='errordiv' class='errmsg'>{{loginerror}}</div>
