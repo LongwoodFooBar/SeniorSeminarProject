@@ -546,10 +546,22 @@ def assignmentsID(assignmentID):
 			cfile.close()
 		return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code)
 	elif utype == "INSTRUCTOR":
-		uploads = db.execute("SELECT login.firstName, login.lastName, uploads.fileLocation FROM login NATURAL JOIN uploads WHERE uploads.assignmentID = ?", (assignmentID,)).fetchall()
+		uploads = db.execute("SELECT login.firstName, login.lastName, login.userID, uploads.fileLocation FROM login NATURAL JOIN uploads WHERE uploads.assignmentID = ?", (assignmentID,)).fetchall()
 		print(uploads)
 		if request.method == 'POST':
-			if request.form['sandbox'] == 'runTest':
+			if request.form['sandbox'] == 'compile':
+				userID = request.form['student']
+				for u in uploads:
+					if u[2] == userID:
+						filename = u[3]
+				os.system('g++ -Wall %s -o %s 2> %s' % (filename, exe, ofilename))
+				if os.path.exists(ofilename):
+					opfile = open(ofilename, "r")
+					output = opfile.read()
+					opfile.close()
+					os.remove(ofilename)
+				return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, uploads=uploads)
+			elif request.form['sandbox'] == 'runCases':
 				pass
 		return render_template("profAssignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, uploads=uploads)
 
@@ -589,7 +601,7 @@ def editAssignment(assignmentID):
 	if request.method == 'POST':
 		title = request.form['title']
 		body = request.form['assignmentDesc']
-		unfdate = request.form['dueDate']
+		undate = request.form['dueDate']
 		unfdate = undate.split("/")
 		if len(unfdate[0]) == 1:
 			unfdate[0] = "0" + unfdate[0]
