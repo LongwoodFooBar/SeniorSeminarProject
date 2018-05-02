@@ -24,6 +24,8 @@
 			<h1>{{title}}</h1>
 			<h2>Due Date: {{date}}</h2>
 			<p>{{body}}</p>
+			<h2>Grade: {{grade}}</h2>
+			<h2>Comment: {{comment}}</h2>
 		</div>
 
 		<!--Buttons to compile, run, upload, and test-->
@@ -33,7 +35,7 @@
 					<button type="submit" name="sandbox" value="compile">Compile</button>
 					<button type="submit" name="sandbox" value="run">Run</button>
 					<button type="submit" name="sandbox" value="runTest">Run Test Cases</button>
-					<button type="submit" name="sandbox" value="save">Save</button>
+					<button type="submit" name="sandbox" value="save" onclick="alert('Saved!')">Save</button>
 					<div id="uploadBox" style="display:inline">
 					<button type="submit" name="sandbox" value="upload">Upload</button>
 					<input type="file" name="uploadfile" style="width:19.7%"></input>
@@ -59,7 +61,7 @@
 			<!--Text boxes for code, input, and output-->
 		   	<div>
       				<label for="code" style="width:59%"><b>CODE HERE:</b></label>
-      				<label for="cin" style="display:inline-block; width:59.5%; float:left"><b>INPUT HERE:</b></label><br/>
+      				<label for="cin" style="display:inline-block; width:40%; float:right"><b>INPUT HERE:</b></label><br/>
 				<textarea type="text" id="code" name="code" class="codeBox" onkeydown="tab(this, event);">{{code}}</textarea>
 
       				<textarea type="text" name="cin" class="inputBox" placeholder="Input Values Here."></textarea>

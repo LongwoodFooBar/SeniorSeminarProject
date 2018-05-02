@@ -1,0 +1,40 @@
+TODO:
+TEST CASES - HEATHER
+FORGOT PASSWORD: QUESTION AND ANSWER - JACOB
+FORGOT PASSWORD VALIDATION
+SUBMISSION OF PROJECTS
+SANDBOX THE SANDBOX WITH VAGRANT
+PROFESSOR VIEW OF ASSIGNMENTS
+USER CREATION VALIDATION
+EMAIL VERIFICATION
+MANUAL
+TEST CASES NEED ASSIGNMENT ID - HEATHER
+TEST CASES STYLING - HEATHER
+ERROR DIVS - HEATHER
+FIX INFILE IN SANDBOX
+
+SERVER TABLE OF CONTENTS:
+checkLogged()
+checkInstructor()
+checkTeaches()
+checkOwnsAssign()
+valiDate()
+connectDB()
+getDB()
+allowedFile()
+home()
+root()
+login()
+logout()
+signup()
+forgot()
+courses()
+sandbox()
+create()
+editCourse()
+assignments()
+createAssignment()
+editAssignment()
+faq()
+about()
+closeDB()
