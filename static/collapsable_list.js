@@ -1,3 +1,5 @@
+/*Code adapted from code found at https://www.w3schools.com/howto/howto_js_topnav.asp*/
+
 var coll = document.getElementsByClassName("collapsible");
 var i;
 
