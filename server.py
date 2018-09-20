@@ -414,7 +414,18 @@ def assignmentsID(assignmentID):
 				infile = open(ifilename, "w")
 				infile.write(inp)
 				infile.close()
-			elif request.form['sandbox'] == 'runTest':
+			if request.form['sandbox'] == 'runTest':
+				if language == "C++":
+					os.system('g++ -Wall %s -o %s 2> %s' % (filename, exe, ofilename))
+					if os.path.exists(ofilename):
+						opfile = open(ofilename, "r")
+						output = opfile.read()
+						opfile.close()
+						os.remove(ofilename)
+				elif language == "Go":
+					pass
+				elif language == "Python":
+					pass
 				userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
 				tests = db.execute("SELECT testCases.inputValue, testCases.outputValue FROM testCases NATURAL JOIN login WHERE assignmentID = ? AND (type = 'PUBLIC' OR (type = 'PRIVATE' AND userID = ?))", (assignmentID, userID)).fetchall()
 				diffFile = "./userdirs/%s/diffFile" % session['username']
@@ -444,16 +455,19 @@ def assignmentsID(assignmentID):
 				outfile.close()
 				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output, language=language)
 			elif request.form['sandbox'] == 'assignment':
-				profUser = db.execute("SELECT login.email FROM login JOIN class ON login.userID=class.instructorID JOIN assignment ON class.classID=assignment.classID WHERE assignment.assignmentID = ?", (assignmentID,)).fetchall()[0][0]
-				savelocation = "./userdirs/%s/assignment%s-%s.cpp" % (profUser, assignmentID, userID)
-				submitFile = open(savelocation, "w")
-				submitFile.write(code)
-				submitFile.close()
+				if language == "C++":
+					os.system('g++ -Wall %s -o %s 2> %s' % (filename, exe, ofilename))
+					if os.path.exists(ofilename):
+						opfile = open(ofilename, "r")
+						output = opfile.read()
+						opfile.close()
+						os.remove(ofilename)
+				elif language == "Go":
+					pass
+				elif language == "Python":
+					pass
 				userID = db.execute("SELECT userID FROM login WHERE email = ?", (session['username'],)).fetchall()[0][0]
 				submitted = db.execute("SELECT uploadID FROM uploads WHERE assignmentID = ? AND userID = ?", (assignmentID, userID)).fetchall()
-				if not submitted:
-					db.execute("INSERT INTO uploads(userID, assignmentID, fileLocation, type) VALUES(?, ?, ?, 'SUBMISSION')", (userID, assignmentID, savelocation))
-					db.commit()
 				tests = db.execute("SELECT testCases.inputValue, testCases.outputValue FROM testCases NATURAL JOIN login WHERE assignmentID = ? AND (type = 'PUBLIC' OR type = 'HIDDEN')", (assignmentID, userID)).fetchall()
 				diffFile = "./userdirs/%s/diffFile" % session['username']
 				if os.path.exists(diffFile):
