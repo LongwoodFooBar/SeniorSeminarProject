@@ -32,14 +32,7 @@
 		<form method="POST" enctype=multipart/form-data >
 			<div style="width:100%; right:0.6%">
 				<nav class="testCaseBtn">
-					<button type="submit" name="sandbox" value="compile">Compile</button>
-					<button type="submit" name="sandbox" value="run">Run</button>
 					<button type="submit" name="sandbox" value="runTest">Run Test Cases</button>
-					<button type="submit" name="sandbox" value="save" onclick="alert('Saved!')">Save</button>
-					<div id="uploadBox" style="display:inline">
-					<button type="submit" name="sandbox" value="upload">Upload</button>
-					<input type="file" name="uploadfile" style="width:19.7%"></input>
-					</div>
 					<button type="submit" name="sandbox" value="assignment" style="width:20%; float:right">Submit Assignment</button>
 				</nav>
 			</div>
@@ -54,6 +47,14 @@
 					<option value="300">300</option>
 					<option value="600">600</option>
 					<option value="1200">1200</option>
+				</select>
+			</div>
+			<div>
+				<b>Select Language</b>
+				<select>
+					<option value="C++"{% if language="C++" %} selected=true {% endif %}>C++</option>
+					<option value="Python"{% if language="Python" %} selected=true {% endif %}>Python</option>
+					<option value="C++"{% if language="Go" %} selected=true {% endif %}>Go</option>
 				</select>
 			</div>
 
