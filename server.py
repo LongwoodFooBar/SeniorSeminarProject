@@ -382,9 +382,11 @@ def assignmentsID(assignmentID):
 		else:
 			completed = 0
 		filename = ""
+		language = "C++"
 		fexist = db.execute("SELECT fileLocation FROM uploads WHERE userID=? AND assignmentID=?", (userID, assignmentID)).fetchall()
 		if fexist:
 			filename = fexist[0][0]
+			language = db.execute("SELECT language FROM uploads WHERE userID=? AND assignmentID=?", (userID, assignmentID)).fetchall()[0][0]
 		ifilename = './userdirs/%s/infile' % session['username']
 		ofilename = './userdirs/%s/outfile' % session['username']
 		exe = './userdirs/%s/assignment%s-%s' % (session['username'], assignmentID, userID)
