@@ -396,6 +396,7 @@ def assignmentsID(assignmentID):
 			comment = ugrade[0][1]
 		if request.method == "POST":
 			language = request.form['language']
+			print(language)
 			if not checkToday(unfdate):
 				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, error="Overdue", language=language)
 			if language == "C++":
@@ -405,7 +406,6 @@ def assignmentsID(assignmentID):
 			elif language == "Go":
 				filename = './userdirs/%s/assignment%s-%s.go' % (session['username'], assignmentID, userID)
 			print(filename)
-			print(language)
 			code = request.form['code']
 			inp = request.form.get('cin')
 			timeout = int(request.form['timeout'])
