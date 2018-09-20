@@ -398,7 +398,7 @@ def assignmentsID(assignmentID):
 			language = request.form['language']
 			if language == "C++":
 				filename = './userdirs/%s/assignment%s-%s.cpp' % (session['username'], assignmentID, userID)
-			elif language == "Python"
+			elif language == "Python":
 				filename = './userdirs/%s/assignment%s-%s.py' % (session['username'], assignmentID, userID)
 			elif language == "Go":
 				filename = './userdirs/%s/assignment%s-%s.go' % (session['username'], assignmentID, userID)
