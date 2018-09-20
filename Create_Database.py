@@ -5,7 +5,7 @@ import sqlite3
 
 # Create the schema
 def createSchema():
-	conn = sqlite3.connect('foobar.db')
+	conn = sqlite3.connect('acm.db')
 	c = conn.cursor()
 
 	c.execute('''CREATE TABLE IF NOT EXISTS login (

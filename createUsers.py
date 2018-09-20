@@ -7,7 +7,7 @@ from hashlib import md5
 
 # Create the schema
 def createUsers():
-	conn = sqlite3.connect('foobar.db')
+	conn = sqlite3.connect('acm.db')
 	c = conn.cursor()
 
 	password = md5("password".encode('utf-8')).hexdigest()
@@ -17,8 +17,8 @@ def createUsers():
 		os.makedirs(userdir)
 
 	password = md5("password".encode('utf-8')).hexdigest()
-	c.execute('INSERT INTO login(firstName, lastName, password, email, position, question, answer) VALUES("First", "Team", ?, "Team1@gmail.com", "STUDENT", "petName", "Captain")',  (password,))
-	userdir = r'./userdirs/Team1@gmail.com'
+	c.execute('INSERT INTO login(firstName, lastName, password, email, position, question, answer, score) VALUES("First", "Team", ?, "Team1", "STUDENT", "petName", "Captain", 0)',  (password,))
+	userdir = r'./userdirs/Team1'
 	if not os.path.exists(userdir):
 		os.makedirs(userdir)
 	
