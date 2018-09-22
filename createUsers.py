@@ -21,12 +21,20 @@ def createUsers():
 	userdir = r'./userdirs/Team1'
 	if not os.path.exists(userdir):
 		os.makedirs(userdir)
+
+	password = md5("password".encode('utf-8')).hexdigest()
+	c.execute('INSERT INTO login(firstName, lastName, password, email, position, question, answer, score) VALUES("Second", "Team", ?, "Team2", "STUDENT", "petName", "Captain", 0)',  (password,))
+	userdir = r'./userdirs/Team1'
+	if not os.path.exists(userdir):
+		os.makedirs(userdir)
 	
 	c.execute('INSERT INTO class(instructorID, title, section, semester, year) VALUES(1, "Programming Competition 2018", 1, "Fall", 2018)')
 	
 	c.execute('INSERT INTO takes(userID, classID) VALUES(2, 1)')
+	c.execute('INSERT INTO takes(userID, classID) VALUES(3, 1)')
 
-	c.execute('INSERT INTO assignment(title, body, classID, dueDate) VALUES("Problem #1","Placeholder", 1, "2018-1-10")')
+
+	c.execute('INSERT INTO assignment(title, body, classID, dueDate) VALUES("Problem #1","Placeholder", 1, "2018-10-10")')
 
 
 	conn.commit()

@@ -396,16 +396,15 @@ def assignmentsID(assignmentID):
 			comment = ugrade[0][1]
 		if request.method == "POST":
 			language = request.form['language']
-			print(language)
 			if not checkToday(unfdate):
 				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, error="Overdue", language=language)
 			if language == "C++":
 				filename = './userdirs/%s/assignment%s-%s.cpp' % (session['username'], assignmentID, userID)
+				exe = './userdirs/%s/assignment%s-%s' % (session['username'], assignmentID, userID)
 			elif language == "Python":
 				filename = './userdirs/%s/assignment%s-%s.py' % (session['username'], assignmentID, userID)
 			elif language == "Go":
 				filename = './userdirs/%s/assignment%s-%s.go' % (session['username'], assignmentID, userID)
-			print(filename)
 			code = request.form['code']
 			inp = request.form.get('cin')
 			timeout = int(request.form['timeout'])
@@ -418,23 +417,27 @@ def assignmentsID(assignmentID):
 				infile.close()
 			if request.form['sandbox'] == 'runTest':
 				if language == "C++":
-					os.system('g++ -Wall %s -o %s 2> %s' % (filename, exe, ofilename))
+					os.system('g++ %s -o %s 2> %s' % (filename, exe, ofilename))
 					if os.path.exists(ofilename):
 						opfile = open(ofilename, "r")
 						output = opfile.read()
 						opfile.close()
-						os.remove(ofilename)
+						if output:
+							os.remove(ofilename)
+						#RENDER ERROR
 				elif language == "Go":
 					pass
 				elif language == "Python":
 					pass
 				userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
+				submitted = db.execute("SELECT uploadID FROM uploads WHERE assignmentID = ? AND userID = ?", (assignmentID, userID)).fetchall()
+				if not submitted:
+					db.execute("INSERT INTO uploads(userID, assignmentID, fileLocation, type, language, completed) VALUES(?, ?, ?, 'SUBMISSION', ?, 0)", (userID, assignmentID, filename, language))
+					db.commit()
 				tests = db.execute("SELECT testCases.inputValue, testCases.outputValue FROM testCases NATURAL JOIN login WHERE assignmentID = ? AND (type = 'PUBLIC' OR (type = 'PRIVATE' AND userID = ?))", (assignmentID, userID)).fetchall()
 				diffFile = "./userdirs/%s/diffFile" % session['username']
 				if os.path.exists(diffFile):
 					os.remove(diffFile)
-				if os.path.exists(ofilename):
-					os.remove(ofilename)
 				eOutFile = "./userdirs/%s/expectedOut" % session['username']
 				eOut = open(eOutFile, "w")
 				for t in tests:
@@ -463,19 +466,21 @@ def assignmentsID(assignmentID):
 						opfile = open(ofilename, "r")
 						output = opfile.read()
 						opfile.close()
-						os.remove(ofilename)
+						if output:
+							os.remove(ofilename)
 				elif language == "Go":
 					pass
 				elif language == "Python":
 					pass
 				userID = db.execute("SELECT userID FROM login WHERE email = ?", (session['username'],)).fetchall()[0][0]
 				submitted = db.execute("SELECT uploadID FROM uploads WHERE assignmentID = ? AND userID = ?", (assignmentID, userID)).fetchall()
-				tests = db.execute("SELECT testCases.inputValue, testCases.outputValue FROM testCases NATURAL JOIN login WHERE assignmentID = ? AND (type = 'PUBLIC' OR type = 'HIDDEN')", (assignmentID, userID)).fetchall()
+				if not submitted:
+					db.execute("INSERT INTO uploads(userID, assignmentID, fileLocation, type, language, completed) VALUES(?, ?, ?, 'SUBMISSION', ?, 0)", (userID, assignmentID, filename, language))
+					db.commit()
+				tests = db.execute("SELECT testCases.inputValue, testCases.outputValue FROM testCases NATURAL JOIN login WHERE assignmentID = ? AND (type = 'PUBLIC' OR type = 'HIDDEN')", (assignmentID,)).fetchall()
 				diffFile = "./userdirs/%s/diffFile" % session['username']
 				if os.path.exists(diffFile):
 					os.remove(diffFile)
-				if os.path.exists(ofilename):
-					os.remove(ofilename)
 				eOutFile = "./userdirs/%s/expectedOut" % session['username']
 				eOut = open(eOutFile, "w")
 				for t in tests:
@@ -498,16 +503,14 @@ def assignmentsID(assignmentID):
 				outfile.close()
 				if not output:
 					#INCREMENT SCORE
-					if not submitted:
-						score = db.execute("SELECT score FROM login WHERE userID=?", (userID)).fetchall()[0][0]
-						db.execute("UPDATE login SET score=?", (score+1))
-						db.execute("INSERT INTO uploads(userID, assignmentID, fileLocation, type, language, completed) VALUES(?, ?, ?, 'SUBMISSION', ?, 1)", (userID, assignmentID, savelocation, language))
+					completed = db.execute("SELECT * from uploads WHERE userID=? AND assignmentID=? AND completed=1", (userID, assignmentID)).fetchall()
+					if not completed:
+						score = db.execute("SELECT score FROM login WHERE userID=?", (userID,)).fetchall()[0][0]
+						db.execute("UPDATE login SET score=? WHERE userID=?", (score+1, userID))
+						db.execute("UPDATE uploads SET completed=1 WHERE userID=? AND assignmentID=?", (userID,assignmentID))
 						db.commit()
-					return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment="COMPLETED", code=code, output=output, language=language)
+						return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment="COMPLETED", code=code, output=output, language=language)
 				elif output:
-					if not submitted:
-						db.execute("INSERT INTO uploads(userID, assignmentID, fileLocation, type, language, completed) VALUES(?, ?, ?, 'SUBMISSION', ?, 0)", (userID, assignmentID, savelocation, language))
-						db.commit()
 					return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output, language=language)
 		if os.path.exists(filename):
 			cfile = open(filename, "r")
@@ -718,6 +721,16 @@ def about():
 	if not checkLogged():
 		return home()
 	return render_template('about.html', user=session['username'])
+
+@app.route('/scoreboard')
+def scoreboard():
+	db = getDB()
+	students = db.execute("SELECT firstName, lastName, score FROM login WHERE position='STUDENT'").fetchall()
+	print(students)
+	board = ""
+	for a in students:
+		board += "<p>%s %s: %d</p>" % (a[0], a[1], a[2])
+	return board
 
 @app.teardown_appcontext
 def closeDB(error):

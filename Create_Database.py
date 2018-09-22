@@ -49,6 +49,7 @@ def createSchema():
 		fileLocation TEXT,
 		type TEXT,
 		completed INTEGER,
+		language TEXT,
 		FOREIGN KEY (userID) REFERENCES login(userID),
 		FOREIGN KEY (assignmentID) REFERENCES assignment(assignmentID)
         ) ''')
