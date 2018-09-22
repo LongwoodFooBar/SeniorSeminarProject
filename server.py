@@ -11,8 +11,8 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config.from_object(__name__)
 app.config.update(dict(
-	SECRET_KEY="foobardongle",
-	DATABASE="foobar.db",
+	SECRET_KEY="acmdongle",
+	DATABASE="acm.db",
 	USERNAME="admin",
 	PASSWORD="default",
 ))
@@ -160,18 +160,6 @@ def signup():
 def forgot():
 	if request.method == "POST":
 		db = getDB()
-		'''email = request.form['username']
-		password = request.form['password']
-		question = request.form['securityQuestion']#MAKE REQUIRED / MAKE A LIST OF QUESTIONS
-		answer = request.form['answer']#MAKE REQUIRED
-		db = getDB()
-		if db.execute("SELECT userID FROM login WHERE question=? AND answer=? AND email=?", (question, answer, email)).fetchall():
-			pw = md5(password.encode('utf-8')).hexdigest()
-			db.execute("UPDATE login SET password = ? WHERE email = ?", (pw, email))
-			db.commit()
-		else:
-			return render_template('forgotpw.html', email = email, question = question, error = 'Question or answer is incorrect')
-		return redirect(url_for('root'))'''
 		email = request.form['username']
 		exists = db.execute("SELECT userID FROM login WHERE email=?", (email,)).fetchall()
 		print(exists)
@@ -227,90 +215,6 @@ def courses():
 				cs[i].append(db.execute("SELECT assignment.title, assignment.assignmentID FROM assignment JOIN class ON class.classID=assignment.classID WHERE class.title=?", (cs[i][0],)).fetchall())
 			return render_template('courses.html', user=session['username'], courses=cs)
 	return redirect(url_for('root'))
-
-@app.route('/sandbox', methods=['GET', 'POST'])
-def sandbox(code='', output=''):
-	if not checkLogged():
-		return home()
-	code = ""
-	output = ""
-	filename = './userdirs/%s/sandbox.cpp' % session['username']
-	ifilename = './userdirs/%s/infile' % session['username']
-	ofilename = './userdirs/%s/outfile' % session['username']
-	exe = './userdirs/%s/sandbox' % session['username']
-	if request.method == 'POST':
-		code = request.form['code']
-		inp = request.form.get('cin')
-		timeout = int(request.form['timeout'])
-		codefile = open(filename, "w")
-		codefile.write(code)
-		codefile.close()
-		if inp:
-			infile = open(ifilename, "w")
-			infile.write(inp)
-			infile.close()
-		if request.form['sandbox'] == 'compile':
-			os.system('g++ -Wall %s -o %s 2> %s' % (filename, exe, ofilename))
-			if os.path.exists(ofilename):
-				opfile = open(ofilename, "r")
-				output = opfile.read()
-				opfile.close()
-				os.remove(ofilename)
-			return render_template('sandbox.html', user=session['username'], code=code, output=output)
-		elif request.form['sandbox'] == 'run':
-			if platform.system() == 'Linux':
-				if inp:
-					exitstat = os.system('timeout %d %s < %s > %s' % (timeout, exe, ifilename, ofilename))
-				else:
-					exitstat = os.system('timeout %d %s > %s' % (timeout, exe, ofilename))
-				if os.WEXITSTATUS(exitstat) == 124:
-					os.system('echo "Program timed out" > %s' % ofilename)
-			elif platform.system() == 'Darwin':
-				if inp:
-					exitstat = os.system('gtimeout %d %s < %s > %s' % (timeout, exe, ifilename, ofilename))
-				else:
-					exitstat = os.system('gtimeout %d ./userdirs/%s/sandbox > ./userdirs/%s/outfile' % (timeout, session['username'], session['username']))
-				if os.WEXITSTATUS(exitstat) == 124:
-					os.system('echo "Program timed out" > %s' % ofilename)
-			if os.path.exists(ofilename):
-				opfile = open(ofilename, "r")
-				output = opfile.read()
-				opfile.close()
-				os.remove(ofilename)
-			if os.path.exists(filename):
-				cfile = open(filename, "r")
-				code = cfile.read()
-				cfile.close()
-			return render_template('sandbox.html', user=session['username'], code=code, output=output)
-		elif request.form['sandbox'] == 'save':
-			return render_template('sandbox.html', user=session['username'], code=code, output=output)
-		elif request.form['sandbox'] == 'upload':
-			if 'uploadfile' not in request.files:
-				return render_template('sandbox.html', user=session['username'], code=code, output=output, error="No file selected")
-			upfile = request.files['uploadfile']
-			if upfile.filename == '':
-				return render_template('sandbox.html', user=session['username'], code=code, output=output, error = "No file selected")
-			if not allowedFile(upfile.filename):
-				return render_template('sandbox.html', user=session['username'], code=code, output=output, error = "Bad filetype")
-			upfile.save(filename)
-			cfile = open(filename, "r")
-			code = cfile.read()
-			cfile.close()
-			return render_template('sandbox.html', user=session['username'], code=code, output=output)
-	if os.path.exists(ofilename):
-		opfile = open(ofilename, "r")
-		output = opfile.read()
-		opfile.close()
-		os.remove(ofilename)
-	if os.path.exists(exe):
-		os.remove(exe)
-	if os.path.exists(ifilename):
-		os.remove(ifilename)
-	if os.path.exists(filename):
-		cfile = open(filename, "r")
-		code = cfile.read()
-		cfile.close()
-	return render_template('sandbox.html', user=session['username'], code=code, output=output)
 
 @app.route('/create', methods=['GET', 'POST'])
 def create():
@@ -471,7 +375,18 @@ def assignmentsID(assignmentID):
 		comment = ""
 		grade = ""
 		userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
-		filename = './userdirs/%s/assignment%s-%s.cpp' % (session['username'], assignmentID, userID)
+		uexist = db.execute("SELECT completed FROM uploads WHERE userID=? AND assignmentID=?", (userID, assignmentID)).fetchall()
+		completed = ""
+		if uexist:
+			completed = uexist[0][0]
+		else:
+			completed = 0
+		filename = ""
+		language = "C++"
+		fexist = db.execute("SELECT fileLocation FROM uploads WHERE userID=? AND assignmentID=?", (userID, assignmentID)).fetchall()
+		if fexist:
+			filename = fexist[0][0]
+			language = db.execute("SELECT language FROM uploads WHERE userID=? AND assignmentID=?", (userID, assignmentID)).fetchall()[0][0]
 		ifilename = './userdirs/%s/infile' % session['username']
 		ofilename = './userdirs/%s/outfile' % session['username']
 		exe = './userdirs/%s/assignment%s-%s' % (session['username'], assignmentID, userID)
@@ -480,8 +395,16 @@ def assignmentsID(assignmentID):
 			grade = ugrade[0][0]
 			comment = ugrade[0][1]
 		if request.method == "POST":
+			language = request.form['language']
 			if not checkToday(unfdate):
-				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, error="Overdue")
+				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, error="Overdue", language=language)
+			if language == "C++":
+				filename = './userdirs/%s/assignment%s-%s.cpp' % (session['username'], assignmentID, userID)
+				exe = './userdirs/%s/assignment%s-%s' % (session['username'], assignmentID, userID)
+			elif language == "Python":
+				filename = './userdirs/%s/assignment%s-%s.py' % (session['username'], assignmentID, userID)
+			elif language == "Go":
+				filename = './userdirs/%s/assignment%s-%s.go' % (session['username'], assignmentID, userID)
 			code = request.form['code']
 			inp = request.form.get('cin')
 			timeout = int(request.form['timeout'])
@@ -492,47 +415,29 @@ def assignmentsID(assignmentID):
 				infile = open(ifilename, "w")
 				infile.write(inp)
 				infile.close()
-			if request.form['sandbox'] == 'compile':
-				os.system('g++ -Wall %s -o %s 2> %s' % (filename, exe, ofilename))
-				if os.path.exists(ofilename):
-					opfile = open(ofilename, "r")
-					output = opfile.read()
-					opfile.close()
-					os.remove(ofilename)
-				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output)
-			elif request.form['sandbox'] == 'run':
-				if platform.system() == 'Linux':
-					if inp:
-						exitstat = os.system('timeout %d %s < %s > %s' % (timeout, exe, ifilename, ofilename))
-					else:
-						exitstat = os.system('timeout %d %s > %s' % (timeout, exe, ofilename))
-					if os.WEXITSTATUS(exitstat) == 124:
-						os.system('echo "Program timed out" > %s' % ofilename)
-				elif platform.system() == 'Darwin':
-					if inp:
-						exitstat = os.system('gtimeout %d %s < %s > %s' % (timeout, exe, ifilename, ofilename))
-					else:
-						exitstat = os.system('gtimeout %d %s > %s' % (timeout, exe, ofilename))
-					if os.WEXITSTATUS(exitstat) == 124:
-						os.system('echo "Program timed out" > %s' % ofilename)
-				if os.path.exists(ofilename):
-					opfile = open(ofilename, "r")
-					output = opfile.read()
-					opfile.close()
-					os.remove(ofilename)
-				if os.path.exists(filename):
-					cfile = open(filename, "r")
-					code = cfile.read()
-					cfile.close()
-				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output)
-			elif request.form['sandbox'] == 'runTest':
+			if request.form['sandbox'] == 'runTest':
+				if language == "C++":
+					os.system('g++ %s -o %s 2> %s' % (filename, exe, ofilename))
+					if os.path.exists(ofilename):
+						opfile = open(ofilename, "r")
+						output = opfile.read()
+						opfile.close()
+						if output:
+							os.remove(ofilename)
+						#RENDER ERROR
+				elif language == "Go":
+					pass
+				elif language == "Python":
+					pass
 				userID = db.execute("SELECT userID FROM login WHERE email=?", (session['username'],)).fetchall()[0][0]
+				submitted = db.execute("SELECT uploadID FROM uploads WHERE assignmentID = ? AND userID = ?", (assignmentID, userID)).fetchall()
+				if not submitted:
+					db.execute("INSERT INTO uploads(userID, assignmentID, fileLocation, type, language, completed) VALUES(?, ?, ?, 'SUBMISSION', ?, 0)", (userID, assignmentID, filename, language))
+					db.commit()
 				tests = db.execute("SELECT testCases.inputValue, testCases.outputValue FROM testCases NATURAL JOIN login WHERE assignmentID = ? AND (type = 'PUBLIC' OR (type = 'PRIVATE' AND userID = ?))", (assignmentID, userID)).fetchall()
 				diffFile = "./userdirs/%s/diffFile" % session['username']
 				if os.path.exists(diffFile):
 					os.remove(diffFile)
-				if os.path.exists(ofilename):
-					os.remove(ofilename)
 				eOutFile = "./userdirs/%s/expectedOut" % session['username']
 				eOut = open(eOutFile, "w")
 				for t in tests:
@@ -553,38 +458,66 @@ def assignmentsID(assignmentID):
 				outfile = open(diffFile, "r")
 				output = outfile.read()
 				outfile.close()
-				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output)
-			elif request.form['sandbox'] == 'save':
-				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output)
-			elif request.form['sandbox'] == 'upload':
-				if 'uploadfile' not in request.files:
-					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output, grade=grade, comment=comment, error="No file selected")
-				upfile = request.files['uploadfile']
-				if upfile.filename == '':
-					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output, error = "No file selected")
-				if not allowedFile(upfile.filename):
-					return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, code=code, output=output, grade=grade, comment=comment, error = "Bad filetype")
-				upfile.save(filename)
-				cfile = open(filename, "r")
-				code = cfile.read()
-				cfile.close()
-				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output)
+				return render_template('assignment.html', user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output, language=language)
 			elif request.form['sandbox'] == 'assignment':
-				profUser = db.execute("SELECT login.email FROM login JOIN class ON login.userID=class.instructorID JOIN assignment ON class.classID=assignment.classID WHERE assignment.assignmentID = ?", (assignmentID,)).fetchall()[0][0]
-				savelocation = "./userdirs/%s/assignment%s-%s.cpp" % (profUser, assignmentID, userID)
-				submitFile = open(savelocation, "w")
-				submitFile.write(code)
-				submitFile.close()
+				if language == "C++":
+					os.system('g++ -Wall %s -o %s 2> %s' % (filename, exe, ofilename))
+					if os.path.exists(ofilename):
+						opfile = open(ofilename, "r")
+						output = opfile.read()
+						opfile.close()
+						if output:
+							os.remove(ofilename)
+				elif language == "Go":
+					pass
+				elif language == "Python":
+					pass
 				userID = db.execute("SELECT userID FROM login WHERE email = ?", (session['username'],)).fetchall()[0][0]
 				submitted = db.execute("SELECT uploadID FROM uploads WHERE assignmentID = ? AND userID = ?", (assignmentID, userID)).fetchall()
 				if not submitted:
-					db.execute("INSERT INTO uploads(userID, assignmentID, fileLocation, type) VALUES(?, ?, ?, 'SUBMISSION')", (userID, assignmentID, savelocation))
+					db.execute("INSERT INTO uploads(userID, assignmentID, fileLocation, type, language, completed) VALUES(?, ?, ?, 'SUBMISSION', ?, 0)", (userID, assignmentID, filename, language))
 					db.commit()
-				return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output)
+				tests = db.execute("SELECT testCases.inputValue, testCases.outputValue FROM testCases NATURAL JOIN login WHERE assignmentID = ? AND (type = 'PUBLIC' OR type = 'HIDDEN')", (assignmentID,)).fetchall()
+				diffFile = "./userdirs/%s/diffFile" % session['username']
+				if os.path.exists(diffFile):
+					os.remove(diffFile)
+				eOutFile = "./userdirs/%s/expectedOut" % session['username']
+				eOut = open(eOutFile, "w")
+				for t in tests:
+					infile = open(ifilename, "w")
+					infile.write(t[0])
+					infile.close()
+					eOut.write(t[1])
+					if platform.system() == 'Linux':
+						exitstat = os.system('timeout %d %s < %s >> %s' % (int(request.form['timeout']), exe, ifilename, ofilename))
+						if os.WEXITSTATUS(exitstat) == 124:
+							os.system('echo "Program timed out on test %s" >> %s' % (t[0], diffFile))
+					elif platform.system() == 'Darwin':
+						exitstat = os.system('gtimeout %d %s < %s >> %s' % (int(request.form['timeout']), exe, ifilename, ofilename))
+						if os.WEXITSTATUS(exitstat) == 124:
+							os.system('echo "Program timed out on test %s" >> %s' % (t[0], diffFile))
+				eOut.close()
+				os.system('diff %s %s > %s' % (ofilename, eOutFile, diffFile))
+				outfile = open(diffFile, "r")
+				output = outfile.read()
+				outfile.close()
+				if not output:
+					#INCREMENT SCORE
+					completed = db.execute("SELECT * from uploads WHERE userID=? AND assignmentID=? AND completed=1", (userID, assignmentID)).fetchall()
+					if not completed:
+						score = db.execute("SELECT score FROM login WHERE userID=?", (userID,)).fetchall()[0][0]
+						db.execute("UPDATE login SET score=? WHERE userID=?", (score+1, userID))
+						db.execute("UPDATE uploads SET completed=1 WHERE userID=? AND assignmentID=?", (userID,assignmentID))
+						db.commit()
+						return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment="COMPLETED", code=code, output=output, language=language)
+				elif output:
+					return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code, output=output, language=language)
 		if os.path.exists(filename):
 			cfile = open(filename, "r")
 			code = cfile.read()
 			cfile.close()
+		if completed:
+			return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment="COMPLETED", code=code)
 		return render_template("assignment.html", user=session['username'], title = a[0][1], body = a[0][2], date = date, assignmentID = assignmentID, grade=grade, comment=comment, code=code)
 	elif utype == "INSTRUCTOR":
 		uploads = db.execute("SELECT login.firstName, login.lastName, login.userID, uploads.fileLocation FROM login NATURAL JOIN uploads WHERE uploads.assignmentID = ?", (assignmentID,)).fetchall()
@@ -788,6 +721,16 @@ def about():
 	if not checkLogged():
 		return home()
 	return render_template('about.html', user=session['username'])
+
+@app.route('/scoreboard')
+def scoreboard():
+	db = getDB()
+	students = db.execute("SELECT firstName, lastName, score FROM login WHERE position='STUDENT'").fetchall()
+	print(students)
+	board = ""
+	for a in students:
+		board += "<p>%s %s: %d</p>" % (a[0], a[1], a[2])
+	return board
 
 @app.teardown_appcontext
 def closeDB(error):

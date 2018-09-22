@@ -5,7 +5,7 @@ import sqlite3
 
 # Create the schema
 def createSchema():
-	conn = sqlite3.connect('foobar.db')
+	conn = sqlite3.connect('acm.db')
 	c = conn.cursor()
 
 	c.execute('''CREATE TABLE IF NOT EXISTS login (
@@ -13,6 +13,7 @@ def createSchema():
 		firstName TEXT,
 		lastName TEXT,
 		password TEXT,
+		score INTEGER,
 		email TEXT UNIQUE,
 		position TEXT,
 		question TEXT,
@@ -47,6 +48,8 @@ def createSchema():
 		assignmentID INTEGER,
 		fileLocation TEXT,
 		type TEXT,
+		completed INTEGER,
+		language TEXT,
 		FOREIGN KEY (userID) REFERENCES login(userID),
 		FOREIGN KEY (assignmentID) REFERENCES assignment(assignmentID)
         ) ''')
