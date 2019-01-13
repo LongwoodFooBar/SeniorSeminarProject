@@ -72,7 +72,3 @@ The pages that are the same regardles of account type are:
 Instructors have the ability to create courses, edit courses, add students to and remove students from courses, create and edit assignments, and create test cases for assignments. They have access to the add course, edit course, create assignment, and edit assignment pages.
 
 ### Student
-
-
-## Contributing
-The project's development is limited to the team members of Longwood FooBar until the end of the spring semester of 2018.
